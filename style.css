@@ -42,22 +42,25 @@ body {
 }
 
 .header {
-    background: rgba(15,23,42,.95);
+    background: rgba(15,23,42,.96);
     color: white;
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding: 15px 0;
+    padding: 10px 0;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
 }
 
 .header h1 {
-    font-size: 2rem;
+    font-size: 1.4rem;
+    line-height: 1.3;
 }
 
 .header h2 {
-    font-size: 1rem;
+    font-size: .85rem;
     font-weight: 400;
-    opacity: .9;
+    opacity: .85;
 }
 
 .header p {
@@ -65,10 +68,11 @@ body {
 }
 
 nav {
-    margin-top: 15px;
+    margin-top: 10px;
     display: flex;
-    gap: 20px;
+    gap: 18px;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 nav a {
@@ -107,8 +111,9 @@ nav a:hover {
 }
 
 .hero-content h1 {
-    font-size: clamp(2rem,5vw,4rem);
+    font-size: clamp(1.9rem,4vw,3.8rem);
     margin-bottom: 15px;
+    text-shadow: 0 4px 20px rgba(0,0,0,.5);
 }
 
 .hero-badges {
@@ -130,9 +135,15 @@ nav a:hover {
     background: var(--accent);
     color: white;
     text-decoration: none;
-    padding: 14px 24px;
-    border-radius: 10px;
+    padding: 14px 28px;
+    border-radius: 12px;
     font-weight: bold;
+    box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    transition: transform .25s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
 }
 
 .section {
@@ -169,7 +180,13 @@ nav a:hover {
     background: var(--card);
     border: 1px solid var(--border);
     padding: 25px;
-    border-radius: 16px;
+    border-radius: 18px;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.info-grid div:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
 }
 
 .info-grid strong {
@@ -214,5 +231,67 @@ footer {
 
     .hero {
         min-height: 80vh;
+    }
+}
+#stats {
+    background: linear-gradient(180deg, rgba(217,119,6,.08), transparent);
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 18px;
+}
+
+.gallery-grid img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 18px;
+    transition: transform .3s ease;
+}
+
+.gallery-grid img:hover {
+    transform: scale(1.03);
+}
+
+#principal {
+    background: var(--card);
+}
+
+#contact {
+    text-align: center;
+}
+
+#contact a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.section h2 {
+    color: var(--accent);
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 1.05rem;
+    }
+
+    .header h2 {
+        font-size: .72rem;
+    }
+
+    nav {
+        gap: 10px;
+        font-size: .9rem;
+    }
+
+    .hero-content h1 {
+        font-size: 2.1rem;
+    }
+
+    .section {
+        padding: 60px 0;
     }
 }
