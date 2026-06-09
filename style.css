@@ -1,5 +1,3 @@
-
-
 * {
     margin: 0;
     padding: 0;
@@ -328,4 +326,168 @@ footer {
 
 html {
     scroll-padding-top: 120px;
+}
+
+/* NOTICE BOARD */
+#notices {
+    background: linear-gradient(180deg, rgba(217,119,6,.08), rgba(217,119,6,.02));
+}
+
+#notices .container {
+    max-width: 1300px;
+}
+
+#notices h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.notice-subtitle {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 35px;
+    opacity: .85;
+}
+
+#notice-container {
+    display: grid;
+    gap: 20px;
+    max-height: 900px;
+    overflow-y: auto;
+    padding-right: 10px;
+    scroll-behavior: smooth;
+}
+
+.notice-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.10);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.notice-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0,0,0,.15);
+}
+
+.notice-high {
+    border-left: 8px solid #dc2626;
+}
+
+.notice-normal {
+    border-left: 8px solid #2563eb;
+}
+
+.notice-category {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.notice-card {
+    position: relative;
+    backdrop-filter: blur(8px);
+}
+
+.notice-category {
+    font-size: .95rem;
+}
+
+.notice-card::after {
+    content: 'ACTIVE';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #16a34a;
+    color: white;
+    font-size: .75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.notice-card h3 {
+    margin-bottom: 12px;
+    line-height: 1.4;
+    font-size: 1.15rem;
+}
+
+.notice-card p {
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.notice-documents {
+    background: rgba(217,119,6,.08);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.notice-date {
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+}
+
+.notice-pdf a {
+    display: inline-block;
+    text-decoration: none;
+    background: var(--accent);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.notice-pdf a:hover {
+    opacity: .9;
+}
+
+.notice-loading {
+    text-align: center;
+    padding: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.notice-footer {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#notice-container {
+    max-width: 1200px;
+    margin: auto;
+    scrollbar-width: thin;
+}
+
+#notice-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+#notice-container::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 999px;
+}
+
+@media (max-width: 768px) {
+    .notice-card {
+        padding: 18px;
+    }
+
+    #notice-container {
+        max-height: 650px;
+    }
+
+    .notice-card h3 {
+        font-size: .95rem;
+    }
 }
