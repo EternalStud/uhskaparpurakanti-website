@@ -234,26 +234,45 @@ body {
     border-radius: 24px;
     background: rgba(0,0,0,.18);
     backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 25px 60px rgba(0,0,0,.35);
 }
 
 .hero-content h1 {
     font-size: clamp(1.9rem,4vw,3.8rem);
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     text-shadow: 0 4px 20px rgba(0,0,0,.5);
+    font-weight: 800;
+    letter-spacing: -.5px;
+}
+
+.hero-content p {
+    opacity: .95;
+    margin-bottom: 6px;
 }
 
 .hero-badges {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin: 25px 0;
+    gap: 12px;
+    margin: 28px 0;
 }
 
 .hero-badges span {
-    background: rgba(255,255,255,.15);
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(10px);
     padding: 10px 16px;
     border-radius: 999px;
+    font-size: .92rem;
+    font-weight: 600;
+    transition: all .25s ease;
+}
+
+.hero-badges span:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,.22);
 }
 
 .btn-primary {
@@ -305,6 +324,58 @@ body {
 
 .about-grid p {
     margin-bottom: 14px;
+}
+
+/* =====================
+   SCHOOL STATS PREVIEW
+   ===================== */
+.school-stats-preview {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.school-stats-preview div {
+    text-align: center;
+    background: linear-gradient(180deg, var(--card), rgba(217,119,6,.05));
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 26px 18px;
+    cursor: pointer;
+    position: relative;
+    transition: all .3s ease;
+    overflow: hidden;
+}
+
+.school-stats-preview div:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 40px rgba(0,0,0,.14);
+    border-color: rgba(217,119,6,.25);
+}
+
+.school-stats-preview strong {
+    display: block;
+    color: var(--accent);
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.school-stats-preview p {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1;
+    color: var(--primary);
+}
+
+.school-stats-preview div::after {
+    content: 'क्लिक कर विवरण देखें';
+    display: block;
+    margin-top: 10px;
+    font-size: .75rem;
+    opacity: .7;
 }
 
 .about-grid img,
@@ -682,6 +753,97 @@ footer {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.stats-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 10001;
+}
+
+.stats-modal.active {
+    display: flex;
+}
+
+.stats-modal-content {
+    width: min(1000px, 95vw);
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.25);
+    position: relative;
+}
+
+.stats-modal-close {
+    position: sticky;
+    top: 0;
+    float: right;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    background: var(--accent);
+    color: white;
+}
+
+#stats-modal-body h3 {
+    color: var(--accent);
+    margin-bottom: 18px;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.stats-table th {
+    background: var(--accent);
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.stats-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.stats-table tr:hover {
+    background: rgba(217,119,6,.05);
+}
+
+.stats-card {
+    position: relative;
+}
+
+.stats-card::before {
+    content: '👆';
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    opacity: .55;
+    font-size: 1rem;
+}
+
+.stats-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(217,119,6,.04), transparent 60%);
+    pointer-events: none;
+}
+
 /* =====================
    GALLERY LIGHTBOX
    ===================== */
@@ -797,12 +959,30 @@ footer {
         grid-template-columns: 1fr;
     }
 
+    .school-stats-preview {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .school-stats-preview p {
+        font-size: 2.3rem;
+    }
+
     .hero {
         min-height: 80vh;
     }
 
     .hero-content h1 {
         font-size: 2.1rem;
+    }
+
+    .hero-badges {
+        gap: 8px;
+    }
+
+    .hero-badges span {
+        font-size: .78rem;
+        padding: 8px 12px;
     }
 
     .section {
@@ -854,6 +1034,20 @@ footer {
 
     #lightbox-image {
         max-width: 100%;
+    }
+    .stats-modal-content {
+        width: 100%;
+        max-height: 90vh;
+        padding: 16px;
+    }
+
+    .stats-table {
+        font-size: .82rem;
+    }
+
+    .stats-table th,
+    .stats-table td {
+        padding: 8px;
     }
 }
 .notice-text.expanded {

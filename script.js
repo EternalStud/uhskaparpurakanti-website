@@ -281,6 +281,158 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadSchoolStats() {
+
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw586WFslTxwTECtYWwu0XWiUD9czAeZ5BDg8zTnRSafE0PgF0PMc8W3rdU1h4BS1rS/exec';
+
+        try {
+
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            const studentCount = document.getElementById('student-count');
+            const teacherCount = document.getElementById('teacher-count');
+            const clerkCount = document.getElementById('clerk-count');
+
+            if (studentCount) studentCount.textContent = data.stats.students;
+            if (teacherCount) teacherCount.textContent = data.stats.teachers;
+            if (clerkCount) clerkCount.textContent = data.stats.clerks;
+
+            const modal = document.getElementById('stats-modal');
+            const modalBody = document.getElementById('stats-modal-body');
+            const closeBtn = document.getElementById('stats-modal-close');
+
+            function openModal(title, content) {
+                modalBody.innerHTML = `<h3>${title}</h3>${content}`;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+
+            const studentsCard = document.getElementById('students-card');
+            const teachersCard = document.getElementById('teachers-card');
+            const clerksCard = document.getElementById('clerks-card');
+
+            if (studentsCard) {
+                studentsCard.addEventListener('click', () => {
+
+                    const totalBoys = data.studentDetails.reduce((sum, item) => sum + Number(item.boys || 0), 0);
+                    const totalGirls = data.studentDetails.reduce((sum, item) => sum + Number(item.girls || 0), 0);
+                    const totalStudents = data.studentDetails.reduce((sum, item) => sum + Number(item.total || 0), 0);
+                    const rows = data.studentDetails.map(item => `
+                        <tr>
+                            <td>${item.class}</td>
+                            <td>${item.section}</td>
+                            <td>${item.boys}</td>
+                            <td>${item.girls}</td>
+                            <td>${item.total}</td>
+                        </tr>
+                    `).join('');
+
+                    openModal(
+                        '📊 कक्षा-वार नामांकन विवरण',
+                        `
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>कक्षा</th>
+                                    <th>सेक्शन</th>
+                                    <th>बालक</th>
+                                    <th>बालिका</th>
+                                    <th>कुल</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                                <tr style="font-weight:bold;background:rgba(217,119,6,.08);">
+                                    <td>योग</td>
+                                    <td>-</td>
+                                    <td>${totalBoys}</td>
+                                    <td>${totalGirls}</td>
+                                    <td>${totalStudents}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        `
+                    );
+                });
+            }
+
+            if (teachersCard) {
+                teachersCard.addEventListener('click', () => {
+
+                    const rows = data.teacherDetails.map(item => `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.category}</td>
+                            <td>${item.subject}</td>
+                        </tr>
+                    `).join('');
+
+                    openModal(
+                        `👨‍🏫 शिक्षक विवरण (कुल ${data.stats.teachers})`,
+                        `
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>नाम</th>
+                                    <th>कोटि</th>
+                                    <th>नियुक्ति विषय</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                        `
+                    );
+                });
+            }
+
+            if (clerksCard) {
+                clerksCard.addEventListener('click', () => {
+
+                    const rows = data.clerkDetails.map(item => `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.designation}</td>
+                        </tr>
+                    `).join('');
+
+                    openModal(
+                        `🏢 कार्यालय कर्मी (कुल ${data.stats.clerks})`,
+                        `
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>नाम</th>
+                                    <th>पदनाम</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                        `
+                    );
+                });
+            }
+
+        } catch (error) {
+            console.error('Stats loading failed:', error);
+        }
+    }
+
     async function updateVisitorCount() {
     const visitorElement = document.getElementById('visitor-count');
     if (!visitorElement) return;
@@ -336,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadNotices();
     loadGallery();
+    loadSchoolStats();
     updateVisitorCount();
     console.log('UCHCH MADHYAMIK VIDYALAYA KAPARPURA website loaded successfully.');
 });

@@ -37,7 +37,6 @@
       <a href="#home">मुख्य पृष्ठ</a>
       <a href="#notices">महत्वपूर्ण सूचनाएँ</a>
       <a href="#about">विद्यालय परिचय</a>
-      <a href="#info">जानकारी</a>
       <a href="#gallery">फोटो गैलरी</a>
       <a href="#contact">संपर्क</a>
     </nav>
@@ -51,7 +50,6 @@
     <a href="#home" class="drawer-link">🏠 मुख्य पृष्ठ</a>
     <a href="#notices" class="drawer-link">📢 महत्वपूर्ण सूचनाएँ</a>
     <a href="#about" class="drawer-link">🏫 विद्यालय परिचय</a>
-    <a href="#info" class="drawer-link">ℹ️ जानकारी</a>
     <a href="#gallery" class="drawer-link">📸 फोटो गैलरी</a>
     <a href="#contact" class="drawer-link">📞 संपर्क</a>
   </nav>
@@ -65,10 +63,14 @@
     <p>Government Senior Secondary School</p>
     <p>Recognized by the Department of Education, Bihar</p>
     <div class="hero-badges">
-      <span>UDISE : 10140616812</span>
-      <span>काँटी, मुजफ्फरपुर</span>
+      <span>🎓 UDISE : 10140616812</span>
+      <span>📝 Matric Code : 51375</span>
+      <span>📚 Inter Code : 31445</span>
+      <span>🏫 कक्षा : IX - XII</span>
+      <span>📝 माध्यम : हिन्दी</span>
+      <span>📖 संकाय : कला एवं विज्ञान</span>
+      <span>✅ संबद्धता : बिहार विद्यालय परीक्षा समिति</span>
     </div>
-    <a href="#about" class="btn-primary">विद्यालय परिचय देखें</a>
   </div>
 </section>
 
@@ -87,27 +89,30 @@
   </div>
 </section>
 
-<section id="stats" class="section">
-  <div class="container">
-    <h2>विद्यालय एक नज़र में</h2>
-    <div class="info-grid">
-      <div><strong>Students</strong><p>233</p></div>
-      <div><strong>Teachers</strong><p>17</p></div>
-      <div><strong>Classes</strong><p>IX - XII</p></div>
-      <div><strong>Established</strong><p>2013</p></div>
-    </div>
-  </div>
-</section>
-
 <!-- FIX 5: Removed extra padding/whitespace from about section -->
 <section id="about" class="section">
   <div class="container">
-    <h2>विद्यालय परिचय</h2>
-    <p class="section-subtitle">About the School</p>
+    <h2>विद्यालय एक नज़र में</h2>
+    <p class="section-subtitle">नामांकन, शिक्षक एवं कार्यालय कर्मियों की जानकारी</p>
     <div class="about-grid">
       <div>
-        <p>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर बिहार सरकार के शिक्षा विभाग के अंतर्गत संचालित एक मान्यता प्राप्त सरकारी विद्यालय है।</p>
-        <p>विद्यालय विद्यार्थियों को गुणवत्तापूर्ण शिक्षा, विज्ञान गतिविधियों, सांस्कृतिक कार्यक्रमों तथा तकनीकी शिक्षा के अवसर प्रदान करता है।</p>
+        <p>नीचे दिए गए कार्ड पर क्लिक कर नामांकन, शिक्षक एवं कार्यालय कर्मियों की विस्तृत जानकारी देखें।</p>
+        <div class="info-grid school-stats-preview">
+          <div id="students-card" class="stats-card">
+            <strong>👨‍🎓 विद्यार्थी</strong>
+            <p id="student-count">...</p>
+          </div>
+
+          <div id="teachers-card" class="stats-card">
+            <strong>👨‍🏫 शिक्षक</strong>
+            <p id="teacher-count">...</p>
+          </div>
+
+          <div id="clerks-card" class="stats-card">
+            <strong>🏢 कार्यालय कर्मी</strong>
+            <p id="clerk-count">...</p>
+          </div>
+        </div>
       </div>
       <div>
         <img src="images/staff.jpg" alt="School Staff">
@@ -116,24 +121,7 @@
   </div>
 </section>
 
-<section id="info" class="section">
-  <div class="container">
-    <h2>विद्यालय जानकारी</h2>
-    <div class="info-grid">
-      <div><strong>UDISE Code</strong><p>10140616812</p></div>
-      <div><strong>Matric Code</strong><p>51375</p></div>
-      <div><strong>Inter Code</strong><p>31445</p></div>
-      <div><strong>District</strong><p>Muzaffarpur</p></div>
-      <div><strong>Block</strong><p>Kanti</p></div>
-      <div><strong>Medium</strong><p>Hindi</p></div>
-      <div><strong>Established</strong><p>2013</p></div>
-      <div><strong>School Category</strong><p>Secondary with Higher Secondary</p></div>
-      <div><strong>Affiliation</strong><p>Bihar School Examination Board</p></div>
-      <div><strong>Streams</strong><p>Arts & Science</p></div>
-      <div><strong>Management</strong><p>Department of Education, Bihar</p></div>
-    </div>
-  </div>
-</section>
+
 
 <section id="highlights" class="section">
   <div class="container">
@@ -200,6 +188,14 @@
     <p><a href="https://maps.app.goo.gl/J5Jp2DG2oXMSZ6RQ7?g_st=ac" target="_blank">📍 View School on Google Maps</a></p>
   </div>
 </section>
+
+<!-- School Stats Modal -->
+<div id="stats-modal" class="stats-modal">
+  <div class="stats-modal-content">
+    <button id="stats-modal-close" class="stats-modal-close">✕</button>
+    <div id="stats-modal-body"></div>
+  </div>
+</div>
 
 <!-- Gallery Lightbox -->
 <div id="gallery-lightbox" class="gallery-lightbox">
