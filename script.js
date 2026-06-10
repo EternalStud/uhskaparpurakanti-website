@@ -101,6 +101,88 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function loadGallery() {
+        const galleryContainer = document.getElementById('gallery-categories');
+        const galleryViewer = document.getElementById('gallery-viewer');
+
+        if (!galleryContainer || !galleryViewer) {
+            return;
+        }
+
+        const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbzojAlGSjnTcE5_BfkbmO4E1ga2ptIct9cbbsOTaf18Pffow9bu1FlIVq5tFzZrLF2R/exec';
+
+        try {
+            const response = await fetch(GALLERY_API_URL);
+            const categories = await response.json();
+
+            if (!categories.length) {
+                galleryContainer.innerHTML = '<div class="gallery-loading">No photos available.</div>';
+                return;
+            }
+
+            galleryContainer.innerHTML = categories.map(category => `
+                <div class="gallery-category-card" data-category="${category.category}">
+                    <img src="${category.cover}" alt="${category.category}">
+                    <div class="gallery-category-info">
+                        <h3>${category.category}</h3>
+                        <div class="gallery-photo-count">📸 ${category.count} Photos</div>
+                    </div>
+                </div>
+            `).join('');
+
+            function renderCategory(category) {
+                galleryViewer.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:20px;">
+                        <h3 class="gallery-viewer-title">📸 ${category.category}</h3>
+                        <button id="close-gallery" class="btn-primary">⬅ सभी श्रेणियाँ देखें</button>
+                    </div>
+
+                    <div class="gallery-viewer-grid">
+                        ${category.photos.map(photo => `
+                            <img src="${photo.url}" alt="${photo.name}" loading="lazy">
+                        `).join('')}
+                    </div>
+                `;
+
+                galleryViewer.style.display = 'block';
+
+                document.getElementById('close-gallery').addEventListener('click', () => {
+                    galleryViewer.style.display = 'none';
+                    document.getElementById('gallery-categories').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                });
+            }
+
+            galleryViewer.style.display = 'none';
+
+            document.querySelectorAll('.gallery-category-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const selected = categories.find(
+                        item => item.category === card.dataset.category
+                    );
+
+                    if (selected) {
+                        renderCategory(selected);
+
+                        setTimeout(() => {
+                            galleryViewer.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }, 100);
+                    }
+                });
+            });
+
+        } catch (error) {
+            console.error('Error loading gallery:', error);
+            galleryContainer.innerHTML = '<div class="gallery-loading">Unable to load gallery.</div>';
+        }
+    }
+
     loadNotices();
+    loadGallery();
     console.log('UCHCH MADHYAMIK VIDYALAYA KAPARPURA website loaded successfully.');
 });
