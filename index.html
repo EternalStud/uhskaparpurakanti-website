@@ -5,182 +5,206 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>उच्चतर माध्यमिक विद्यालय कपरपुरा | UCHCH MADHYAMIK VIDYALAYA KAPARPURA</title>
 <meta name="description" content="Official website of Uchch Madhyamik Vidyalaya Kaparpura, Kanti, Muzaffarpur, Bihar. UDISE Code: 10140616812">
+
+<!-- FIX 9: Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230f172a'/><text y='68' x='50' text-anchor='middle' font-size='60'>🏫</text></svg>">
+
+<!-- FIX 8: Noto Sans Devanagari font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <button id="theme-toggle" class="theme-toggle">🌙</button>
+
+<!-- FIX 1 & 4: Compact header with hamburger -->
 <header class="header">
-<div class="container">
-<h1>उच्चतर माध्यमिक विद्यालय कपरपुरा, कांटी, मुजफ्फरपुर</h1>
-<h2>UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</h2>
-<p>Kanti, Muzaffarpur, Bihar</p>
-<nav>
-<a href="#home">मुख्य पृष्ठ</a>
-<a href="#about">विद्यालय परिचय</a>
-<a href="#info">जानकारी</a>
-<a href="#activities">गतिविधियाँ</a>
-<a href="#gallery">गैलरी</a>
-<a href="#contact">संपर्क</a>
-</nav>
-</div>
+  <div class="container header-inner">
+    <div class="header-text">
+      <h1>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+      <p class="header-english">UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</p>
+      <p class="header-sub">UDISE: 10140616812</p>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- Desktop nav (always visible on desktop) -->
+  <div class="container">
+    <nav class="desktop-nav">
+      <a href="#home">मुख्य पृष्ठ</a>
+      <a href="#notices">महत्वपूर्ण सूचनाएँ</a>
+      <a href="#about">विद्यालय परिचय</a>
+      <a href="#info">जानकारी</a>
+      <a href="#gallery">फोटो गैलरी</a>
+      <a href="#contact">संपर्क</a>
+    </nav>
+  </div>
 </header>
+
+<!-- FIX 1: Mobile drawer nav -->
+<div class="nav-drawer" id="nav-drawer">
+  <button class="drawer-close" id="drawer-close">✕</button>
+  <nav>
+    <a href="#home" class="drawer-link">🏠 मुख्य पृष्ठ</a>
+    <a href="#notices" class="drawer-link">📢 महत्वपूर्ण सूचनाएँ</a>
+    <a href="#about" class="drawer-link">🏫 विद्यालय परिचय</a>
+    <a href="#info" class="drawer-link">ℹ️ जानकारी</a>
+    <a href="#gallery" class="drawer-link">📸 फोटो गैलरी</a>
+    <a href="#contact" class="drawer-link">📞 संपर्क</a>
+  </nav>
+</div>
+<div class="nav-overlay" id="nav-overlay"></div>
+
 <section id="home" class="hero">
-<div class="hero-overlay"></div>
-<div class="hero-content">
-<h1>उच्चतर माध्यमिक विद्यालय कपरपुरा, कांटी, मुजफ्फरपुर</h1>
-<p>Government Senior Secondary School</p>
-<p>Recognized by the Department of Education, Bihar</p>
-<div class="hero-badges">
-<span>UDISE : 10140616812</span>
-<span>Kanti, Muzaffarpur</span>
-</div>
-<a href="#about" class="btn-primary">विद्यालय परिचय देखें</a>
-</div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+    <p>Government Senior Secondary School</p>
+    <p>Recognized by the Department of Education, Bihar</p>
+    <div class="hero-badges">
+      <span>UDISE : 10140616812</span>
+      <span>Kanti, Muzaffarpur</span>
+    </div>
+    <a href="#about" class="btn-primary">विद्यालय परिचय देखें</a>
+  </div>
 </section>
 
 <section id="notices" class="section">
-<div class="container">
-
-<h2>📢 महत्वपूर्ण सूचनाएँ</h2>
-
-<div class="notice-subtitle">
-विद्यालय की नवीनतम सूचनाएँ, नामांकन, परीक्षाएँ, छात्रवृत्ति एवं महत्वपूर्ण घोषणाएँ.
-</div>
-
-<div id="notice-container">
-<div class="notice-loading">
-सूचनाएँ लोड हो रही हैं...
-</div>
-</div>
-
-<div class="notice-footer">
-<a href="#contact" class="btn-primary">
-सहायता हेतु विद्यालय से संपर्क करें
-</a>
-</div>
-
-</div>
+  <div class="container">
+    <h2>📢 महत्वपूर्ण सूचनाएँ</h2>
+    <div class="notice-subtitle">
+      विद्यालय की नवीनतम सूचनाएँ, नामांकन, परीक्षाएँ, छात्रवृत्ति एवं महत्वपूर्ण घोषणाएँ.
+    </div>
+    <div id="notice-container">
+      <div class="notice-loading">सूचनाएँ लोड हो रही हैं...</div>
+    </div>
+    <div class="notice-footer">
+      <a href="#contact" class="btn-primary">सहायता हेतु विद्यालय से संपर्क करें</a>
+    </div>
+  </div>
 </section>
 
 <section id="stats" class="section">
-<div class="container">
-<h2>विद्यालय एक नज़र में</h2>
-<div class="info-grid">
-<div><strong>Students</strong><p>233</p></div>
-<div><strong>Teachers</strong><p>17</p></div>
-<div><strong>Classes</strong><p>IX - XII</p></div>
-<div><strong>Established</strong><p>2013</p></div>
-</div>
-</div>
+  <div class="container">
+    <h2>विद्यालय एक नज़र में</h2>
+    <div class="info-grid">
+      <div><strong>Students</strong><p>233</p></div>
+      <div><strong>Teachers</strong><p>17</p></div>
+      <div><strong>Classes</strong><p>IX - XII</p></div>
+      <div><strong>Established</strong><p>2013</p></div>
+    </div>
+  </div>
 </section>
+
+<!-- FIX 5: Removed extra padding/whitespace from about section -->
 <section id="about" class="section">
-<div class="container">
-<h2>विद्यालय परिचय</h2>
-<p>About the School</p>
-<div class="about-grid">
-<div>
-<p>उच्चतर माध्यमिक विद्यालय कपरपुरा, कांटी, मुजफ्फरपुर बिहार सरकार के शिक्षा विभाग के अंतर्गत संचालित एक मान्यता प्राप्त सरकारी विद्यालय है।</p>
-<p>विद्यालय विद्यार्थियों को गुणवत्तापूर्ण शिक्षा, विज्ञान गतिविधियों, सांस्कृतिक कार्यक्रमों तथा तकनीकी शिक्षा के अवसर प्रदान करता है।</p>
-</div>
-<div>
-<img src="images/staff.jpg" alt="School Staff">
-</div>
-</div>
-</div>
+  <div class="container">
+    <h2>विद्यालय परिचय</h2>
+    <p class="section-subtitle">About the School</p>
+    <div class="about-grid">
+      <div>
+        <p>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर बिहार सरकार के शिक्षा विभाग के अंतर्गत संचालित एक मान्यता प्राप्त सरकारी विद्यालय है।</p>
+        <p>विद्यालय विद्यार्थियों को गुणवत्तापूर्ण शिक्षा, विज्ञान गतिविधियों, सांस्कृतिक कार्यक्रमों तथा तकनीकी शिक्षा के अवसर प्रदान करता है।</p>
+      </div>
+      <div>
+        <img src="images/staff.jpg" alt="School Staff">
+      </div>
+    </div>
+  </div>
 </section>
+
 <section id="info" class="section">
-<div class="container">
-<h2>विद्यालय जानकारी</h2>
-<div class="info-grid">
-<div><strong>UDISE Code</strong><p>10140616812</p></div>
-<div><strong>Matric Code</strong><p>51375</p></div>
-<div><strong>Inter Code</strong><p>31445</p></div>
-<div><strong>District</strong><p>Muzaffarpur</p></div>
-<div><strong>Block</strong><p>Kanti</p></div>
-<div><strong>Medium</strong><p>Hindi</p></div>
-<div><strong>Established</strong><p>2013</p></div>
-<div><strong>School Category</strong><p>Secondary with Higher Secondary</p></div>
-<div><strong>Affiliation</strong><p>Bihar School Examination Board</p></div>
-<div><strong>Streams</strong><p>Arts & Science</p></div>
-<div><strong>Management</strong><p>Department of Education, Bihar</p></div>
-</div>
-</div>
+  <div class="container">
+    <h2>विद्यालय जानकारी</h2>
+    <div class="info-grid">
+      <div><strong>UDISE Code</strong><p>10140616812</p></div>
+      <div><strong>Matric Code</strong><p>51375</p></div>
+      <div><strong>Inter Code</strong><p>31445</p></div>
+      <div><strong>District</strong><p>Muzaffarpur</p></div>
+      <div><strong>Block</strong><p>Kanti</p></div>
+      <div><strong>Medium</strong><p>Hindi</p></div>
+      <div><strong>Established</strong><p>2013</p></div>
+      <div><strong>School Category</strong><p>Secondary with Higher Secondary</p></div>
+      <div><strong>Affiliation</strong><p>Bihar School Examination Board</p></div>
+      <div><strong>Streams</strong><p>Arts & Science</p></div>
+      <div><strong>Management</strong><p>Department of Education, Bihar</p></div>
+    </div>
+  </div>
 </section>
 
 <section id="highlights" class="section">
-<div class="container">
-<h2>मुख्य उपलब्धियाँ एवं विशेषताएँ</h2>
-<div class="info-grid">
-<div>
-<strong>🏆 Academic Excellence 2026</strong>
-<p>वर्ष 2026 में मैट्रिक एवं इंटरमीडिएट दोनों परीक्षाओं में विद्यालय के टॉपर्स ने 90% से अधिक अंक प्राप्त कर उत्कृष्ट शैक्षणिक उपलब्धि हासिल की।</p>
-</div>
-<div>
-<strong>🔬 Science Exhibition</strong>
-<p>विद्यार्थियों ने विज्ञान प्रदर्शनी में सक्रिय सहभागिता प्रदर्शित की।</p>
-</div>
-<div>
-<strong>💻 ICT & Smart Class</strong>
-<p>विद्यालय में ICT Lab एवं स्मार्ट क्लास की सुविधा उपलब्ध है।</p>
-</div>
-<div>
-<strong>🇮🇳 National Celebrations</strong>
-<p>राष्ट्रीय पर्व एवं सांस्कृतिक कार्यक्रमों का नियमित आयोजन किया जाता है।</p>
-</div>
-</div>
-</div>
+  <div class="container">
+    <h2>मुख्य उपलब्धियाँ एवं विशेषताएँ</h2>
+    <div class="info-grid">
+      <div>
+        <strong>🏆 Academic Excellence 2026</strong>
+        <p>वर्ष 2026 में मैट्रिक एवं इंटरमीडिएट दोनों परीक्षाओं में विद्यालय के टॉपर्स ने 90% से अधिक अंक प्राप्त कर उत्कृष्ट शैक्षणिक उपलब्धि हासिल की।</p>
+      </div>
+      <div>
+        <strong>🔬 Science Exhibition</strong>
+        <p>विद्यार्थियों ने विज्ञान प्रदर्शनी में सक्रिय सहभागिता प्रदर्शित की।</p>
+      </div>
+      <div>
+        <strong>💻 ICT & Smart Class</strong>
+        <p>विद्यालय में ICT Lab एवं स्मार्ट क्लास की सुविधा उपलब्ध है।</p>
+      </div>
+      <div>
+        <strong>🇮🇳 National Celebrations</strong>
+        <p>राष्ट्रीय पर्व एवं सांस्कृतिक कार्यक्रमों का नियमित आयोजन किया जाता है।</p>
+      </div>
+    </div>
+  </div>
 </section>
+
 <section id="gallery" class="section">
-<div class="container">
-
-<h2>📸 फोटो गैलरी</h2>
-
-<p class="gallery-subtitle">
-विद्यालय की विभिन्न गतिविधियों, आयोजनों एवं उपलब्धियों की झलकियाँ
-</p>
-
-<div id="gallery-categories" class="gallery-categories">
-<div class="gallery-loading">
-गैलरी लोड हो रही है...
-</div>
-</div>
-
-<div id="gallery-viewer"></div>
-
-</div>
+  <div class="container">
+    <h2>📸 फोटो गैलरी</h2>
+    <p class="gallery-subtitle">विद्यालय की विभिन्न गतिविधियों, आयोजनों एवं उपलब्धियों की झलकियाँ</p>
+    <div id="gallery-categories" class="gallery-categories">
+      <div class="gallery-loading">गैलरी लोड हो रही है...</div>
+    </div>
+    <div id="gallery-viewer"></div>
+  </div>
 </section>
+
 <section id="principal" class="section">
-<div class="container">
-<h2>प्रधानाध्यापक का संदेश</h2>
-<p>Headmaster's Message</p>
-<div class="about-grid">
-<div>
-<p>प्रिय विद्यार्थियों, अभिभावकों एवं आगंतुकों,</p>
-<p>उच्चतर माध्यमिक विद्यालय कपरपुरा में आपका स्वागत है। हमारा उद्देश्य गुणवत्तापूर्ण शिक्षा, नैतिक मूल्यों तथा आधुनिक ज्ञान के माध्यम से विद्यार्थियों के सर्वांगीण विकास को सुनिश्चित करना है।</p>
-<p>हम विद्यालय को शिक्षण, विज्ञान, तकनीक, संस्कृति एवं सामाजिक उत्तरदायित्व के क्षेत्र में उत्कृष्ट बनाने के लिए निरंतर प्रयासरत हैं।</p>
-<p><strong>— अर्जुन कुमार</strong><br>प्रधानाध्यापक</p>
-</div>
-<div>
-<img src="images/staff.jpg" alt="Headmaster and Staff">
-</div>
-</div>
-</div>
+  <div class="container">
+    <h2>प्रधानाध्यापक का संदेश</h2>
+    <p class="section-subtitle">Headmaster's Message</p>
+    <div class="about-grid">
+      <div>
+        <p>प्रिय विद्यार्थियों, अभिभावकों एवं आगंतुकों,</p>
+        <p>उच्चतर माध्यमिक विद्यालय कपरपुरा में आपका स्वागत है। हमारा उद्देश्य गुणवत्तापूर्ण शिक्षा, नैतिक मूल्यों तथा आधुनिक ज्ञान के माध्यम से विद्यार्थियों के सर्वांगीण विकास को सुनिश्चित करना है।</p>
+        <p>हम विद्यालय को शिक्षण, विज्ञान, तकनीक, संस्कृति एवं सामाजिक उत्तरदायित्व के क्षेत्र में उत्कृष्ट बनाने के लिए निरंतर प्रयासरत हैं।</p>
+        <p><strong>— अर्जुन कुमार</strong><br>प्रधानाध्यापक</p>
+      </div>
+      <div>
+        <img src="images/staff.jpg" alt="Headmaster and Staff">
+      </div>
+    </div>
+  </div>
 </section>
+
 <section id="contact" class="section">
-<div class="container">
-<h2>संपर्क</h2>
-<p>उच्चतर माध्यमिक विद्यालय कपरपुरा, कांटी, मुजफ्फरपुर, बिहार</p>
-<p>UDISE: 10140616812</p>
-<p>Block: Kanti | District: Muzaffarpur | State: Bihar</p>
-<p>Government Senior Secondary School</p>
-<p>Matric Code: 51375 | Inter Code: 31445</p>
-<p>Classes: IX to XII | Streams: Arts & Science</p>
-<p><a href="https://maps.app.goo.gl/J5Jp2DG2oXMSZ6RQ7?g_st=ac" target="_blank">📍 View School on Google Maps</a></p>
-</div>
+  <div class="container">
+    <h2>संपर्क</h2>
+    <p>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर, बिहार</p>
+    <p>UDISE: 10140616812</p>
+    <p>Block: Kanti | District: Muzaffarpur | State: Bihar</p>
+    <p>Government Senior Secondary School</p>
+    <p>Matric Code: 51375 | Inter Code: 31445</p>
+    <p>Classes: IX to XII | Streams: Arts & Science</p>
+    <p><a href="https://maps.app.goo.gl/J5Jp2DG2oXMSZ6RQ7?g_st=ac" target="_blank">📍 View School on Google Maps</a></p>
+  </div>
 </section>
+
 <footer>
-<p>© 2026 Uchch Madhyamik Vidyalaya Kaparpura. All Rights Reserved.</p>
+  <p>© 2026 Uchch Madhyamik Vidyalaya Kaparpura. All Rights Reserved.</p>
 </footer>
+
 <script src="script.js"></script>
 </body>
 </html>

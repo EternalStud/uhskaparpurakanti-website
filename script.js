@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const toggleButton = document.getElementById('theme-toggle');
 
-    if (!toggleButton) {
-        console.error('Theme toggle button not found');
-        return;
-    }
+    // =====================
+    // THEME TOGGLE
+    // =====================
+    const toggleButton = document.getElementById('theme-toggle');
 
     function applyTheme(theme) {
         if (theme === 'dark') {
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const savedTheme = localStorage.getItem('school-theme');
-
     if (savedTheme) {
         applyTheme(savedTheme);
     } else {
@@ -28,33 +26,57 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleTheme() {
         const isDark = document.body.classList.contains('dark');
         const newTheme = isDark ? 'light' : 'dark';
-
         applyTheme(newTheme);
         localStorage.setItem('school-theme', newTheme);
-
         toggleButton.style.transform = 'scale(0.92)';
-        setTimeout(() => {
-            toggleButton.style.transform = 'scale(1)';
-        }, 120);
+        setTimeout(() => { toggleButton.style.transform = 'scale(1)'; }, 120);
     }
 
     toggleButton.addEventListener('click', toggleTheme);
     toggleButton.addEventListener('touchstart', toggleTheme, { passive: true });
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    mediaQuery.addEventListener('change', (event) => {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
         if (!localStorage.getItem('school-theme')) {
             applyTheme(event.matches ? 'dark' : 'light');
         }
     });
 
+    // =====================
+    // FIX 1: HAMBURGER MENU
+    // =====================
+    const hamburger = document.getElementById('hamburger');
+    const drawer = document.getElementById('nav-drawer');
+    const overlay = document.getElementById('nav-overlay');
+    const drawerClose = document.getElementById('drawer-close');
+    const drawerLinks = document.querySelectorAll('.drawer-link');
+
+    function openDrawer() {
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    if (hamburger) hamburger.addEventListener('click', openDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    // Close drawer when any nav link is clicked
+    drawerLinks.forEach(link => {
+        link.addEventListener('click', closeDrawer);
+    });
+
+    // =====================
+    // NOTICES
+    // =====================
     async function loadNotices() {
         const noticeContainer = document.getElementById('notice-container');
-
-        if (!noticeContainer) {
-            return;
-        }
+        if (!noticeContainer) return;
 
         const NOTICE_API_URL = 'https://script.google.com/macros/s/AKfycbzJ_s1J02Q3bs9PVV6nREQLacFYUr_p5d9etNChGntnq4RzirSYZBrntZp4IMl2bhrY/exec';
 
@@ -69,24 +91,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             noticeContainer.innerHTML = notices.map(notice => {
                 const priorityClass = notice.priority === 'High' ? 'notice-high' : 'notice-normal';
-
                 return `
                     <div class="notice-card ${priorityClass}">
                         <div class="notice-category">${notice.category || ''}</div>
                         <h3>${notice.title || ''}</h3>
-                        <p>${notice.details || ''}</p>
-
+                        <p class="notice-text">${notice.details || ''}</p>
+                        ${(notice.details || '').length > 250 ? `
+                        <button class="notice-toggle btn-primary" type="button">पूरा पढ़ें ▼</button>
+                        ` : ''}
                         ${notice.documents ? `
                         <div class="notice-documents">
                             <strong>Required Documents:</strong><br>
                             ${notice.documents}
                         </div>` : ''}
-
                         ${notice.lastDate ? `
                         <div class="notice-date">
                             📅 Last Date: ${new Date(notice.lastDate).toLocaleDateString('en-IN')}
                         </div>` : ''}
-
                         ${notice.pdf ? `
                         <div class="notice-pdf">
                             <a href="${notice.pdf}" target="_blank">📎 Download Official Notification</a>
@@ -94,6 +115,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             }).join('');
+            document.querySelectorAll('.notice-toggle').forEach(button => {
+                button.addEventListener('click', () => {
+                    const text = button.parentElement.querySelector('.notice-text');
+
+                    if (text.classList.contains('expanded')) {
+                        text.classList.remove('expanded');
+                        button.textContent = 'पूरा पढ़ें ▼';
+                    } else {
+                        text.classList.add('expanded');
+                        button.textContent = 'कम करें ▲';
+                    }
+                });
+            });
 
         } catch (error) {
             console.error('Error loading notices:', error);
@@ -101,13 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // =====================
+    // FIX 11: GALLERY with always-visible देखें button
+    // =====================
     async function loadGallery() {
         const galleryContainer = document.getElementById('gallery-categories');
         const galleryViewer = document.getElementById('gallery-viewer');
-
-        if (!galleryContainer || !galleryViewer) {
-            return;
-        }
+        if (!galleryContainer || !galleryViewer) return;
 
         const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbzojAlGSjnTcE5_BfkbmO4E1ga2ptIct9cbbsOTaf18Pffow9bu1FlIVq5tFzZrLF2R/exec';
 
@@ -120,12 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // FIX 11: Added always-visible "देखें →" button in the count row
             galleryContainer.innerHTML = categories.map(category => `
                 <div class="gallery-category-card" data-category="${category.category}">
                     <img src="${category.cover}" alt="${category.category}">
                     <div class="gallery-category-info">
                         <h3>${category.category}</h3>
-                        <div class="gallery-photo-count">📸 ${category.count} Photos</div>
+                        <div class="gallery-photo-count">
+                            <span>📸 ${category.count} Photos</span>
+                            <span class="gallery-see-btn">देखें →</span>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -136,21 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3 class="gallery-viewer-title">📸 ${category.category}</h3>
                         <button id="close-gallery" class="btn-primary">⬅ सभी श्रेणियाँ देखें</button>
                     </div>
-
                     <div class="gallery-viewer-grid">
                         ${category.photos.map(photo => `
                             <img src="${photo.url}" alt="${photo.name}" loading="lazy">
                         `).join('')}
                     </div>
                 `;
-
                 galleryViewer.style.display = 'block';
 
                 document.getElementById('close-gallery').addEventListener('click', () => {
                     galleryViewer.style.display = 'none';
                     document.getElementById('gallery-categories').scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                        behavior: 'smooth', block: 'start'
                     });
                 });
             }
@@ -159,18 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.querySelectorAll('.gallery-category-card').forEach(card => {
                 card.addEventListener('click', () => {
-                    const selected = categories.find(
-                        item => item.category === card.dataset.category
-                    );
-
+                    const selected = categories.find(item => item.category === card.dataset.category);
                     if (selected) {
                         renderCategory(selected);
-
                         setTimeout(() => {
-                            galleryViewer.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
-                            });
+                            galleryViewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }, 100);
                     }
                 });
