@@ -19,13 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedTheme) {
         applyTheme(savedTheme);
     } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        applyTheme(prefersDark ? 'dark' : 'light');
+        applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     }
 
     function toggleTheme() {
-        const isDark = document.body.classList.contains('dark');
-        const newTheme = isDark ? 'light' : 'dark';
+        const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
         applyTheme(newTheme);
         localStorage.setItem('school-theme', newTheme);
         toggleButton.style.transform = 'scale(0.92)';
@@ -41,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =====================
-    // FIX 1: HAMBURGER MENU
+    // HAMBURGER MENU
     // =====================
     const hamburger = document.getElementById('hamburger');
     const drawer = document.getElementById('nav-drawer');
@@ -64,10 +62,43 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hamburger) hamburger.addEventListener('click', openDrawer);
     if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
     if (overlay) overlay.addEventListener('click', closeDrawer);
+    drawerLinks.forEach(link => link.addEventListener('click', closeDrawer));
 
-    // Close drawer when any nav link is clicked
-    drawerLinks.forEach(link => {
-        link.addEventListener('click', closeDrawer);
+    // =====================
+    // E: ACTIVE NAV HIGHLIGHT ON SCROLL
+    // =====================
+    const sections = document.querySelectorAll('section[id]');
+    const allNavLinks = document.querySelectorAll('[data-section]');
+
+    function updateActiveNav() {
+        let current = '';
+        const scrollY = window.scrollY + 120;
+
+        sections.forEach(section => {
+            if (scrollY >= section.offsetTop) {
+                current = section.id;
+            }
+        });
+
+        allNavLinks.forEach(link => {
+            link.classList.toggle('nav-active', link.dataset.section === current);
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    updateActiveNav(); // run once on load
+
+    // =====================
+    // L: SCROLL TO TOP
+    // =====================
+    const scrollTopBtn = document.getElementById('scroll-top');
+
+    window.addEventListener('scroll', () => {
+        scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     // =====================
@@ -89,36 +120,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             notices = notices.filter(notice => {
                 if (!notice.expiryDate) return true;
-
                 const expiry = new Date(notice.expiryDate);
                 expiry.setHours(0, 0, 0, 0);
-
                 return expiry >= today;
             });
 
             if (!notices.length) {
-                noticeContainer.innerHTML = '<div class="notice-loading">No active notices available.</div>';
+                noticeContainer.innerHTML = '<div class="notice-loading">कोई सक्रिय सूचना उपलब्ध नहीं है।</div>';
                 return;
             }
 
             noticeContainer.innerHTML = notices.map(notice => {
                 const priorityClass = notice.priority === 'High' ? 'notice-high' : 'notice-normal';
+                const details = notice.details || '';
                 return `
                     <div class="notice-card ${priorityClass}">
                         <div class="notice-category">${notice.category || ''}</div>
                         <h3>${notice.title || ''}</h3>
-                        <p class="notice-text">${notice.details || ''}</p>
-                        ${(notice.details || '').length > 250 ? `
-                        <button class="notice-toggle btn-primary" type="button">पूरा पढ़ें ▼</button>
+                        <p class="notice-text">${details}</p>
+                        ${details.length > 250 ? `
+                        <button class="notice-toggle" type="button">पूरा पढ़ें ▼</button>
                         ` : ''}
                         ${notice.documents ? `
                         <div class="notice-documents">
-                            <strong>आवश्यक दस्तावेज:</strong><br>
-                            ${notice.documents}
+                            <strong>आवश्यक दस्तावेज:</strong><br>${notice.documents}
                         </div>` : ''}
                         ${notice.lastDate ? `
                         <div class="notice-date">
-                            📅 अंतिम तिथि: ${new Date(notice.lastDate).toLocaleDateString('en-IN')}
+                            📅 अंतिम तिथि: ${new Date(notice.lastDate).toLocaleDateString('hi-IN')}
                         </div>` : ''}
                         ${notice.pdf ? `
                         <div class="notice-pdf">
@@ -127,28 +156,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             }).join('');
-            document.querySelectorAll('.notice-toggle').forEach(button => {
+
+            // Expand/collapse toggle
+            noticeContainer.querySelectorAll('.notice-toggle').forEach(button => {
                 button.addEventListener('click', () => {
                     const text = button.parentElement.querySelector('.notice-text');
-
-                    if (text.classList.contains('expanded')) {
-                        text.classList.remove('expanded');
-                        button.textContent = 'पूरा पढ़ें ▼';
-                    } else {
-                        text.classList.add('expanded');
-                        button.textContent = 'कम करें ▲';
-                    }
+                    const expanded = text.classList.toggle('expanded');
+                    button.textContent = expanded ? 'कम करें ▲' : 'पूरा पढ़ें ▼';
                 });
             });
 
         } catch (error) {
             console.error('Error loading notices:', error);
-            noticeContainer.innerHTML = '<div class="notice-loading">Unable to load notices at the moment.</div>';
+            noticeContainer.innerHTML = '<div class="notice-loading">सूचनाएँ लोड नहीं हो सकीं।</div>';
         }
     }
 
     // =====================
-    // FIX 11: GALLERY with always-visible देखें button
+    // GALLERY
     // =====================
     async function loadGallery() {
         const galleryContainer = document.getElementById('gallery-categories');
@@ -164,42 +189,39 @@ document.addEventListener('DOMContentLoaded', () => {
             let currentPhotos = [];
             let currentIndex = 0;
 
-            const lightbox = document.getElementById('gallery-lightbox');
-            const lightboxImage = document.getElementById('lightbox-image');
-            const closeBtn = document.getElementById('lightbox-close');
-            const prevBtn = document.getElementById('lightbox-prev');
-            const nextBtn = document.getElementById('lightbox-next');
+            const lightbox    = document.getElementById('gallery-lightbox');
+            const lightboxImg = document.getElementById('lightbox-image');
+            const closeBtn    = document.getElementById('lightbox-close');
+            const prevBtn     = document.getElementById('lightbox-prev');
+            const nextBtn     = document.getElementById('lightbox-next');
 
             function openLightbox(index) {
-                if (!currentPhotos.length || !lightboxImage || !lightbox) return;
                 currentIndex = index;
-                lightboxImage.src = currentPhotos[currentIndex].url;
+                lightboxImg.src = currentPhotos[currentIndex].url;
                 lightbox.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
 
             function closeLightbox() {
-                if (!lightbox) return;
                 lightbox.classList.remove('active');
                 document.body.style.overflow = '';
             }
 
-            function showPrevious() {
+            function showPrev() {
                 currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
-                lightboxImage.src = currentPhotos[currentIndex].url;
+                lightboxImg.src = currentPhotos[currentIndex].url;
             }
 
             function showNext() {
                 currentIndex = (currentIndex + 1) % currentPhotos.length;
-                lightboxImage.src = currentPhotos[currentIndex].url;
+                lightboxImg.src = currentPhotos[currentIndex].url;
             }
 
             if (!categories.length) {
-                galleryContainer.innerHTML = '<div class="gallery-loading">No photos available.</div>';
+                galleryContainer.innerHTML = '<div class="gallery-loading">कोई फोटो उपलब्ध नहीं है।</div>';
                 return;
             }
 
-            // FIX 11: Added always-visible "देखें →" button in the count row
             galleryContainer.innerHTML = categories.map(category => `
                 <div class="gallery-category-card" data-category="${category.category}">
                     <img src="${category.cover}" alt="${category.category}">
@@ -214,58 +236,54 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
 
             function renderCategory(category) {
+                currentPhotos = category.photos;
                 galleryViewer.innerHTML = `
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:20px;">
                         <h3 class="gallery-viewer-title">📸 ${category.category}</h3>
                         <button id="close-gallery" class="btn-primary">⬅ सभी श्रेणियाँ देखें</button>
                     </div>
                     <div class="gallery-viewer-grid">
-                        ${category.photos.map((photo, index) => `
-                            <img src="${photo.url}" alt="${photo.name}" loading="lazy" data-index="${index}">
+                        ${category.photos.map((photo, i) => `
+                            <img src="${photo.url}" alt="${photo.name}" loading="lazy" data-index="${i}">
                         `).join('')}
                     </div>
                 `;
                 galleryViewer.style.display = 'block';
 
-                currentPhotos = category.photos;
-
-                document.querySelectorAll('.gallery-viewer-grid img').forEach(img => {
-                    img.addEventListener('click', () => {
-                        openLightbox(parseInt(img.dataset.index, 10));
-                    });
+                galleryViewer.querySelectorAll('.gallery-viewer-grid img').forEach(img => {
+                    img.addEventListener('click', () => openLightbox(parseInt(img.dataset.index, 10)));
                 });
 
                 document.getElementById('close-gallery').addEventListener('click', () => {
                     galleryViewer.style.display = 'none';
-                    document.getElementById('gallery-categories').scrollIntoView({
-                        behavior: 'smooth', block: 'start'
-                    });
+                    galleryContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
             }
 
             galleryViewer.style.display = 'none';
 
             if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
-            if (prevBtn) prevBtn.addEventListener('click', showPrevious);
-            if (nextBtn) nextBtn.addEventListener('click', showNext);
+            if (prevBtn)  prevBtn.addEventListener('click', showPrev);
+            if (nextBtn)  nextBtn.addEventListener('click', showNext);
 
-            if (lightbox) {
-                lightbox.addEventListener('click', (e) => {
-                    if (e.target === lightbox) closeLightbox();
-                });
-            }
+            lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
             document.addEventListener('keydown', (e) => {
-                if (!lightbox || !lightbox.classList.contains('active')) return;
-
-                if (e.key === 'Escape') closeLightbox();
-                if (e.key === 'ArrowLeft') showPrevious();
-                if (e.key === 'ArrowRight') showNext();
+                if (!lightbox.classList.contains('active')) return;
+                
+                // Block default page scrolling behavior when shifting lightbox slides
+                if (['ArrowLeft', 'ArrowRight', 'Escape'].includes(e.key)) {
+                    e.preventDefault();
+                }
+                
+                if (e.key === 'Escape')      closeLightbox();
+                if (e.key === 'ArrowLeft')   showPrev();
+                if (e.key === 'ArrowRight')  showNext();
             });
 
-            document.querySelectorAll('.gallery-category-card').forEach(card => {
+            galleryContainer.querySelectorAll('.gallery-category-card').forEach(card => {
                 card.addEventListener('click', () => {
-                    const selected = categories.find(item => item.category === card.dataset.category);
+                    const selected = categories.find(c => c.category === card.dataset.category);
                     if (selected) {
                         renderCategory(selected);
                         setTimeout(() => {
@@ -276,31 +294,130 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } catch (error) {
-            console.error('Error loading gallery:', error);
-            galleryContainer.innerHTML = '<div class="gallery-loading">Unable to load gallery.</div>';
+            console.error('Gallery error:', error);
+            galleryContainer.innerHTML = '<div class="gallery-loading">गैलरी लोड नहीं हो सकी।</div>';
         }
     }
 
-    async function loadSchoolStats() {
-
-        const API_URL = 'https://script.google.com/macros/s/AKfycbw586WFslTxwTECtYWwu0XWiUD9czAeZ5BDg8zTnRSafE0PgF0PMc8W3rdU1h4BS1rS/exec';
+    // =====================
+    // PRINCIPAL SECTION
+    // =====================
+    async function loadPrincipalSection() {
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxRHACdvIq2cdOZsVB8ZcRTSdkrZ-7QuwnwE2diPJH-Sgt14XGqhe58z2p4_IlBnVme/exec';
 
         try {
-
             const response = await fetch(API_URL);
             const data = await response.json();
 
-            const studentCount = document.getElementById('student-count');
-            const teacherCount = document.getElementById('teacher-count');
-            const clerkCount = document.getElementById('clerk-count');
+            const nameEl        = document.getElementById('principal-name');
+            const desigEl       = document.getElementById('principal-designation');
+            const msgContent    = document.getElementById('principal-message-content');
+            const mobileEl      = document.getElementById('principal-mobile');
+            const photoWrap     = document.getElementById('principal-photo-wrap');
+            const staffWrap     = document.getElementById('staff-photo-wrap');
+            const subtitleEl    = document.getElementById('principal-subtitle');
 
-            if (studentCount) studentCount.textContent = data.stats.students;
-            if (teacherCount) teacherCount.textContent = data.stats.teachers;
-            if (clerkCount) clerkCount.textContent = data.stats.clerks;
+            if (msgContent) {
+                msgContent.innerHTML = `
+                    <p id="principal-message">${data.principal?.message || ''}</p>
+                `;
+            }
 
-            const modal = document.getElementById('stats-modal');
+            if (subtitleEl) subtitleEl.textContent = data.principal?.subtitle || '';
+            if (nameEl)     nameEl.textContent  = data.principal?.name || '';
+            if (desigEl)    desigEl.textContent = data.principal?.designation || '';
+
+            if (mobileEl) {
+                if (data.principal?.mobile) {
+                    mobileEl.textContent = `📞 ${data.principal.mobile}`;
+                    mobileEl.style.display = 'block';
+                } else {
+                    mobileEl.style.display = 'none';
+                }
+            }
+
+            if (photoWrap) {
+                if (data.principalPhoto) {
+                    photoWrap.outerHTML = `<img id="principal-photo" src="${data.principalPhoto}" alt="${data.principal?.name || 'प्रधानाध्यापक'}">`;
+                } else {
+                    photoWrap.outerHTML = `<img id="principal-photo" src="images/staff.jpg" alt="प्रधानाध्यापक">`;
+                }
+            }
+
+            if (staffWrap) {
+                if (data.staffPhoto) {
+                    staffWrap.outerHTML = `<img id="staff-group-photo" src="${data.staffPhoto}" alt="विद्यालय शिक्षक समूह">`;
+                } else {
+                    staffWrap.outerHTML = `<img id="staff-group-photo" src="images/staff.jpg" alt="विद्यालय शिक्षक समूह">`;
+                }
+            }
+
+        } catch (error) {
+            console.error('Principal section error:', error);
+            const msgContent = document.getElementById('principal-message-content');
+            if (msgContent) msgContent.innerHTML = '<p style="opacity:.6">संदेश लोड नहीं हो सका।</p>';
+            const pw = document.getElementById('principal-photo-wrap');
+            if (pw) pw.outerHTML = `<img id="principal-photo" src="images/staff.jpg" alt="प्रधानाध्यापक">`;
+            const sw = document.getElementById('staff-photo-wrap');
+            if (sw) sw.outerHTML = `<img id="staff-group-photo" src="images/staff.jpg" alt="विद्यालय स्टाफ">`;
+        }
+    }
+
+    // =====================
+    // SCHOOL STATS
+    // =====================
+    async function loadSchoolStats() {
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw586WFslTxwTECtYWwu0XWiUD9czAeZ5BDg8zTnRSafE0PgF0PMc8W3rdU1h4BS1rS/exec';
+
+        try {
+            const response = await fetch(API_URL);
+            const data = await response.json();
+
+            const statsArea = document.getElementById('stats-cards-area');
+            if (statsArea) {
+                statsArea.innerHTML = `
+                    <div id="students-card" class="stats-card">
+                        <strong>👨‍🎓 विद्यार्थी</strong>
+                        <p id="student-count">${data.stats.students}</p>
+                    </div>
+                    <div id="teachers-card" class="stats-card">
+                        <strong>👨‍🏫 शिक्षक</strong>
+                        <p id="teacher-count">${data.stats.teachers}</p>
+                    </div>
+                    <div id="clerks-card" class="stats-card">
+                        <strong>🏢 कार्यालय कर्मी</strong>
+                        <p id="clerk-count">${data.stats.clerks}</p>
+                    </div>
+                `;
+            }
+
+            const achievementsContainer = document.getElementById('achievements-container');
+            if (achievementsContainer && data.achievements) {
+                const achievements = data.achievements
+                    .filter(item => {
+                        const a = String(item.active || '').toLowerCase();
+                        return a === 'true' || a === 'yes' || a === '1';
+                    })
+                    .sort((a, b) => Number(a.priority || 999) - Number(b.priority || 999));
+
+                if (!achievements.length) {
+                    achievementsContainer.innerHTML = `<div class="achievement-loading">अभी कोई उपलब्धि उपलब्ध नहीं है।</div>`;
+                } else {
+                    achievementsContainer.innerHTML = achievements.map(item => `
+                        <div class="achievement-card achievement-${item.color || 'gold'}">
+                            <div class="achievement-header">
+                                <div class="achievement-icon">${item.icon || '🏆'}</div>
+                                <div class="achievement-title">${item.title || ''}</div>
+                            </div>
+                            <div class="achievement-description">${item.description || ''}</div>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            const modal    = document.getElementById('stats-modal');
             const modalBody = document.getElementById('stats-modal-body');
-            const closeBtn = document.getElementById('stats-modal-close');
+            const closeBtn  = document.getElementById('stats-modal-close');
 
             function openModal(title, content) {
                 modalBody.innerHTML = `<h3>${title}</h3>${content}`;
@@ -313,182 +430,107 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.style.overflow = '';
             }
 
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) closeModal();
-                });
-            }
+            document.getElementById('students-card')?.addEventListener('click', () => {
+                const totalBoys  = data.studentDetails.reduce((s, i) => s + Number(i.boys  || 0), 0);
+                const totalGirls = data.studentDetails.reduce((s, i) => s + Number(i.girls || 0), 0);
+                const totalAll   = data.studentDetails.reduce((s, i) => s + Number(i.total || 0), 0);
+                const rows = data.studentDetails.map(i => `
+                    <tr><td>${i.class}</td><td>${i.section}</td><td>${i.boys}</td><td>${i.girls}</td><td>${i.total}</td></tr>
+                `).join('');
+                openModal('📊 कक्षा-वार नामांकन विवरण', `
+                    <table class="stats-table">
+                        <thead><tr><th>कक्षा</th><th>सेक्शन</th><th>बालक</th><th>बालिका</th><th>कुल</th></tr></thead>
+                        <tbody>${rows}
+                            <tr style="font-weight:bold;background:rgba(217,119,6,.08);">
+                                <td>योग</td><td>-</td><td>${totalBoys}</td><td>${totalGirls}</td><td>${totalAll}</td>
+                            </tr>
+                        </tbody>
+                    </table>`
+                );
+            });
 
-            const studentsCard = document.getElementById('students-card');
-            const teachersCard = document.getElementById('teachers-card');
-            const clerksCard = document.getElementById('clerks-card');
+            document.getElementById('teachers-card')?.addEventListener('click', () => {
+                const rows = data.teacherDetails.map(i => `
+                    <tr><td>${i.name}</td><td>${i.category}</td><td>${i.subject}</td></tr>
+                `).join('');
+                openModal(`👨‍🏫 शिक्षक विवरण (कुल ${data.stats.teachers})`, `
+                    <table class="stats-table">
+                        <thead><tr><th>नाम</th><th>कोटि</th><th>नियुक्ति विषय</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>`
+                );
+            });
 
-            if (studentsCard) {
-                studentsCard.addEventListener('click', () => {
-
-                    const totalBoys = data.studentDetails.reduce((sum, item) => sum + Number(item.boys || 0), 0);
-                    const totalGirls = data.studentDetails.reduce((sum, item) => sum + Number(item.girls || 0), 0);
-                    const totalStudents = data.studentDetails.reduce((sum, item) => sum + Number(item.total || 0), 0);
-                    const rows = data.studentDetails.map(item => `
-                        <tr>
-                            <td>${item.class}</td>
-                            <td>${item.section}</td>
-                            <td>${item.boys}</td>
-                            <td>${item.girls}</td>
-                            <td>${item.total}</td>
-                        </tr>
-                    `).join('');
-
-                    openModal(
-                        '📊 कक्षा-वार नामांकन विवरण',
-                        `
-                        <table class="stats-table">
-                            <thead>
-                                <tr>
-                                    <th>कक्षा</th>
-                                    <th>सेक्शन</th>
-                                    <th>बालक</th>
-                                    <th>बालिका</th>
-                                    <th>कुल</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rows}
-                                <tr style="font-weight:bold;background:rgba(217,119,6,.08);">
-                                    <td>योग</td>
-                                    <td>-</td>
-                                    <td>${totalBoys}</td>
-                                    <td>${totalGirls}</td>
-                                    <td>${totalStudents}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        `
-                    );
-                });
-            }
-
-            if (teachersCard) {
-                teachersCard.addEventListener('click', () => {
-
-                    const rows = data.teacherDetails.map(item => `
-                        <tr>
-                            <td>${item.name}</td>
-                            <td>${item.category}</td>
-                            <td>${item.subject}</td>
-                        </tr>
-                    `).join('');
-
-                    openModal(
-                        `👨‍🏫 शिक्षक विवरण (कुल ${data.stats.teachers})`,
-                        `
-                        <table class="stats-table">
-                            <thead>
-                                <tr>
-                                    <th>नाम</th>
-                                    <th>कोटि</th>
-                                    <th>नियुक्ति विषय</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                        `
-                    );
-                });
-            }
-
-            if (clerksCard) {
-                clerksCard.addEventListener('click', () => {
-
-                    const rows = data.clerkDetails.map(item => `
-                        <tr>
-                            <td>${item.name}</td>
-                            <td>${item.designation}</td>
-                        </tr>
-                    `).join('');
-
-                    openModal(
-                        `🏢 कार्यालय कर्मी (कुल ${data.stats.clerks})`,
-                        `
-                        <table class="stats-table">
-                            <thead>
-                                <tr>
-                                    <th>नाम</th>
-                                    <th>पदनाम</th>
-                                </tr>
-                            </thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                        `
-                    );
-                });
-            }
+            document.getElementById('clerks-card')?.addEventListener('click', () => {
+                const rows = data.clerkDetails.map(i => `
+                    <tr><td>${i.name}</td><td>${i.designation}</td></tr>
+                `).join('');
+                openModal(`🏢 कार्यालय कर्मी (कुल ${data.stats.clerks})`, `
+                    <table class="stats-table">
+                        <thead><tr><th>नाम</th><th>पदनाम</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>`
+                );
+            });
 
         } catch (error) {
-            console.error('Stats loading failed:', error);
+            const achievementsContainer = document.getElementById('achievements-container');
+            if (achievementsContainer) {
+                achievementsContainer.innerHTML = `<div class="achievement-loading">उपलब्धियाँ लोड नहीं हो सकीं।</div>`;
+            }
+            const statsArea = document.getElementById('stats-cards-area');
+            if (statsArea) {
+                statsArea.innerHTML = `<div class="achievement-loading" style="grid-column:1/-1">आँकड़े लोड नहीं हो सके।</div>`;
+            }
+            console.error('Stats error:', error);
         }
     }
 
+    // =====================
+    // VISITOR COUNT
+    // =====================
     async function updateVisitorCount() {
-    const visitorElement = document.getElementById('visitor-count');
-    if (!visitorElement) return;
+        const visitorEl = document.getElementById('visitor-count');
+        if (!visitorEl) return;
 
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxQ20oeRs-fiKEUrrYUY2HD6fiMvjQhh7_NR0m-QmHzYc0JqGRgA871gBFCI1BJYwNq/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxQ20oeRs-fiKEUrrYUY2HD6fiMvjQhh7_NR0m-QmHzYc0JqGRgA871gBFCI1BJYwNq/exec';
 
-    try {
+        try {
+            const today = new Date().toLocaleDateString('en-CA');
+            const lastVisit = localStorage.getItem('uhs-last-visit');
+            const action = lastVisit !== today ? 'visit' : 'get';
 
-        const today = new Date().toLocaleDateString('en-CA');
-        const lastVisit = localStorage.getItem('uhs-last-visit');
+            const response = await fetch(`${API_URL}?action=${action}`);
+            const data = await response.json();
 
-        let data;
+            if (action === 'visit') localStorage.setItem('uhs-last-visit', today);
 
-        // Count only once per day per device
-        if (lastVisit !== today) {
+            const count = Number(data.count || 0);
 
-            const response = await fetch(`${API_URL}?action=visit`);
-            data = await response.json();
-
-            localStorage.setItem('uhs-last-visit', today);
-
-        } else {
-
-            const response = await fetch(`${API_URL}?action=get`);
-            data = await response.json();
-        }
-
-        const count = Number(data.count || 0);
-
-        function formatCount(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
+            function formatCount(n) {
+                if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
+                if (n >= 10000)   return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+                return n.toLocaleString('en-IN');
             }
 
-            if (num >= 10000) {
-                return (num / 1000).toFixed(1).replace('.0', '') + 'K';
-            }
+            visitorEl.textContent = `👥 कुल आगंतुक: ${formatCount(count)}`;
 
-            return num.toLocaleString('en-IN');
+        } catch (error) {
+            visitorEl.textContent = '👥 कुल आगंतुक: --';
         }
-
-        visitorElement.textContent =
-            `👥 कुल आगंतुक: ${formatCount(count)}`;
-
-    } catch (error) {
-
-        console.error('Visitor counter error:', error);
-
-        visitorElement.textContent =
-            '👥 कुल आगंतुक: --';
     }
-}
 
+    // =====================
+    // INIT
+    // =====================
     loadNotices();
     loadGallery();
     loadSchoolStats();
+    loadPrincipalSection();
     updateVisitorCount();
+
     console.log('UCHCH MADHYAMIK VIDYALAYA KAPARPURA website loaded successfully.');
 });

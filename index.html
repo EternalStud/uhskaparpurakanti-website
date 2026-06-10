@@ -6,10 +6,8 @@
 <title>उच्चतर माध्यमिक विद्यालय कपरपुरा | UCHCH MADHYAMIK VIDYALAYA KAPARPURA</title>
 <meta name="description" content="Official website of Uchch Madhyamik Vidyalaya Kaparpura, Kanti, Muzaffarpur, Bihar. UDISE Code: 10140616812">
 
-<!-- FIX 9: Favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230f172a'/><text y='68' x='50' text-anchor='middle' font-size='60'>🏫</text></svg>">
 
-<!-- FIX 8: Noto Sans Devanagari font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
@@ -19,7 +17,9 @@
 <body>
 <button id="theme-toggle" class="theme-toggle">🌙</button>
 
-<!-- FIX 1 & 4: Compact header with hamburger -->
+<!-- L: Scroll to top button -->
+<button id="scroll-top" class="scroll-top" aria-label="ऊपर जाएँ">↑</button>
+
 <header class="header">
   <div class="container header-inner">
     <div class="header-text">
@@ -31,27 +31,25 @@
       <span></span><span></span><span></span>
     </button>
   </div>
-  <!-- Desktop nav (always visible on desktop) -->
-  <div class="container">
-    <nav class="desktop-nav">
-      <a href="#home">मुख्य पृष्ठ</a>
-      <a href="#notices">महत्वपूर्ण सूचनाएँ</a>
-      <a href="#about">विद्यालय परिचय</a>
-      <a href="#gallery">फोटो गैलरी</a>
-      <a href="#contact">संपर्क</a>
-    </nav>
-  </div>
+    <nav class="container" aria-label="Desktop Navigation">
+    <div class="desktop-nav">
+      <a href="#home" data-section="home">मुख्य पृष्ठ</a>
+      <a href="#notices" data-section="notices">महत्वपूर्ण सूचनाएँ</a>
+      <a href="#about" data-section="about">विद्यालय एक नज़र में</a>
+      <a href="#gallery" data-section="gallery">फोटो गैलरी</a>
+      <a href="#contact" data-section="contact">संपर्क</a>
+    </div>
+  </nav>
 </header>
 
-<!-- FIX 1: Mobile drawer nav -->
 <div class="nav-drawer" id="nav-drawer">
   <button class="drawer-close" id="drawer-close">✕</button>
   <nav>
-    <a href="#home" class="drawer-link">🏠 मुख्य पृष्ठ</a>
-    <a href="#notices" class="drawer-link">📢 महत्वपूर्ण सूचनाएँ</a>
-    <a href="#about" class="drawer-link">🏫 विद्यालय परिचय</a>
-    <a href="#gallery" class="drawer-link">📸 फोटो गैलरी</a>
-    <a href="#contact" class="drawer-link">📞 संपर्क</a>
+    <a href="#home" class="drawer-link" data-section="home">🏠 मुख्य पृष्ठ</a>
+    <a href="#notices" class="drawer-link" data-section="notices">📢 महत्वपूर्ण सूचनाएँ</a>
+    <a href="#about" class="drawer-link" data-section="about">📊 विद्यालय एक नज़र में</a>
+    <a href="#gallery" class="drawer-link" data-section="gallery">📸 फोटो गैलरी</a>
+    <a href="#contact" class="drawer-link" data-section="contact">📞 संपर्क</a>
   </nav>
 </div>
 <div class="nav-overlay" id="nav-overlay"></div>
@@ -80,8 +78,11 @@
     <div class="notice-subtitle">
       विद्यालय की नवीनतम सूचनाएँ, नामांकन, परीक्षाएँ, छात्रवृत्ति एवं महत्वपूर्ण घोषणाएँ.
     </div>
+    <!-- A: Skeleton shown initially, replaced by JS -->
     <div id="notice-container">
-      <div class="notice-loading">सूचनाएँ लोड हो रही हैं...</div>
+      <div class="skeleton-card"><div class="skeleton-line wide"></div><div class="skeleton-line medium"></div><div class="skeleton-line short"></div></div>
+      <div class="skeleton-card"><div class="skeleton-line wide"></div><div class="skeleton-line medium"></div><div class="skeleton-line short"></div></div>
+      <div class="skeleton-card"><div class="skeleton-line wide"></div><div class="skeleton-line medium"></div><div class="skeleton-line short"></div></div>
     </div>
     <div class="notice-footer">
       <a href="#contact" class="btn-primary">सहायता हेतु विद्यालय से संपर्क करें</a>
@@ -89,60 +90,41 @@
   </div>
 </section>
 
-<!-- FIX 5: Removed extra padding/whitespace from about section -->
+<!-- H: Brief school intro added above stats -->
 <section id="about" class="section">
   <div class="container">
     <h2>विद्यालय एक नज़र में</h2>
     <p class="section-subtitle">नामांकन, शिक्षक एवं कार्यालय कर्मियों की जानकारी</p>
+
+   
+
     <div class="about-grid">
       <div>
         <p>नीचे दिए गए कार्ड पर क्लिक कर नामांकन, शिक्षक एवं कार्यालय कर्मियों की विस्तृत जानकारी देखें।</p>
-        <div class="info-grid school-stats-preview">
-          <div id="students-card" class="stats-card">
-            <strong>👨‍🎓 विद्यार्थी</strong>
-            <p id="student-count">...</p>
-          </div>
-
-          <div id="teachers-card" class="stats-card">
-            <strong>👨‍🏫 शिक्षक</strong>
-            <p id="teacher-count">...</p>
-          </div>
-
-          <div id="clerks-card" class="stats-card">
-            <strong>🏢 कार्यालय कर्मी</strong>
-            <p id="clerk-count">...</p>
-          </div>
+        <!-- A: Skeleton for stats cards -->
+        <div class="info-grid school-stats-preview" id="stats-cards-area">
+          <div class="skeleton-stat"></div>
+          <div class="skeleton-stat"></div>
+          <div class="skeleton-stat"></div>
         </div>
       </div>
       <div>
-        <img src="images/staff.jpg" alt="School Staff">
+        <div id="staff-photo-wrap" class="skeleton-photo-wide"></div>
       </div>
     </div>
   </div>
 </section>
 
-
-
 <section id="highlights" class="section">
   <div class="container">
-    <h2>मुख्य उपलब्धियाँ एवं विशेषताएँ</h2>
-    <div class="info-grid">
-      <div>
-        <strong>🏆 Academic Excellence 2026</strong>
-        <p>वर्ष 2026 में मैट्रिक एवं इंटरमीडिएट दोनों परीक्षाओं में विद्यालय के टॉपर्स ने 90% से अधिक अंक प्राप्त कर उत्कृष्ट शैक्षणिक उपलब्धि हासिल की।</p>
-      </div>
-      <div>
-        <strong>🔬 Science Exhibition</strong>
-        <p>विद्यार्थियों ने विज्ञान प्रदर्शनी में सक्रिय सहभागिता प्रदर्शित की।</p>
-      </div>
-      <div>
-        <strong>💻 ICT & Smart Class</strong>
-        <p>विद्यालय में ICT Lab एवं स्मार्ट क्लास की सुविधा उपलब्ध है।</p>
-      </div>
-      <div>
-        <strong>🇮🇳 National Celebrations</strong>
-        <p>राष्ट्रीय पर्व एवं सांस्कृतिक कार्यक्रमों का नियमित आयोजन किया जाता है।</p>
-      </div>
+    <h2>🏆 मुख्य उपलब्धियाँ एवं विशेषताएँ</h2>
+    <p class="section-subtitle">विद्यालय की प्रमुख शैक्षणिक, वैज्ञानिक, खेलकूद एवं सांस्कृतिक उपलब्धियाँ</p>
+    <!-- A: Skeleton for achievements -->
+    <div id="achievements-container" class="achievements-grid">
+      <div class="skeleton-achievement"></div>
+      <div class="skeleton-achievement"></div>
+      <div class="skeleton-achievement"></div>
+      <div class="skeleton-achievement"></div>
     </div>
   </div>
 </section>
@@ -151,26 +133,43 @@
   <div class="container">
     <h2>📸 फोटो गैलरी</h2>
     <p class="gallery-subtitle">विद्यालय की विभिन्न गतिविधियों, आयोजनों एवं उपलब्धियों की झलकियाँ</p>
+    <!-- A: Skeleton for gallery -->
     <div id="gallery-categories" class="gallery-categories">
-      <div class="gallery-loading">गैलरी लोड हो रही है...</div>
+      <div class="skeleton-gallery-card"></div>
+      <div class="skeleton-gallery-card"></div>
+      <div class="skeleton-gallery-card"></div>
+      <div class="skeleton-gallery-card"></div>
     </div>
     <div id="gallery-viewer"></div>
   </div>
 </section>
 
+<!-- G: h2 added, subtitle starts empty -->
 <section id="principal" class="section">
   <div class="container">
     <h2>प्रधानाध्यापक का संदेश</h2>
-    <p class="section-subtitle">Headmaster's Message</p>
+    <p id="principal-subtitle" class="section-subtitle"></p>
+
     <div class="about-grid">
       <div>
-        <p>प्रिय विद्यार्थियों, अभिभावकों एवं आगंतुकों,</p>
-        <p>उच्चतर माध्यमिक विद्यालय कपरपुरा में आपका स्वागत है। हमारा उद्देश्य गुणवत्तापूर्ण शिक्षा, नैतिक मूल्यों तथा आधुनिक ज्ञान के माध्यम से विद्यार्थियों के सर्वांगीण विकास को सुनिश्चित करना है।</p>
-        <p>हम विद्यालय को शिक्षण, विज्ञान, तकनीक, संस्कृति एवं सामाजिक उत्तरदायित्व के क्षेत्र में उत्कृष्ट बनाने के लिए निरंतर प्रयासरत हैं।</p>
-        <p><strong>— अर्जुन कुमार</strong><br>प्रधानाध्यापक</p>
+        <!-- A: Skeleton for principal message -->
+        <div id="principal-message-content">
+          <div class="skeleton-principal">
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line wide"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line short"></div>
+          </div>
+        </div>
+        <p style="margin-top:16px;">
+          <strong id="principal-name"></strong><br>
+          <span id="principal-designation"></span>
+        </p>
+        <p id="principal-mobile" style="display:none;"></p>
       </div>
       <div>
-        <img src="images/staff.jpg" alt="Headmaster and Staff">
+        <div id="principal-photo-wrap" class="skeleton-photo-tall"></div>
       </div>
     </div>
   </div>
@@ -189,7 +188,7 @@
   </div>
 </section>
 
-<!-- School Stats Modal -->
+<!-- Stats Modal -->
 <div id="stats-modal" class="stats-modal">
   <div class="stats-modal-content">
     <button id="stats-modal-close" class="stats-modal-close">✕</button>
@@ -205,19 +204,13 @@
   <button id="lightbox-next" class="lightbox-nav">▶</button>
 </div>
 
+
 <footer>
   <div class="footer-content">
-    <div class="footer-left">
-      Made with ❤ by Eternal Student
-    </div>
-
-    <div class="footer-center">
-      © 2026 उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर
-    </div>
-
-    <div class="footer-right" id="visitor-count">
-      👥 कुल आगंतुक: Loading...
-    </div>
+    <div class="footer-left">Made with ❤ by Eternal Student</div>
+    <div class="footer-center">© 2026 उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</div>
+    <!-- I: visitor count given its own row on mobile via CSS -->
+    <div class="footer-right" id="visitor-count">👥 कुल आगंतुक: ...</div>
   </div>
 </footer>
 
