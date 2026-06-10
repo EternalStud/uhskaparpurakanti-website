@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     toggleButton.addEventListener('click', toggleTheme);
-    toggleButton.addEventListener('touchstart', toggleTheme, { passive: true });
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
         if (!localStorage.getItem('school-theme')) {
@@ -82,7 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(NOTICE_API_URL);
-            const notices = await response.json();
+            let notices = await response.json();
+
+            // Auto-hide expired notices
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            notices = notices.filter(notice => {
+                if (!notice.expiryDate) return true;
+
+                const expiry = new Date(notice.expiryDate);
+                expiry.setHours(0, 0, 0, 0);
+
+                return expiry >= today;
+            });
 
             if (!notices.length) {
                 noticeContainer.innerHTML = '<div class="notice-loading">No active notices available.</div>';
@@ -101,12 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         ` : ''}
                         ${notice.documents ? `
                         <div class="notice-documents">
-                            <strong>Required Documents:</strong><br>
+                            <strong>आवश्यक दस्तावेज:</strong><br>
                             ${notice.documents}
                         </div>` : ''}
                         ${notice.lastDate ? `
                         <div class="notice-date">
-                            📅 Last Date: ${new Date(notice.lastDate).toLocaleDateString('en-IN')}
+                            📅 अंतिम तिथि: ${new Date(notice.lastDate).toLocaleDateString('en-IN')}
                         </div>` : ''}
                         ${notice.pdf ? `
                         <div class="notice-pdf">
@@ -149,6 +161,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(GALLERY_API_URL);
             const categories = await response.json();
 
+            let currentPhotos = [];
+            let currentIndex = 0;
+
+            const lightbox = document.getElementById('gallery-lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const closeBtn = document.getElementById('lightbox-close');
+            const prevBtn = document.getElementById('lightbox-prev');
+            const nextBtn = document.getElementById('lightbox-next');
+
+            function openLightbox(index) {
+                if (!currentPhotos.length || !lightboxImage || !lightbox) return;
+                currentIndex = index;
+                lightboxImage.src = currentPhotos[currentIndex].url;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeLightbox() {
+                if (!lightbox) return;
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            function showPrevious() {
+                currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+                lightboxImage.src = currentPhotos[currentIndex].url;
+            }
+
+            function showNext() {
+                currentIndex = (currentIndex + 1) % currentPhotos.length;
+                lightboxImage.src = currentPhotos[currentIndex].url;
+            }
+
             if (!categories.length) {
                 galleryContainer.innerHTML = '<div class="gallery-loading">No photos available.</div>';
                 return;
@@ -161,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="gallery-category-info">
                         <h3>${category.category}</h3>
                         <div class="gallery-photo-count">
-                            <span>📸 ${category.count} Photos</span>
+                            <span>📸 ${category.count} फोटो</span>
                             <span class="gallery-see-btn">देखें →</span>
                         </div>
                     </div>
@@ -175,12 +220,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button id="close-gallery" class="btn-primary">⬅ सभी श्रेणियाँ देखें</button>
                     </div>
                     <div class="gallery-viewer-grid">
-                        ${category.photos.map(photo => `
-                            <img src="${photo.url}" alt="${photo.name}" loading="lazy">
+                        ${category.photos.map((photo, index) => `
+                            <img src="${photo.url}" alt="${photo.name}" loading="lazy" data-index="${index}">
                         `).join('')}
                     </div>
                 `;
                 galleryViewer.style.display = 'block';
+
+                currentPhotos = category.photos;
+
+                document.querySelectorAll('.gallery-viewer-grid img').forEach(img => {
+                    img.addEventListener('click', () => {
+                        openLightbox(parseInt(img.dataset.index, 10));
+                    });
+                });
 
                 document.getElementById('close-gallery').addEventListener('click', () => {
                     galleryViewer.style.display = 'none';
@@ -191,6 +244,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             galleryViewer.style.display = 'none';
+
+            if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+            if (prevBtn) prevBtn.addEventListener('click', showPrevious);
+            if (nextBtn) nextBtn.addEventListener('click', showNext);
+
+            if (lightbox) {
+                lightbox.addEventListener('click', (e) => {
+                    if (e.target === lightbox) closeLightbox();
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (!lightbox || !lightbox.classList.contains('active')) return;
+
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') showPrevious();
+                if (e.key === 'ArrowRight') showNext();
+            });
 
             document.querySelectorAll('.gallery-category-card').forEach(card => {
                 card.addEventListener('click', () => {
@@ -210,7 +281,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function updateVisitorCount() {
+    const visitorElement = document.getElementById('visitor-count');
+    if (!visitorElement) return;
+
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxQ20oeRs-fiKEUrrYUY2HD6fiMvjQhh7_NR0m-QmHzYc0JqGRgA871gBFCI1BJYwNq/exec';
+
+    try {
+
+        const today = new Date().toLocaleDateString('en-CA');
+        const lastVisit = localStorage.getItem('uhs-last-visit');
+
+        let data;
+
+        // Count only once per day per device
+        if (lastVisit !== today) {
+
+            const response = await fetch(`${API_URL}?action=visit`);
+            data = await response.json();
+
+            localStorage.setItem('uhs-last-visit', today);
+
+        } else {
+
+            const response = await fetch(`${API_URL}?action=get`);
+            data = await response.json();
+        }
+
+        const count = Number(data.count || 0);
+
+        function formatCount(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace('.0', '') + 'M';
+            }
+
+            if (num >= 10000) {
+                return (num / 1000).toFixed(1).replace('.0', '') + 'K';
+            }
+
+            return num.toLocaleString('en-IN');
+        }
+
+        visitorElement.textContent =
+            `👥 कुल आगंतुक: ${formatCount(count)}`;
+
+    } catch (error) {
+
+        console.error('Visitor counter error:', error);
+
+        visitorElement.textContent =
+            '👥 कुल आगंतुक: --';
+    }
+}
+
     loadNotices();
     loadGallery();
+    updateVisitorCount();
     console.log('UCHCH MADHYAMIK VIDYALAYA KAPARPURA website loaded successfully.');
 });

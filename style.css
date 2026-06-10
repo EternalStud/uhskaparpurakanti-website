@@ -371,8 +371,42 @@ body {
 footer {
     background: #0f172a;
     color: white;
+    padding: 22px 20px;
+    border-top: 3px solid var(--accent);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+    flex: 1;
+}
+
+.footer-left {
+    text-align: left;
+    font-weight: 600;
+}
+
+.footer-center {
     text-align: center;
-    padding: 30px;
+}
+
+.footer-right {
+    text-align: right;
+}
+
+#visitor-count {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fbbf24;
 }
 
 /* =====================
@@ -649,6 +683,67 @@ footer {
 }
 
 /* =====================
+   GALLERY LIGHTBOX
+   ===================== */
+.gallery-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.gallery-lightbox.active {
+    display: flex;
+}
+
+#lightbox-image {
+    max-width: 90%;
+    max-height: 85vh;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    color: white;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,.15);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+#lightbox-prev {
+    left: 25px;
+}
+
+#lightbox-next {
+    right: 25px;
+}
+
+/* =====================
    OTHER SECTIONS
    ===================== */
 #highlights {
@@ -741,6 +836,25 @@ footer {
         right: 14px;
         bottom: 14px;
     }
+    .footer-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .footer-left,
+    .footer-center,
+    .footer-right {
+        text-align: center;
+    }
+
+    .lightbox-nav {
+        width: 50px;
+        height: 50px;
+    }
+
+    #lightbox-image {
+        max-width: 100%;
+    }
 }
 .notice-text.expanded {
     display: block !important;
@@ -752,4 +866,10 @@ footer {
     margin-bottom: 12px;
     padding: 6px 12px;
     font-size: .9rem;
+}
+
+@media (max-width: 768px) {
+    #visitor-count {
+        font-size: .95rem;
+    }
 }
