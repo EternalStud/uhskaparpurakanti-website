@@ -111,7 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const NOTICE_API_URL = 'https://script.google.com/macros/s/AKfycbzJ_s1J02Q3bs9PVV6nREQLacFYUr_p5d9etNChGntnq4RzirSYZBrntZp4IMl2bhrY/exec';
 
         try {
-            const response = await fetch(NOTICE_API_URL);
+            const response = await fetch(NOTICE_API_URL, {
+                cache: 'no-store'
+            });
             let notices = await response.json();
 
             // Auto-hide expired notices
@@ -183,7 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbzojAlGSjnTcE5_BfkbmO4E1ga2ptIct9cbbsOTaf18Pffow9bu1FlIVq5tFzZrLF2R/exec';
 
         try {
-            const response = await fetch(GALLERY_API_URL);
+            const response = await fetch(GALLERY_API_URL, {
+                cache: 'no-store'
+            });
             const categories = await response.json();
 
             let currentPhotos = [];
@@ -306,7 +310,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const API_URL = 'https://script.google.com/macros/s/AKfycbxRHACdvIq2cdOZsVB8ZcRTSdkrZ-7QuwnwE2diPJH-Sgt14XGqhe58z2p4_IlBnVme/exec';
 
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(API_URL, {
+                cache: 'no-store'
+            });
             const data = await response.json();
 
             const nameEl        = document.getElementById('principal-name');
@@ -370,7 +376,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const API_URL = 'https://script.google.com/macros/s/AKfycbw586WFslTxwTECtYWwu0XWiUD9czAeZ5BDg8zTnRSafE0PgF0PMc8W3rdU1h4BS1rS/exec';
 
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(API_URL, {
+                cache: 'no-store'
+            });
             const data = await response.json();
 
             const statsArea = document.getElementById('stats-cards-area');
