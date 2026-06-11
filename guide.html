@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>वेबसाइट प्रबंधन निर्देशिका — उ.मा.वि. कपरपुरा</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --accent: #d97706;
+    --dark:   #1e293b;
+    --light:  #f8fafc;
+    --border: #e2e8f0;
+    --green:  #16a34a;
+    --red:    #dc2626;
+    --blue:   #2563eb;
+    --warn:   #fff7ed;
+    --warn-border: #fed7aa;
+    --tip:    #f0fdf4;
+    --tip-border: #bbf7d0;
+    --info:   #eff6ff;
+    --info-border: #bfdbfe;
+  }
+
+  body {
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    background: #fff;
+    color: var(--dark);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    body { font-size: 13px; }
+    .cover { min-height: auto; padding: 60px 40px; }
+
+    /* Prevent ugly page splits */
+    .section-header,
+    .access-box,
+    .link-box,
+    .info-box,
+    .tip-box,
+    .warn-box,
+    .flow,
+    .steps,
+    .master-card {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .info-table {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .info-table tr {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    h2,
+    h3,
+    h4 {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      page-break-after: avoid;
+      break-after: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-header {
+      margin-top: 0;
+    }
+
+    /* Better A4 page margins */
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+  }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 0 32px 60px; }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 40px;
+    background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 100%);
+    color: white;
+    page-break-after: always;
+  }
+
+  .cover-icon { font-size: 5rem; margin-bottom: 24px; }
+
+  .cover h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #fbbf24;
+  }
+
+  .cover h2 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    opacity: .85;
+    margin-bottom: 40px;
+  }
+
+  .cover-divider {
+    width: 80px;
+    height: 4px;
+    background: #fbbf24;
+    border-radius: 4px;
+    margin: 28px auto;
+  }
+
+  .cover-meta {
+    font-size: .95rem;
+    opacity: .75;
+    margin-top: 40px;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: .9rem;
+    margin: 6px;
+  }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc {
+    background: var(--light);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px 36px;
+    margin: 48px 0;
+  }
+
+  .toc h2 {
+    color: var(--accent);
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .toc ol {
+    list-style: none;
+    padding: 0;
+  }
+
+  .toc li {
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+  }
+
+  .toc li:last-child { border-bottom: none; }
+
+  .toc-num {
+    background: var(--accent);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 60px 0 28px;
+    padding: 20px 24px;
+    background: #0f172a;
+    border-radius: 14px;
+    color: white;
+  }
+
+  .section-header .sec-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fbbf24;
+    line-height: 1.3;
+  }
+
+  .section-header p {
+    font-size: .85rem;
+    opacity: .75;
+    margin-top: 2px;
+  }
+
+  /* ── SUBSECTION ── */
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin: 28px 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid var(--accent);
+  }
+
+  /* ── LINK BOX ── */
+  .link-box {
+    background: var(--info);
+    border: 1px solid var(--info-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .link-box .link-label {
+    font-weight: 700;
+    color: var(--blue);
+    font-size: .85rem;
+    white-space: nowrap;
+  }
+
+  .link-box a {
+    color: var(--blue);
+    word-break: break-all;
+    font-size: .88rem;
+    font-weight: 600;
+  }
+
+  /* ── FLOWCHART ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 24px 0;
+  }
+
+  .flow-step {
+    background: white;
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 24px;
+    text-align: center;
+    width: 100%;
+    max-width: 480px;
+    font-weight: 600;
+    font-size: .95rem;
+    position: relative;
+  }
+
+  .flow-step .step-num {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: .75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flow-step sub {
+    display: block;
+    font-size: .78rem;
+    font-weight: 400;
+    opacity: .7;
+    margin-top: 4px;
+  }
+
+  .flow-arrow {
+    font-size: 1.5rem;
+    color: var(--accent);
+    line-height: 1;
+    margin: 4px 0;
+  }
+
+  .flow-step.green { border-color: var(--green); }
+  .flow-step.green .step-num { background: var(--green); }
+  .flow-step.blue  { border-color: var(--blue); }
+  .flow-step.blue  .step-num { background: var(--blue); }
+
+  /* ── STEPS LIST ── */
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+
+  .steps li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps li:last-child { border-bottom: none; }
+
+  .step-circle {
+    background: var(--accent);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: .85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .steps li .text { flex: 1; }
+  .steps li .text strong { display: block; font-size: .95rem; }
+  .steps li .text span { font-size: .85rem; opacity: .75; }
+
+  /* ── TABLE ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: .9rem;
+    table-layout: fixed;
+  }
+
+  .info-table th {
+    background: var(--dark);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  .info-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    word-break: break-word;
+  }
+
+  .info-table tr:nth-child(even) td { background: var(--light); }
+
+  .info-table .field-name {
+    font-weight: 700;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+
+  .info-table .required {
+    color: var(--red);
+    font-size: .75rem;
+    font-weight: 700;
+  }
+
+  .info-table .optional {
+    color: var(--green);
+    font-size: .75rem;
+    font-weight: 700;
+  }
+
+  /* ── BOXES ── */
+  .warn-box {
+    background: var(--warn);
+    border: 1px solid var(--warn-border);
+    border-left: 4px solid #f97316;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .9rem;
+  }
+
+  .warn-box strong { color: #c2410c; }
+
+  .tip-box {
+    background: var(--tip);
+    border: 1px solid var(--tip-border);
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .9rem;
+  }
+
+  .tip-box strong { color: #15803d; }
+
+  .info-box {
+    background: var(--info);
+    border: 1px solid var(--info-border);
+    border-left: 4px solid var(--blue);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .9rem;
+  }
+
+  .info-box strong { color: #1d4ed8; }
+
+  /* ── ACCESS SHARE BOX ── */
+  .access-box {
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    border-left: 4px solid #d97706;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 20px 0;
+  }
+
+  .access-box h4 {
+    color: #92400e;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .access-steps {
+    list-style: none;
+    padding: 0;
+    counter-reset: access-counter;
+  }
+
+  .access-steps li {
+    counter-increment: access-counter;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 6px 0;
+    font-size: .88rem;
+  }
+
+  .access-steps li::before {
+    content: counter(access-counter);
+    background: #d97706;
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── UPDATE TIME BADGE ── */
+  .update-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: .85rem;
+    font-weight: 700;
+    color: #15803d;
+    margin: 8px 0;
+  }
+
+  /* ── MASTER FLOWCHART ── */
+  .master-flow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .master-card {
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    transition: border-color .2s;
+  }
+
+  .master-card .mc-icon { font-size: 2rem; margin-bottom: 8px; }
+  .master-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; color: var(--dark); }
+  .master-card p { font-size: .78rem; color: #64748b; line-height: 1.5; }
+  .master-card .mc-tool {
+    display: inline-block;
+    margin-top: 10px;
+    background: var(--accent);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+  }
+
+  /* ── COLOR CHIPS ── */
+  .color-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .chip {
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 700;
+    color: white;
+  }
+  .chip-gold   { background: #d97706; }
+  .chip-blue   { background: #2563eb; }
+  .chip-green  { background: #16a34a; }
+  .chip-orange { background: #ea580c; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 2px dashed var(--border);
+    margin: 40px 0;
+  }
+
+  /* ── PRINT BUTTON ── */
+  .print-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: .95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    font-family: inherit;
+    z-index: 999;
+  }
+
+  .print-btn:hover { background: var(--accent); }
+
+  p { margin-bottom: 10px; }
+  ul { padding-left: 20px; }
+  ul li { margin-bottom: 6px; }
+
+  .badge-inline {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+
+  .badge-red {
+    background: var(--red);
+  }
+
+  .badge-green {
+    background: var(--green);
+  }
+</style>
+</head>
+<body>
+
+<!-- PRINT BUTTON -->
+<button class="print-btn no-print" onclick="window.print()">🖨️ PDF के रूप में सहेजें</button>
+
+<!-- ══════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-icon">🏫</div>
+  <h1>वेबसाइट प्रबंधन<br>निर्देशिका</h1>
+  <h2>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h2>
+  <div class="cover-divider"></div>
+  <p style="opacity:.8;font-size:1rem;max-width:500px;line-height:1.7;">
+    यह निर्देशिका विद्यालय की आधिकारिक वेबसाइट को प्रबंधित करने के लिए<br>
+    प्रधानाध्यापक एवं अधिकृत शिक्षकों हेतु तैयार की गई है।
+  </p>
+  <div style="margin-top:32px;">
+    <span class="cover-badge">🌐 uhskaparpurakanti.in</span>
+    <span class="cover-badge">📅 सत्र 2026–27</span>
+  </div>
+  <div class="cover-meta" style="margin-top:48px;">
+    <p>UDISE : 10140616812 &nbsp;|&nbsp; प्रखंड : काँटी &nbsp;|&nbsp; जिला : मुजफ्फरपुर</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE CONTENT STARTS
+══════════════════════════════════════ -->
+<div class="page">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h2>📋 विषय-सूची</h2>
+    <ol>
+      <li><span class="toc-num">१</span> वेबसाइट का परिचय एवं सारांश</li>
+      <li><span class="toc-num">२</span> सूचना बोर्ड अपडेट करें (Google Form)</li>
+      <li><span class="toc-num">३</span> प्रधानाध्यापक संदेश, फोटो एवं स्टाफ फोटो (Google Form)</li>
+      <li><span class="toc-num">४</span> विद्यालय आँकड़े एवं उपलब्धियाँ (Google Sheet)</li>
+      <li><span class="toc-num">५</span> फोटो गैलरी अपडेट करें (Google Drive)</li>
+      <li><span class="toc-num">६</span> किसी शिक्षक को अधिकार कैसे दें</li>
+      <li><span class="toc-num">७</span> सामान्य सावधानियाँ एवं समस्या समाधान</li>
+    </ol>
+  </div>
+
+  <!-- ══════════════
+       PART 1
+  ══════════════ -->
+  <div class="section-header">
+    <div class="sec-icon">🌐</div>
+    <div>
+      <h2>भाग १ — वेबसाइट का परिचय एवं सारांश</h2>
+      <p>वेबसाइट पर क्या-क्या है और कौन क्या अपडेट कर सकता है</p>
+    </div>
+  </div>
+
+  <p>विद्यालय की वेबसाइट का पता है:</p>
+  <div class="link-box">
+    <span class="link-label">🌐 वेबसाइट</span>
+    <a href="#">विद्यालय की आधिकारिक वेबसाइट</a>
+  </div>
+
+  <p>यह वेबसाइट पूरी तरह <strong>स्वचालित (Dynamic)</strong> है — अर्थात आप Google Form भरें, Sheet अपडेट करें या Drive में फोटो डालें, और वेबसाइट तुरंत अपने आप अपडेट हो जाती है। किसी तकनीकी ज्ञान की आवश्यकता नहीं।</p>
+
+  <h3>वेबसाइट पर कौन-कौन सी जानकारी दिखती है</h3>
+
+  <div class="master-flow">
+    <div class="master-card">
+      <div class="mc-icon">📢</div>
+      <h4>महत्वपूर्ण सूचनाएँ</h4>
+      <p>नामांकन, परीक्षा, छात्रवृत्ति, जरूरी घोषणाएँ</p>
+      <span class="mc-tool">Google Form</span>
+    </div>
+    <div class="master-card">
+      <div class="mc-icon">👨‍🏫</div>
+      <h4>प्रधानाध्यापक का संदेश</h4>
+      <p>HM का संदेश, फोटो एवं स्टाफ ग्रुप फोटो</p>
+      <span class="mc-tool">Google Form</span>
+    </div>
+    <div class="master-card">
+      <div class="mc-icon">📊</div>
+      <h4>विद्यालय आँकड़े</h4>
+      <p>छात्र संख्या, शिक्षक, कर्मी, उपलब्धियाँ</p>
+      <span class="mc-tool">Google Sheet</span>
+    </div>
+    <div class="master-card">
+      <div class="mc-icon">📸</div>
+      <h4>फोटो गैलरी</h4>
+      <p>विद्यालय की विभिन्न गतिविधियों की फोटो</p>
+      <span class="mc-tool">Google Drive</span>
+    </div>
+  </div>
+
+  <h3>अपडेट होने में कितना समय लगता है?</h3>
+  <table class="info-table">
+    <tr>
+      <th>क्या अपडेट किया</th>
+      <th>वेबसाइट पर कब दिखेगा</th>
+    </tr>
+    <tr>
+      <td>सूचना बोर्ड (Form भरा)</td>
+      <td><span class="update-time">⚡ तुरंत — Page Refresh करें</span></td>
+    </tr>
+    <tr>
+      <td>HM संदेश / फोटो (Form भरा)</td>
+      <td><span class="update-time">⚡ तुरंत — Page Refresh करें</span></td>
+    </tr>
+    <tr>
+      <td>आँकड़े / उपलब्धियाँ (Sheet अपडेट)</td>
+      <td><span class="update-time">⚡ तुरंत — Page Refresh करें</span></td>
+    </tr>
+    <tr>
+      <td>गैलरी (Drive में फोटो डाली)</td>
+      <td><span class="update-time">⏱️ 2–3 मिनट बाद Refresh करें</span></td>
+    </tr>
+  </table>
+
+  <div class="info-box">
+    <strong>📱 Page Refresh कैसे करें?</strong><br>
+    मोबाइल पर: ब्राउज़र में ऊपर Address Bar के पास 🔄 बटन दबाएँ या पेज को नीचे खींचें (Pull down to refresh)।<br>
+    Computer पर: <strong>Ctrl + R</strong> दबाएँ।
+  </div>
+
+
+  <!-- ══════════════
+       PART 2
+  ══════════════ -->
+  <div class="page-break"></div>
+  <div class="section-header">
+    <div class="sec-icon">📢</div>
+    <div>
+      <h2>भाग २ — सूचना बोर्ड अपडेट करें</h2>
+      <p>Google Form के माध्यम से नई सूचनाएँ जोड़ें</p>
+    </div>
+  </div>
+
+  <div class="link-box">
+    <span class="link-label">📋 सूचना फॉर्म</span>
+    <a href="#">अधिकृत Notice Board Google Form</a>
+  </div>
+
+  <span class="update-time">⚡ Form Submit करने के बाद Page Refresh करें — सूचना तुरंत दिखेगी</span>
+
+  <h3>फॉर्म भरने के चरण</h3>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-num">१</div>
+      ऊपर दिए लिंक पर क्लिक करें
+      <sub>Google Form खुलेगा</sub>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="step-num">२</div>
+      सभी जरूरी खाने भरें
+      <sub>नीचे तालिका में हर खाने की जानकारी दी गई है</sub>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="step-num">३</div>
+      यदि PDF है तो अपलोड करें
+      <sub>Google Drive से लिंक भी दे सकते हैं</sub>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step green">
+      <div class="step-num" style="background:#16a34a;">४</div>
+      "Submit" बटन दबाएँ
+      <sub>सूचना वेबसाइट पर दिखने लगेगी</sub>
+    </div>
+  </div>
+
+  <h3>फॉर्म के हर खाने का अर्थ</h3>
+  <table class="info-table">
+    <tr>
+      <th>खाने का नाम</th>
+      <th>क्या भरें</th>
+      <th>जरूरी है?</th>
+    </tr>
+    <tr>
+      <td class="field-name">श्रेणी (Category)</td>
+      <td>सूचना का प्रकार — जैसे Scholarship, Examination, Admission, Urgent, General</td>
+      <td><span class="required">✱ जरूरी</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">प्राथमिकता (Priority)</td>
+      <td><strong>High</strong> — लाल रंग में दिखेगी (जरूरी सूचनाओं के लिए)<br><strong>Normal</strong> — नीले रंग में दिखेगी</td>
+      <td><span class="required">✱ जरूरी</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">शीर्षक (Title)</td>
+      <td>सूचना का मुख्य शीर्षक — संक्षेप में लिखें</td>
+      <td><span class="required">✱ जरूरी</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">विवरण (Details)</td>
+      <td>सूचना का पूरा विवरण — जितना चाहें लिख सकते हैं</td>
+      <td><span class="required">✱ जरूरी</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">अंतिम तिथि (Last Date)</td>
+      <td>यदि कोई अंतिम तिथि है तो भरें — वेबसाइट पर 📅 के साथ दिखेगी</td>
+      <td><span class="optional">वैकल्पिक</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">समाप्ति तिथि (Expiry Date)</td>
+      <td>जिस तारीख के बाद सूचना अपने आप हट जाए — वो तारीख डालें</td>
+      <td><span class="optional">वैकल्पिक</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">आवश्यक दस्तावेज</td>
+      <td>यदि कोई दस्तावेज चाहिए तो लिखें — जैसे: Aadhar Card, Bank Passbook</td>
+      <td><span class="optional">वैकल्पिक</span></td>
+    </tr>
+    <tr>
+      <td class="field-name">PDF लिंक</td>
+      <td>यदि कोई सरकारी अधिसूचना PDF है तो Google Drive का लिंक डालें</td>
+      <td><span class="optional">वैकल्पिक</span></td>
+    </tr>
+  </table>
+
+  <div class="warn-box">
+    <strong>⚠️ Expiry Date का महत्व:</strong><br>
+    यदि आप Expiry Date नहीं डालते तो सूचना हमेशा वेबसाइट पर दिखती रहेगी। इसलिए हर सूचना में Expiry Date जरूर डालें। उस तारीख के बाद सूचना अपने आप हट जाएगी — आपको कुछ करने की जरूरत नहीं।
+  </div>
+
+  <div class="tip-box">
+    <strong>💡 PDF कैसे अपलोड करें:</strong><br>
+    १. PDF को Google Drive में अपलोड करें।<br>
+    २. उस फ़ाइल पर Right Click करें → "Get Link" / "लिंक प्राप्त करें" चुनें।<br>
+    ३. "Anyone with the link can view" सेट करें।<br>
+    ४. Link Copy करें और Form के PDF खाने में Paste करें।
+  </div>
+
+  <div class="warn-box">
+    <strong>⚠️ ध्यान दें:</strong> एक बार Submit की गई सूचना को Form से edit नहीं किया जा सकता। यदि गलती हो तो Developer को सूचित करें।
+  </div>
+
+
+  <!-- ══════════════
+       PART 3
+  ══════════════ -->
+  <div class="page-break"></div>
+  <div class="section-header">
+    <div class="sec-icon">👨‍🏫</div>
+    <div>
+      <h2>भाग ३ — प्रधानाध्यापक संदेश, फोटो एवं स्टाफ फोटो</h2>
+      <p>Google Form के माध्यम से संदेश और फोटो बदलें</p>
+    </div>
+  </div>
+
+  <div class="link-box">
+    <span class="link-label">📋 HM फॉर्म</span>
+    <a href="#">अधिकृत HM Website Manager Form</a>
+  </div>
+
+  <span class="update-time">⚡ Form Submit करने के बाद Page Refresh करें — तुरंत दिखेगा</span>
+
+  <h3>इस Form में क्या-क्या कर सकते हैं?</h3>
+  <p>Form खुलने पर सबसे पहले पूछा जाएगा — <strong>"आप क्या अपडेट करना चाहते हैं?"</strong></p>
+
+  <table class="info-table">
+    <tr>
+      <th>विकल्प</th>
+      <th>क्या होगा</th>
+      <th>कब चुनें</th>
+    </tr>
+    <tr>
+      <td><strong>प्रधानाध्यापक का संदेश</strong></td>
+      <td>Section 2 खुलेगा — संदेश, नाम, पदनाम आदि भरें</td>
+      <td>जब संदेश बदलना हो</td>
+    </tr>
+    <tr>
+      <td><strong>प्रधानाध्यापक की फोटो</strong></td>
+      <td>Section 3 खुलेगा — अपनी फोटो Upload करें</td>
+      <td>जब HM की फोटो बदलनी हो</td>
+    </tr>
+    <tr>
+      <td><strong>स्टाफ ग्रुप फोटो</strong></td>
+      <td>Section 4 खुलेगा — स्टाफ की ग्रुप फोटो Upload करें</td>
+      <td>जब स्टाफ फोटो बदलनी हो</td>
+    </tr>
+  </table>
+
+  <h3>संदेश अपडेट करने के चरण</h3>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-num">१</div>
+      Form का लिंक खोलें
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="step-num">२</div>
+      "प्रधानाध्यापक का संदेश" विकल्प चुनें
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step">
+      <div class="step-num">३</div>
+      Section 2 में सभी खाने भरें
+      <sub>संदेश, नाम, पदनाम, मोबाइल नंबर</sub>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step green">
+      <div class="step-num" style="background:#16a34a;">४</div>
+      Submit करें → वेबसाइट Refresh करें
+    </div>
+  </div>
+
+  <h3>Section 2 — संदेश फॉर्म के खाने</h3>
+  <table class="info-table">
+    <tr>
+      <th>खाने का नाम</th>
+      <th>क्या भरें</th>
+    </tr>
+    <tr>
+      <td class="field-name">शीर्षक (Title)</td>
+      <td>वेबसाइट पर दिखने वाला उप-शीर्षक — जैसे: "प्रधानाध्यापक का संदेश, 2026" (यह ऊपर बड़े heading के नीचे छोटे में दिखेगा)</td>
+    </tr>
+    <tr>
+      <td class="field-name">प्रधानाध्यापक का नाम</td>
+      <td>पूरा नाम — जैसे: अर्जुन कुमार</td>
+    </tr>
+    <tr>
+      <td class="field-name">पदनाम</td>
+      <td>जैसे: प्रधानाध्यापक</td>
+    </tr>
+    <tr>
+      <td class="field-name">संदेश</td>
+      <td>पूरा संदेश लिखें — जितना लंबा चाहें</td>
+    </tr>
+    <tr>
+      <td class="field-name">मोबाइल नंबर (वैकल्पिक)</td>
+      <td>यदि दिखाना हो तो भरें, अन्यथा खाली छोड़ें</td>
+    </tr>
+  </table>
+
+  <h3>फोटो अपलोड करते समय ध्यान रखें</h3>
+  <table class="info-table">
+    <tr>
+      <th>बात</th>
+      <th>निर्देश</th>
+    </tr>
+    <tr>
+      <td>फोटो का प्रारूप (Format)</td>
+      <td>JPG, JPEG, PNG — कोई भी चलेगा</td>
+    </tr>
+    <tr>
+      <td>फोटो का आकार (Size)</td>
+      <td>10 MB से कम — अधिकतर मोबाइल फोटो ठीक रहती हैं</td>
+    </tr>
+    <tr>
+      <td>HM की फोटो</td>
+      <td>साफ चेहरा दिखे — अकेली फोटो बेहतर रहेगी</td>
+    </tr>
+    <tr>
+      <td>स्टाफ ग्रुप फोटो</td>
+      <td>Landscape (आड़ी) फोटो बेहतर दिखेगी</td>
+    </tr>
+  </table>
+
+
+  <!-- ══════════════
+       PART 4
+  ══════════════ -->
+  <div class="page-break"></div>
+  <div class="section-header">
+    <div class="sec-icon">📊</div>
+    <div>
+      <h2>भाग ४ — विद्यालय आँकड़े एवं उपलब्धियाँ</h2>
+      <p>Google Sheet के माध्यम से छात्र संख्या एवं उपलब्धियाँ अपडेट करें</p>
+    </div>
+  </div>
+
+  <div class="link-box">
+    <span class="link-label">📊 Google Sheet</span>
+    <a href="#">अधिकृत School Statistics एवं Achievements Sheet</a>
+  </div>
+
+  <span class="update-time">⚡ Sheet में बदलाव के बाद Page Refresh करें — तुरंत दिखेगा</span>
+
+  <div class="warn-box">
+    <strong>⚠️ बहुत जरूरी:</strong> Sheet में केवल <strong>Data (संख्या/शब्द) बदलें</strong> — Column के नाम (Header Row) कभी मत बदलें। Header बदलने से वेबसाइट पर कुछ भी नहीं दिखेगा।
+  </div>
+
+  <h3>Sheet में कौन-कौन से Tab (पन्ने) हैं</h3>
+  <table class="info-table">
+    <tr>
+      <th>Tab का नाम</th>
+      <th>इसमें क्या है</th>
+      <th>कब अपडेट करें</th>
+    </tr>
+    <tr>
+      <td><strong>Stats</strong></td>
+      <td>कुल छात्र संख्या, शिक्षक संख्या, कार्यालय कर्मी</td>
+      <td>नया नामांकन/नियुक्ति होने पर</td>
+    </tr>
+    <tr>
+      <td><strong>Students</strong></td>
+      <td>कक्षा-वार बालक/बालिका संख्या का विवरण</td>
+      <td>नामांकन के बाद</td>
+    </tr>
+    <tr>
+      <td><strong>Teachers</strong></td>
+      <td>शिक्षकों के नाम, कोटि, विषय</td>
+      <td>शिक्षक बदलने पर</td>
+    </tr>
+    <tr>
+      <td><strong>Clerks</strong></td>
+      <td>कार्यालय कर्मियों के नाम एवं पदनाम</td>
+      <td>कर्मी बदलने पर</td>
+    </tr>
+    <tr>
+      <td><strong>Achievements</strong></td>
+      <td>मुख्य उपलब्धियाँ जो वेबसाइट पर दिखती हैं</td>
+      <td>नई उपलब्धि मिलने पर</td>
+    </tr>
+  </table>
+
+  <h3>Achievements Tab — उपलब्धि कैसे जोड़ें / बंद करें</h3>
+  <p>इस Tab में हर Row एक उपलब्धि है। हर Column का अर्थ:</p>
+
+  <table class="info-table">
+    <tr>
+      <th>Column</th>
+      <th>क्या लिखें</th>
+      <th>उदाहरण</th>
+    </tr>
+    <tr>
+      <td class="field-name">icon</td>
+      <td>Emoji (एक प्रतीक चिह्न)</td>
+      <td>🏆 🔬 💻 🎨 ⚽</td>
+    </tr>
+    <tr>
+      <td class="field-name">title</td>
+      <td>उपलब्धि का शीर्षक</td>
+      <td>Academic Excellence 2026</td>
+    </tr>
+    <tr>
+      <td class="field-name">description</td>
+      <td>उपलब्धि का विवरण</td>
+      <td>वर्ष 2026 में टॉपर्स ने 90% से अधिक अंक प्राप्त किए।</td>
+    </tr>
+    <tr>
+      <td class="field-name">color</td>
+      <td>कार्ड का रंग — नीचे से एक चुनें</td>
+      <td>
+        <div class="color-chips">
+          <span class="chip chip-gold">gold</span>
+          <span class="chip chip-blue">blue</span>
+          <span class="chip chip-green">green</span>
+          <span class="chip chip-orange">orange</span>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="field-name">priority</td>
+      <td>दिखने का क्रम — 1 सबसे पहले</td>
+      <td>1, 2, 3, 4...</td>
+    </tr>
+    <tr>
+      <td class="field-name">active</td>
+      <td>दिखाना है या नहीं</td>
+      <td><strong>TRUE</strong> = दिखेगा &nbsp;|&nbsp; <strong>FALSE</strong> = नहीं दिखेगा</td>
+    </tr>
+  </table>
+
+  <div class="tip-box">
+    <strong>💡 उपलब्धि को अस्थायी रूप से हटाना हो तो:</strong><br>
+    Row delete मत करें। बस <strong>active</strong> column में <strong>FALSE</strong> लिख दें — उपलब्धि वेबसाइट से हट जाएगी। जब फिर दिखानी हो तो <strong>TRUE</strong> करें।
+  </div>
+
+  <h3>नई Row (उपलब्धि/शिक्षक/छात्र) कैसे जोड़ें</h3>
+  <ul class="steps">
+    <li>
+      <div class="step-circle">१</div>
+      <div class="text">
+        <strong>Sheet खोलें → सही Tab चुनें</strong>
+        <span>नीचे की पट्टी में Tab का नाम दिखेगा</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">२</div>
+      <div class="text">
+        <strong>आखिरी भरी Row के नीचे Click करें</strong>
+        <span>खाली अगली Row में Data भरें</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">३</div>
+      <div class="text">
+        <strong>हर Column में सही जानकारी भरें</strong>
+        <span>ऊपर दी गई तालिका के अनुसार</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">४</div>
+      <div class="text">
+        <strong>Ctrl+S दबाएँ या Auto-Save होगा</strong>
+        <span>Sheet में बदलाव तुरंत Save हो जाते हैं</span>
+      </div>
+    </li>
+  </ul>
+
+
+  <!-- ══════════════
+       PART 5
+  ══════════════ -->
+  <div class="page-break"></div>
+  <div class="section-header">
+    <div class="sec-icon">📸</div>
+    <div>
+      <h2>भाग ५ — फोटो गैलरी अपडेट करें</h2>
+      <p>Google Drive Folder में फोटो डालें और हटाएँ</p>
+    </div>
+  </div>
+
+  <div class="link-box">
+    <span class="link-label">📁 Gallery Drive Folder</span>
+    <a href="#">अधिकृत Gallery Google Drive Folder</a>
+  </div>
+
+  <span class="update-time">⏱️ फोटो डालने के 2–3 मिनट बाद Page Refresh करें</span>
+
+  <h3>Drive Folder की संरचना कैसे है</h3>
+
+  <div class="info-box">
+    <strong>📂 मुख्य Folder (UMV Kaparpura Gallery)</strong><br>
+    &nbsp;&nbsp;&nbsp;├── 📁 विज्ञान प्रदर्शनी एवं शैक्षणिक गतिविधियाँ<br>
+    &nbsp;&nbsp;&nbsp;├── 📁 राष्ट्रीय पर्व एवं समारोह<br>
+    &nbsp;&nbsp;&nbsp;├── 📁 स्मार्ट क्लास एवं ICT लैब<br>
+    &nbsp;&nbsp;&nbsp;├── 📁 अभिभावक-शिक्षक बैठक (PTM)<br>
+    &nbsp;&nbsp;&nbsp;└── 📁 <em>(आप नई Category के लिए नया Folder बना सकते हैं)</em><br><br>
+    <strong>हर Subfolder = वेबसाइट पर एक Gallery Category</strong>
+  </div>
+
+  <div class="tip-box">
+    <strong>💡 Cover Photo:</strong> हर Subfolder की पहली फोटो (नाम के अनुसार alphabetically पहली) वेबसाइट पर Category का Cover बनती है। इसलिए जो फोटो सबसे अच्छी हो उसका नाम A या 1 से शुरू करें।
+  </div>
+
+  <h3>गैलरी में फोटो जोड़ने के चरण</h3>
+  <ul class="steps">
+    <li>
+      <div class="step-circle">१</div>
+      <div class="text">
+        <strong>ऊपर दिए Drive Folder का लिंक खोलें</strong>
+        <span>Google Account से Login होना जरूरी है</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">२</div>
+      <div class="text">
+        <strong>जिस Category में फोटो जोड़नी है उस Subfolder पर Click करें</strong>
+        <span>जैसे — "राष्ट्रीय पर्व एवं समारोह"</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">३</div>
+      <div class="text">
+        <strong>ऊपर "+ New" बटन दबाएँ → "File Upload" चुनें</strong>
+        <span>अपने मोबाइल या Computer से फोटो चुनें</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">४</div>
+      <div class="text">
+        <strong>Upload पूरा होने तक प्रतीक्षा करें</strong>
+        <span>नीचे Progress Bar दिखेगा</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle" style="background:var(--green);">५</div>
+      <div class="text">
+        <strong>2–3 मिनट बाद वेबसाइट Refresh करें</strong>
+        <span>फोटो Gallery में दिखने लगेगी</span>
+      </div>
+    </li>
+  </ul>
+
+  <h3>नई Category (नया Folder) कैसे बनाएँ</h3>
+  <ul class="steps">
+    <li>
+      <div class="step-circle">१</div>
+      <div class="text">
+        <strong>मुख्य Gallery Folder खोलें</strong>
+        <span>Subfolder के अंदर नहीं — मुख्य Folder में रहें</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">२</div>
+      <div class="text">
+        <strong>"+ New" → "New Folder" दबाएँ</strong>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">३</div>
+      <div class="text">
+        <strong>Folder का नाम हिंदी में लिखें</strong>
+        <span>यही नाम वेबसाइट पर Category के रूप में दिखेगा — जैसे "वार्षिक उत्सव 2026"</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">४</div>
+      <div class="text">
+        <strong>नए Folder में फोटो Upload करें</strong>
+        <span>कम से कम 1 फोटो जरूर डालें — Cover के लिए</span>
+      </div>
+    </li>
+  </ul>
+
+  <h3>फोटो हटाने के चरण</h3>
+  <ul class="steps">
+    <li>
+      <div class="step-circle">१</div>
+      <div class="text">
+        <strong>Drive में जाएँ → संबंधित Subfolder खोलें</strong>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle">२</div>
+      <div class="text">
+        <strong>जिस फोटो को हटाना हो उस पर Right Click करें → "Remove" / "हटाएँ" चुनें</strong>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle" style="background:var(--green);">३</div>
+      <div class="text">
+        <strong>2–3 मिनट बाद वेबसाइट Refresh करें</strong>
+      </div>
+    </li>
+  </ul>
+
+  <div class="warn-box">
+    <strong>⚠️ Subfolder का नाम न बदलें:</strong> एक बार Category बनाने के बाद Folder का नाम बदलने से उससे जुड़ी सभी फोटो कुछ समय के लिए गायब हो सकती हैं। यदि नाम बदलना जरूरी हो तो Developer को बताएँ।
+  </div>
+
+
+  <!-- ══════════════
+       PART 6
+  ══════════════ -->
+  <div class="page-break"></div>
+  <div class="section-header">
+    <div class="sec-icon">🔑</div>
+    <div>
+      <h2>भाग ६ — किसी शिक्षक को अधिकार कैसे दें</h2>
+      <p>किसी अधिकृत शिक्षक को वेबसाइट अपडेट का काम सौंपने की प्रक्रिया</p>
+    </div>
+  </div>
+
+  <p>यदि प्रधानाध्यापक किसी शिक्षक को वेबसाइट अपडेट का कार्य सौंपना चाहते हैं तो नीचे दी गई प्रक्रिया अपनाएँ। हर माध्यम (Form/Sheet/Drive) के लिए अलग-अलग Access देनी होगी।</p>
+
+  <!-- Access: Form -->
+  <div class="access-box">
+    <h4>📋 Google Form का Access देना (सूचना बोर्ड / HM Form)</h4>
+    <ol class="access-steps">
+      <li>Google Form खोलें (ऊपर दिए लिंक से)</li>
+      <li>ऊपर दाईं ओर तीन बिंदु (⋮) पर Click करें</li>
+      <li>"Add Collaborators" / "सहयोगी जोड़ें" पर Click करें</li>
+      <li>शिक्षक का Gmail Address लिखें और "Send" करें</li>
+      <li>शिक्षक को Gmail में Invitation मिलेगा — Accept करने के बाद वे Form भर सकेंगे</li>
+    </ol>
+    <div style="margin-top:10px;font-size:.82rem;color:#92400e;">
+      ✅ Form भरने के लिए Collaborator बनाने की जरूरत नहीं — Form का Link share करना ही काफी है यदि Form Public है।
+    </div>
+  </div>
+
+  <!-- Access: Sheet -->
+  <div class="access-box">
+    <h4>📊 Google Sheet का Access देना (आँकड़े / उपलब्धियाँ)</h4>
+    <ol class="access-steps">
+      <li>Google Sheet खोलें</li>
+      <li>ऊपर दाईं ओर <strong>"Share"</strong> / <strong>"साझा करें"</strong> बटन दबाएँ</li>
+      <li>शिक्षक का Gmail Address लिखें</li>
+      <li>Permission चुनें — <span class="badge-inline">Editor</span> = बदलाव कर सकेंगे &nbsp;|&nbsp; <span class="badge-inline" style="background:#2563eb;">Viewer</span> = सिर्फ देख सकेंगे</li>
+      <li>"Send" दबाएँ — शिक्षक को Gmail में Link मिलेगा</li>
+    </ol>
+    <div style="margin-top:10px;font-size:.82rem;color:#92400e;">
+      ⚠️ केवल विश्वसनीय शिक्षक को ही <strong>Editor</strong> Access दें। गलत बदलाव वेबसाइट पर दिखेगा।
+    </div>
+  </div>
+
+  <!-- Access: Drive -->
+  <div class="access-box">
+    <h4>📁 Google Drive Gallery Folder का Access देना</h4>
+    <ol class="access-steps">
+      <li>Drive में Gallery Folder खोलें</li>
+      <li>Folder के नाम पर Right Click करें → <strong>"Share"</strong> चुनें</li>
+      <li>शिक्षक का Gmail Address लिखें</li>
+      <li>Permission चुनें — <span class="badge-inline">Editor</span> = फोटो जोड़/हटा सकेंगे</li>
+      <li>"Send" दबाएँ</li>
+    </ol>
+    <div style="margin-top:10px;font-size:.82rem;color:#92400e;">
+      💡 गैलरी के लिए Editor Access दें ताकि शिक्षक फोटो Upload और Delete कर सकें।
+    </div>
+  </div>
+
+  <h3>Access वापस कैसे लें?</h3>
+  <ul class="steps">
+    <li>
+      <div class="step-circle" style="background:var(--red);">१</div>
+      <div class="text">
+        <strong>Sheet/Drive Folder खोलें → "Share" बटन दबाएँ</strong>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle" style="background:var(--red);">२</div>
+      <div class="text">
+        <strong>शिक्षक का नाम/Email दिखेगा — उसके सामने Permission पर Click करें</strong>
+      </div>
+    </li>
+    <li>
+      <div class="step-circle" style="background:var(--red);">३</div>
+      <div class="text">
+        <strong>"Remove Access" / "Access हटाएँ" चुनें</strong>
+        <span>शिक्षक की पहुँच तुरंत बंद हो जाएगी</span>
+      </div>
+    </li>
+  </ul>
+
+
+  <!-- ══════════════
+       PART 7
+  ══════════════ -->
+  <div class="page-break"></div>
+  <div class="section-header">
+    <div class="sec-icon">🛠️</div>
+    <div>
+      <h2>भाग ७ — सामान्य सावधानियाँ एवं समस्या समाधान</h2>
+      <p>कुछ न दिखे तो क्या करें — और क्या गलतियाँ न करें</p>
+    </div>
+  </div>
+
+  <h3>⚠️ ये काम कभी न करें</h3>
+
+  <table class="info-table">
+    <tr>
+      <th>❌ क्या न करें</th>
+      <th>क्यों नहीं</th>
+    </tr>
+    <tr>
+      <td>Google Sheet के Column Headers बदलें</td>
+      <td>वेबसाइट का Code इन्हीं Headers को पढ़ता है — बदलने से कुछ नहीं दिखेगा</td>
+    </tr>
+    <tr>
+      <td>Google Sheet की पूरी Row Delete करें</td>
+      <td>Data हमेशा के लिए चला जाएगा — Active = FALSE करें बजाय Delete के</td>
+    </tr>
+    <tr>
+      <td>Drive में Gallery Subfolder का नाम बदलें</td>
+      <td>Category का नाम वेबसाइट पर बदल जाएगा या फोटो गायब हो सकती हैं</td>
+    </tr>
+    <tr>
+      <td>किसी अनजान व्यक्ति को Sheet/Drive Edit Access दें</td>
+      <td>वेबसाइट की जानकारी गलत हो सकती है</td>
+    </tr>
+    <tr>
+      <td>Drive का मुख्य Gallery Folder Delete करें</td>
+      <td>पूरी Gallery वेबसाइट से हट जाएगी</td>
+    </tr>
+  </table>
+
+  <h3>🔧 समस्या और समाधान</h3>
+
+  <table class="info-table">
+    <tr>
+      <th>समस्या</th>
+      <th>क्या करें</th>
+    </tr>
+    <tr>
+      <td>Form भरा पर वेबसाइट पर नहीं दिखा</td>
+      <td>Page Refresh करें (Ctrl+R या मोबाइल पर Pull down) — 1 मिनट प्रतीक्षा करें</td>
+    </tr>
+    <tr>
+      <td>गैलरी में फोटो डाली पर नहीं दिख रही</td>
+      <td>2–3 मिनट प्रतीक्षा करें, फिर Refresh करें। यदि फिर भी न दिखे — Developer को बताएँ</td>
+    </tr>
+    <tr>
+      <td>वेबसाइट पर पुरानी जानकारी दिख रही है</td>
+      <td>Browser का Cache Clear करें: <strong>Ctrl+Shift+R</strong> (Computer) / Browser Settings → Clear Cache (Mobile)</td>
+    </tr>
+    <tr>
+      <td>Form का Link नहीं खुल रहा</td>
+      <td>Google Account से Login करें — Form केवल अधिकृत लोगों के लिए है</td>
+    </tr>
+    <tr>
+      <td>Sheet खुल रही है पर Edit नहीं हो रहा</td>
+      <td>आपको Viewer Access मिला है — Developer से Editor Access माँगें</td>
+    </tr>
+    <tr>
+      <td>गलत सूचना Submit हो गई</td>
+      <td>Form से edit नहीं होता — Developer को तुरंत सूचित करें</td>
+    </tr>
+    <tr>
+      <td>फोटो Upload नहीं हो रही</td>
+      <td>Internet Connection जाँचें — फोटो 10MB से बड़ी हो तो Compress करें</td>
+    </tr>
+    <tr>
+      <td>वेबसाइट पूरी तरह खुल नहीं रही</td>
+      <td>Hosting/Server की समस्या हो सकती है — Developer को सूचित करें</td>
+    </tr>
+  </table>
+
+  <h3>📱 त्वरित संदर्भ — सभी Links एक जगह</h3>
+
+  <table class="info-table">
+    <tr>
+      <th>काम</th>
+      <th>Link / माध्यम</th>
+    </tr>
+    <tr>
+      <td>🌐 वेबसाइट देखें</td>
+      <td>विद्यालय की आधिकारिक वेबसाइट</td>
+    </tr>
+    <tr>
+      <td>📢 नई सूचना जोड़ें</td>
+      <td>अधिकृत Notice Board Google Form</td>
+    </tr>
+    <tr>
+      <td>👨‍🏫 HM संदेश / फोटो बदलें</td>
+      <td>अधिकृत HM Website Manager Form</td>
+    </tr>
+    <tr>
+      <td>📊 आँकड़े / उपलब्धियाँ अपडेट करें</td>
+      <td>अधिकृत School Statistics एवं Achievements Sheet</td>
+    </tr>
+    <tr>
+      <td>📸 गैलरी में फोटो जोड़ें</td>
+      <td>अधिकृत Gallery Google Drive Folder</td>
+    </tr>
+  </table>
+
+  <div class="tip-box" style="margin-top:32px;">
+    <strong>💡 सुझाव:</strong> इस निर्देशिका को Print करके विद्यालय के Office में रखें ताकि जरूरत पड़ने पर कोई भी देख सके। सभी Links को अपने Mobile के Bookmark में Save कर लें।
+  </div>
+
+  <hr class="divider">
+
+  <div style="text-align:center;padding:20px 0 40px;opacity:.6;font-size:.85rem;">
+    उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर &nbsp;|&nbsp; UDISE: 10140616812 &nbsp;|&nbsp; uhskaparpurakanti.in
+  </div>
+
+</div><!-- end .page -->
+
+</body>
+</html>
