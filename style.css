@@ -1289,15 +1289,14 @@ footer {
 
     #visitor-count { font-size: .95rem; }
 
-    /* Hide toggle button on desktop for short notices */
+ /* Desktop: show full text, hide toggle button */
 @media (min-width: 769px) {
     .notice-toggle {
-        display: none;
+        display: none !important;
     }
     .notice-card p.notice-text {
-        display: block;
-        overflow: visible;
-        -webkit-line-clamp: unset;
+        display: -webkit-box !important;
+        -webkit-line-clamp: unset !important;
+        overflow: visible !important;
     }
-}
 }
