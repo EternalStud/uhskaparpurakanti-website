@@ -619,10 +619,15 @@ footer {
 
 .notice-card p {
     margin-bottom: 12px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+}
+
+@media (min-width: 769px) {
+    .notice-card p.notice-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
 }
 
 .notice-text.expanded {
@@ -1288,15 +1293,3 @@ footer {
     .skeleton-gallery-card { height: 220px; }
 
     #visitor-count { font-size: .95rem; }
-
- /* Desktop: show full text, hide toggle button */
-@media (min-width: 769px) {
-    .notice-toggle {
-        display: none !important;
-    }
-    .notice-card p.notice-text {
-        display: -webkit-box !important;
-        -webkit-line-clamp: unset !important;
-        overflow: visible !important;
-    }
-}
