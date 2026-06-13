@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="notice-category">${notice.category || ''}</div>
                         <h3>${notice.title || ''}</h3>
                         <p class="notice-text">${details}</p>
-                        ${details.length > 250 ? `
+                        ${details.length > 120 ? `
                         <button class="notice-toggle" type="button">पूरा पढ़ें ▼</button>
                         ` : ''}
                         ${notice.documents ? `
