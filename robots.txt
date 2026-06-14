@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /guide.html
+
+Sitemap: https://uhskaparpurakanti.in/sitemap.xml
