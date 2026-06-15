@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="notice-card ${priorityClass}">
                         <div class="notice-category">${notice.category || ''}</div>
                         <h3>${notice.title || ''}</h3>
-                        <p class="notice-text">${details}</p>
+                        <p class="notice-text collapsed">${details}</p>
                         ${details.length > 120 ? `
                         <button class="notice-toggle" type="button">पूरा पढ़ें ▼</button>
                         ` : ''}
@@ -163,8 +163,16 @@ document.addEventListener('DOMContentLoaded', () => {
             noticeContainer.querySelectorAll('.notice-toggle').forEach(button => {
                 button.addEventListener('click', () => {
                     const text = button.parentElement.querySelector('.notice-text');
-                    const expanded = text.classList.toggle('expanded');
-                    button.textContent = expanded ? 'कम करें ▲' : 'पूरा पढ़ें ▼';
+
+                    if (text.classList.contains('expanded')) {
+                        text.classList.remove('expanded');
+                        text.classList.add('collapsed');
+                        button.textContent = 'पूरा पढ़ें ▼';
+                    } else {
+                        text.classList.remove('collapsed');
+                        text.classList.add('expanded');
+                        button.textContent = 'कम करें ▲';
+                    }
                 });
             });
 

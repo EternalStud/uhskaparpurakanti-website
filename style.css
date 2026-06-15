@@ -621,13 +621,11 @@ footer {
     margin-bottom: 12px;
 }
 
-@media (min-width: 769px) {
-    .notice-card p.notice-text {
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
+.notice-text.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .notice-text.expanded {
@@ -635,6 +633,8 @@ footer {
     overflow: visible !important;
     -webkit-line-clamp: unset !important;
 }
+
+/* removed old desktop 2-line clamp rule; replaced by collapsed/expanded classes */
 
 .notice-toggle {
     margin-bottom: 12px;
