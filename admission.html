@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Admission Form - UHS Kaparpura</title>
+    <link rel="stylesheet" href="admission.css">
+</head>
+<body>
+
+<div class="admission-container">
+
+    <div class="form-header">
+        <div class="header-top-row">
+            <div class="school-info">
+                <h1>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+                <h2>UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</h2>
+            </div>
+            <div class="header-badges">
+                <span class="udise-badge">UDISE: 10140616812</span>
+                <span class="session-badge">सत्र: <span id="academicSession"></span></span>
+            </div>
+        </div>
+        <div class="admission-title">
+            ऑनलाइन नामांकन प्रपत्र
+        </div>
+        <p class="header-note">
+आवेदन सफलतापूर्वक जमा होने के बाद Application ID सुरक्षित रखें तथा आवेदन डाउनलोड कर विद्यालय में जमा करें।
+</p>
+    </div>
+
+    <form id="admissionForm">
+
+        <section class="form-section">
+            <h3>नामांकन कक्षा का चयन</h3>
+
+            <div class="grid-2">
+                <div>
+                    <label>जिस कक्षा में नामांकन लेना है <span style="color:red">*</span></label>
+                    <select id="admissionClass" required>
+                        <option value="">-- कक्षा चुनें --</option>
+                        <option value="1">Class I</option>
+                        <option value="2">Class II</option>
+                        <option value="3">Class III</option>
+                        <option value="4">Class IV</option>
+                        <option value="5">Class V</option>
+                        <option value="6">Class VI</option>
+                        <option value="7">Class VII</option>
+                        <option value="8">Class VIII</option>
+                        <option value="9">Class IX</option>
+                        <option value="10">Class X</option>
+                        <option value="11">Class XI</option>
+                        <option value="12">Class XII</option>
+                    </select>
+                </div>
+
+                <div id="streamBlock" style="display:none;">
+                    <label>संकाय / Stream <span style="color:red">*</span></label>
+                    <select id="stream">
+                        <option value="">-- संकाय चुनें --</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section" id="studentSection" style="display:none;">
+            <h3>विद्यार्थी का विवरण</h3>
+
+            <div class="grid-2">
+                <div>
+                    <label id="penLabel">विद्यार्थी का PEN संख्या <span style="color:red">*</span></label>
+                    <input type="text" id="penNumber" maxlength="11" placeholder="Enter 11-digit PEN Number" required>
+                    <small id="penNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए PEN संख्या वैकल्पिक है।</small>
+                </div>
+
+                <div>
+                    <label>विद्यार्थी का APAAR ID</label>
+                    <input type="text" id="apaarId" placeholder="Enter 12-digit APAAR ID">
+                </div>
+
+                <div>
+                    <label id="aadhaarLabel">विद्यार्थी का आधार संख्या <span style="color:red">*</span></label>
+                    <input type="text" id="studentAadhaar" maxlength="12" placeholder="Enter 12-digit Aadhaar Number" required>
+                    <small id="aadhaarNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए आधार संख्या वैकल्पिक है।</small>
+                </div>
+
+                <div>
+                    <label>विद्यार्थी का ई-शिक्षाकोष ID</label>
+                    <input type="text" id="eshikshakoshId" placeholder="Enter E-Shikshakosh ID">
+                </div>
+
+                <div>
+                    <label>विद्यार्थी का नाम <span style="color:red">*</span></label>
+                    <input type="text" id="studentNameEnglish" placeholder="Enter Name as per Aadhaar (English)" required>
+                </div>
+
+                <div>
+                    <label>जन्म तिथि <span style="color:red">*</span></label>
+                    <input type="date" id="dob" required>
+                </div>
+
+                <div>
+                    <label>लिंग <span style="color:red">*</span></label>
+                    <select id="gender" required>
+                        <option value="">-- लिंग चुनें --</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>सामाजिक श्रेणी <span style="color:red">*</span></label>
+                    <select id="category" required>
+                        <option value="">-- श्रेणी चुनें --</option>
+                        <option>GEN</option>
+                        <option>EBC</option>
+                        <option>BC</option>
+                        <option>SC</option>
+                        <option>ST</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>धर्म <span style="color:red">*</span></label>
+                    <select id="religion" required>
+                        <option value="">-- धर्म चुनें --</option>
+                        <option>Hindu</option>
+                        <option>Muslim</option>
+                        <option>Sikh</option>
+                        <option>Christian</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section" id="parentSection" style="display:none;">
+            <h3>अभिभावक का विवरण</h3>
+
+            <div class="grid-2">
+                <div>
+                    <label>माता का नाम <span style="color:red">*</span></label>
+                    <input type="text" id="motherName" placeholder="Enter Mother's Full Name" required>
+                </div>
+
+                <div>
+                    <label>पिता का नाम <span style="color:red">*</span></label>
+                    <input type="text" id="fatherName" placeholder="Enter Father's Full Name" required>
+                </div>
+
+                <div>
+                    <label>आधार संख्या किसका है? <span style="color:red">*</span></label>
+                    <select id="parentAadhaarType" required>
+                        <option value="">-- चुनें --</option>
+                        <option>Father</option>
+                        <option>Mother</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>अभिभावक का आधार संख्या <span style="color:red">*</span></label>
+                    <input type="text" id="parentAadhaar" maxlength="12" placeholder="Enter 12-digit Aadhaar Number" required>
+                </div>
+
+                <div>
+                    <label>मोबाइल संख्या <span style="color:red">*</span></label>
+                    <input type="tel" id="mobile" placeholder="Enter 10-digit Mobile Number" required>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section" id="addressSection" style="display:none;">
+            <h3>निवास स्थान / पता विवरण</h3>
+
+            <div class="grid-2">
+                <div>
+                    <label>स्थायी पता <span style="color:red">*</span></label>
+                    <input type="text" placeholder="Enter Full Permanent Address" id="address">
+                </div>
+                <div>
+                    <label>पिन कोड <span style="color:red">*</span></label>
+                    <input type="text" placeholder="Enter 6-digit PIN Code" id="pinCode">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section" id="healthSection" style="display:none;">
+            <h3>सामाजिक एवं स्वास्थ्य विवरण</h3>
+
+            <div class="grid-3">
+                <div>
+                    <label>विद्यालय से दूरी <span style="color:red">*</span></label>
+                    <select id="distance" required>
+                        <option value="">-- दूरी चुनें --</option>
+                        <option>0-1 KM</option>
+                        <option>1-3 KM</option>
+                        <option>3-5 KM</option>
+                        <option>5+ KM</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>क्या विशेष आवश्यकता वाले बच्चों की शिक्षा (CWSN) है? <span style="color:red">*</span></label>
+                    <select id="cwsn">
+                        <option>No</option>
+                        <option>Yes</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>क्या माता-पिता की वार्षिक आय ₹1.5 लाख से अधिक है? <span style="color:red">*</span></label>
+                    <select id="income">
+                        <option value="">-- चुनें --</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>रक्त समूह <span style="color:red">*</span></label>
+                    <select id="bloodGroup">
+                        <option value="">-- चुनें --</option>
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>लंबाई (सेमी) <span style="color:red">*</span></label>
+                    <input type="number" id="height" placeholder="Height in CM">
+                </div>
+
+                <div>
+                    <label>वजन (किलो) <span style="color:red">*</span></label>
+                    <input type="number" id="weight" placeholder="Weight in KG">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section" id="previousSchoolSection" style="display:none;">
+            <h3>पूर्व विद्यालय का विवरण</h3>
+
+            <div>
+                <label id="previousUdiseLabel">पूर्व विद्यालय का UDISE कोड <span style="color:red">*</span></label>
+                <input type="text" placeholder="Enter Previous School UDISE Code" id="previousUdise">
+                <small id="previousUdiseNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए यह विवरण वैकल्पिक है।</small>
+            </div>
+        </section>
+
+        <section class="form-section" id="bankSection" style="display:none;">
+            <h3>बैंक खाता विवरण</h3>
+
+            <div class="grid-2">
+                <div>
+                    <label>बैंक खाता संख्या <span style="color:red">*</span></label>
+                    <input type="text" placeholder="Enter Bank Account Number" id="accountNumber">
+                </div>
+
+                <div>
+                    <label>बैंक IFSC कोड <span style="color:red">*</span></label>
+                    <input type="text" placeholder="Enter IFSC Code" id="ifsc">
+                </div>
+
+                <div>
+                    <label>बैंक का नाम <span style="color:red">*</span></label>
+                    <input type="text" placeholder="Enter Bank Name" id="bankName">
+                </div>
+
+                <div>
+                    <label>खाताधारक का नाम <span style="color:red">*</span></label>
+                    <input type="text" placeholder="Enter Account Holder Name" id="accountHolder">
+                </div>
+                <div id="relationBlock" style="display:none;">
+                    <label>खाताधारक का विद्यार्थी से संबंध <span style="color:red">*</span></label>
+                    <select id="accountHolderRelation">
+                        <option value="">-- चुनें --</option>
+                        <option>Student</option>
+                        <option>Father</option>
+                        <option>Mother</option>
+                        <option>Guardian</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section declaration-box" id="declarationSection" style="display:none;">
+    <p>
+        मैं, यह घोषणा करता/करती हूँ कि ऊपर दी गई सभी सूचना सही है तथा मेरा नामांकन वर्तमान में किसी अन्य निजी/सरकारी विद्यालय में नहीं है। मैं नियमित रूप से विद्यालय में उपस्थित रहूँगा/रहूँगी। 75% से कम उपस्थिति होने पर मुझे किसी भी प्रकार का सरकारी लाभ देय नहीं होगा।
+    </p>
+
+    <br>
+    <p><strong>महत्वपूर्ण:</strong> गलत जानकारी देने पर आवेदन रद्द किया जा सकता है।</p>
+    <br>
+
+    <p>
+        I hereby declare that all information provided is true and correct. I am not currently enrolled in any other school. Below 75% attendance disqualifies me from government benefits.
+    </p>
+
+    <br>
+
+    <label>
+        <input type="checkbox" id="declaration" required>
+        मैं उपरोक्त घोषणा से सहमत हूँ / I agree to the above declaration <span style="color:red">*</span>
+    </label>
+</section>
+
+        <section class="form-section" id="uploadSection" style="display:none;">
+    <h3>फोटो एवं हस्ताक्षर अपलोड</h3>
+
+    <div class="grid-2">
+        <div class="photo-box">
+            <label>छात्र का फोटो <span style="color:red">*</span></label>
+            <p class="upload-note">पासपोर्ट आकार फोटो (3.5cm × 3.0cm)<br>फाइल आकार: 50KB से 100KB</p>
+            <div id="photoPreview">फोटो यहाँ दिखाई देगा</div>
+            <input type="file" id="studentPhoto" accept="image/jpeg,image/jpg,image/png" required>
+        </div>
+
+        <div class="photo-box">
+            <label>छात्र का हस्ताक्षर <span style="color:red">*</span></label>
+            <p class="upload-note">हस्ताक्षर (3.5cm × 1.1cm)<br>फाइल आकार: 5KB से 20KB</p>
+            <div id="signaturePreview">हस्ताक्षर यहाँ दिखाई देगा</div>
+            <input type="file" id="studentSignature" accept="image/jpeg,image/jpg,image/png" required>
+        </div>
+    </div>
+</section>
+
+        <div class="form-actions" id="formActions" style="display:none;">
+            <button type="button" id="previewBtn">👁 आवेदन पूर्वावलोकन</button>
+            <button type="submit" id="submitBtn">✅ आवेदन जमा करें</button>
+            <button type="reset">🗑 सभी जानकारी हटाएँ</button>
+        </div>
+
+<section class="form-section">
+    <h3>यदि आपने पहले से नामांकन प्रपत्र भर रखा है, तो आवेदन डाउनलोड कर विद्यालय में जमा करें</h3>
+
+    <div class="grid-2">
+
+        <div>
+            <label>कक्षा <span style="color:red">*</span></label>
+            <select id="searchClass">
+                <option value="">-- कक्षा चुनें --</option>
+                <option value="1">Class I</option>
+                <option value="2">Class II</option>
+                <option value="3">Class III</option>
+                <option value="4">Class IV</option>
+                <option value="5">Class V</option>
+                <option value="6">Class VI</option>
+                <option value="7">Class VII</option>
+                <option value="8">Class VIII</option>
+                <option value="9">Class IX</option>
+                <option value="10">Class X</option>
+                <option value="11">Class XI</option>
+                <option value="12">Class XII</option>
+            </select>
+        </div>
+
+        <div id="searchApplicationBlock" style="display:none;">
+            <label>Application ID</label>
+            <input
+                type="text"
+                id="searchApplicationId"
+                placeholder="Enter Application ID">
+            <small style="color:#2563eb;">Class I के लिए Application ID से खोजें।</small>
+        </div>
+
+        <div id="searchPenBlock" style="display:none;">
+            <label>PEN संख्या</label>
+            <input
+                type="text"
+                id="searchPen"
+                maxlength="11"
+                placeholder="Enter 11-digit PEN Number">
+            <small style="color:#2563eb;">Class II–XII के लिए PEN Number से खोजें।</small>
+        </div>
+
+    </div>
+
+    <div style="margin-top:15px;">
+        <button type="button" id="downloadExistingBtn">
+            📄 आवेदन डाउनलोड करें
+        </button>
+    </div>
+</section>
+
+    </form>
+</div>
+
+<script>
+(function () {
+    const today = new Date();
+    const year = today.getFullYear();
+
+    // Academic session changes automatically every April
+    const startYear = today.getMonth() >= 3 ? year : year - 1;
+    const endYear = startYear + 1;
+
+    const sessionEl = document.getElementById('academicSession');
+    if (sessionEl) {
+        sessionEl.textContent = `${startYear}-${String(endYear).slice(-2)}`;
+    }
+})();
+</script>
+<script>
+(function(){
+    const classSelect = document.getElementById('admissionClass');
+    const accountHolder = document.getElementById('accountHolder');
+    const relationBlock = document.getElementById('relationBlock');
+    const studentName = document.getElementById('studentNameEnglish');
+    const streamBlock = document.getElementById('streamBlock');
+    const streamField = document.getElementById('stream');
+    const uploadSection = document.getElementById('uploadSection');
+    const photoField = document.getElementById('studentPhoto');
+    const signatureField = document.getElementById('studentSignature');
+    const penField = document.getElementById('penNumber');
+    const penLabel = document.getElementById('penLabel');
+    const penNote = document.getElementById('penNote');
+    const aadhaarField = document.getElementById('studentAadhaar');
+    const aadhaarLabel = document.getElementById('aadhaarLabel');
+    const aadhaarNote = document.getElementById('aadhaarNote');
+    const previousUdiseField = document.getElementById('previousUdise');
+    const previousUdiseLabel = document.getElementById('previousUdiseLabel');
+    const previousUdiseNote = document.getElementById('previousUdiseNote');
+    const searchClass = document.getElementById('searchClass');
+    const searchPenBlock = document.getElementById('searchPenBlock');
+    const searchApplicationBlock = document.getElementById('searchApplicationBlock');
+
+    const studentSection = document.getElementById('studentSection');
+    const parentSection = document.getElementById('parentSection');
+    const addressSection = document.getElementById('addressSection');
+    const healthSection = document.getElementById('healthSection');
+    const previousSchoolSection = document.getElementById('previousSchoolSection');
+    const bankSection = document.getElementById('bankSection');
+    const declarationSection = document.getElementById('declarationSection');
+    const formActions = document.getElementById('formActions');
+
+    function updateBankFields(){
+        const cls = parseInt(classSelect.value || '0',10);
+
+        const showSections = cls >= 1;
+        if (formActions) {
+            formActions.style.display = showSections ? 'flex' : 'none';
+        }
+        studentSection.style.display = showSections ? 'block' : 'none';
+        parentSection.style.display = showSections ? 'block' : 'none';
+        addressSection.style.display = showSections ? 'block' : 'none';
+        healthSection.style.display = showSections ? 'block' : 'none';
+        previousSchoolSection.style.display = showSections ? 'block' : 'none';
+        bankSection.style.display = showSections ? 'block' : 'none';
+        if (declarationSection) {
+            declarationSection.style.display = showSections ? 'block' : 'none';
+        }
+
+        if (cls >= 9) {
+            uploadSection.style.display = 'block';
+            photoField.required = true;
+            signatureField.required = true;
+        } else {
+            uploadSection.style.display = 'none';
+            photoField.required = false;
+            signatureField.required = false;
+        }
+
+        if (cls === 1) {
+            penField.required = false;
+            penNote.style.display = 'block';
+            penLabel.innerHTML = 'विद्यार्थी का PEN संख्या';
+        } else {
+            penField.required = true;
+            penNote.style.display = 'none';
+            penLabel.innerHTML = 'विद्यार्थी का PEN संख्या <span style="color:red">*</span>';
+        }
+
+        // Aadhaar requirement and note logic for student
+        if (cls === 1) {
+            aadhaarField.required = false;
+            aadhaarNote.style.display = 'block';
+            aadhaarLabel.innerHTML = 'विद्यार्थी का आधार संख्या';
+        } else {
+            aadhaarField.required = true;
+            aadhaarNote.style.display = 'none';
+            aadhaarLabel.innerHTML = 'विद्यार्थी का आधार संख्या <span style="color:red">*</span>';
+        }
+
+        // Previous School UDISE code requirement and note logic
+        if (cls === 1) {
+            previousUdiseField.required = false;
+            previousUdiseNote.style.display = 'block';
+            previousUdiseLabel.innerHTML = 'पूर्व विद्यालय का UDISE कोड';
+        } else {
+            previousUdiseField.required = true;
+            previousUdiseNote.style.display = 'none';
+            previousUdiseLabel.innerHTML = 'पूर्व विद्यालय का UDISE कोड <span style="color:red">*</span>';
+        }
+
+        if (cls === 11 || cls === 12) {
+            streamBlock.style.display = 'block';
+            streamField.required = true;
+        } else {
+            streamBlock.style.display = 'none';
+            streamField.required = false;
+            streamField.value = '';
+        }
+
+        if(cls >= 9){
+            relationBlock.style.display = 'none';
+
+            accountHolder.value = studentName.value || '';
+            accountHolder.readOnly = true;
+            accountHolder.style.background = '#f3f4f6';
+        }
+        else if(cls >= 1){
+            relationBlock.style.display = 'block';
+
+            accountHolder.readOnly = false;
+            accountHolder.style.background = '';
+        }
+    }
+
+    classSelect.addEventListener('change', updateBankFields);
+
+    studentName.addEventListener('input', () => {
+        const cls = parseInt(classSelect.value || '0',10);
+
+        if(cls >= 9){
+            accountHolder.value = studentName.value;
+        }
+    });
+
+    function updateSearchMode(){
+        const cls = parseInt(searchClass?.value || '0',10);
+
+        if(cls === 1){
+            searchApplicationBlock.style.display = 'block';
+            searchPenBlock.style.display = 'none';
+        } else if(cls >= 2){
+            searchApplicationBlock.style.display = 'none';
+            searchPenBlock.style.display = 'block';
+        } else {
+            searchApplicationBlock.style.display = 'none';
+            searchPenBlock.style.display = 'none';
+        }
+    }
+
+    if(searchClass){
+        searchClass.addEventListener('change', updateSearchMode);
+    }
+
+    updateSearchMode();
+
+    updateBankFields();
+})();
+</script>
+<script src="admission.js"></script>
+</body>
+</html>
