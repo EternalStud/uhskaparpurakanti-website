@@ -77,7 +77,7 @@
 
                 <div>
                     <label>विद्यार्थी का APAAR ID</label>
-                    <input type="text" id="apaarId" placeholder="Enter 12-digit APAAR ID">
+                    <input type="text" id="apaarId" maxlength="12" placeholder="Enter 12-digit APAAR ID">
                 </div>
 
                 <div>
@@ -88,7 +88,7 @@
 
                 <div>
                     <label>विद्यार्थी का ई-शिक्षाकोष ID</label>
-                    <input type="text" id="eshikshakoshId" placeholder="Enter E-Shikshakosh ID">
+                    <input type="text" id="eshikshakoshId" maxlength="15" placeholder="Enter 15-digit E-Shikshakosh ID">
                 </div>
 
                 <div>
@@ -167,7 +167,7 @@
 
                 <div>
                     <label>मोबाइल संख्या <span style="color:red">*</span></label>
-                    <input type="tel" id="mobile" placeholder="Enter 10-digit Mobile Number" required>
+                    <input type="text" id="mobile" maxlength="10" placeholder="Enter 10-digit Mobile Number" required>
                 </div>
             </div>
         </section>
@@ -182,7 +182,7 @@
                 </div>
                 <div>
                     <label>पिन कोड <span style="color:red">*</span></label>
-                    <input type="text" placeholder="Enter 6-digit PIN Code" id="pinCode">
+                    <input type="text" id="pinCode" maxlength="6" placeholder="Enter 6-digit PIN Code">
                 </div>
             </div>
         </section>
@@ -203,7 +203,7 @@
                 </div>
 
                 <div>
-                    <label>क्या विशेष आवश्यकता वाले बच्चों की शिक्षा (CWSN) है? <span style="color:red">*</span></label>
+                    <label>क्या विद्यार्थी दिव्यांग (CWSN) श्रेणी में आता/आती है?<span style="color:red">*</span></label>
                     <select id="cwsn">
                         <option>No</option>
                         <option>Yes</option>
@@ -236,12 +236,12 @@
 
                 <div>
                     <label>लंबाई (सेमी) <span style="color:red">*</span></label>
-                    <input type="number" id="height" placeholder="Height in CM">
+                    <input type="number" id="height" min="50" max="220" placeholder="Height in CM">
                 </div>
 
                 <div>
                     <label>वजन (किलो) <span style="color:red">*</span></label>
-                    <input type="number" id="weight" placeholder="Weight in KG">
+                    <input type="number" id="weight" min="5" max="150" placeholder="Weight in KG">
                 </div>
             </div>
         </section>
@@ -251,7 +251,7 @@
 
             <div>
                 <label id="previousUdiseLabel">पूर्व विद्यालय का UDISE कोड <span style="color:red">*</span></label>
-                <input type="text" placeholder="Enter Previous School UDISE Code" id="previousUdise">
+                <input type="text" id="previousUdise" maxlength="11" placeholder="Enter 11-digit Previous School UDISE Code">
                 <small id="previousUdiseNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए यह विवरण वैकल्पिक है।</small>
             </div>
         </section>
@@ -262,7 +262,7 @@
             <div class="grid-2">
                 <div>
                     <label>बैंक खाता संख्या <span style="color:red">*</span></label>
-                    <input type="text" placeholder="Enter Bank Account Number" id="accountNumber">
+                    <input type="text" id="accountNumber" maxlength="18" placeholder="Enter Bank Account Number">
                 </div>
 
                 <div>
@@ -293,45 +293,39 @@
         </section>
 
         <section class="form-section declaration-box" id="declarationSection" style="display:none;">
-    <p>
-        मैं, यह घोषणा करता/करती हूँ कि ऊपर दी गई सभी सूचना सही है तथा मेरा नामांकन वर्तमान में किसी अन्य निजी/सरकारी विद्यालय में नहीं है। मैं नियमित रूप से विद्यालय में उपस्थित रहूँगा/रहूँगी। 75% से कम उपस्थिति होने पर मुझे किसी भी प्रकार का सरकारी लाभ देय नहीं होगा।
-    </p>
-
-    <br>
-    <p><strong>महत्वपूर्ण:</strong> गलत जानकारी देने पर आवेदन रद्द किया जा सकता है।</p>
-    <br>
-
-    <p>
-        I hereby declare that all information provided is true and correct. I am not currently enrolled in any other school. Below 75% attendance disqualifies me from government benefits.
-    </p>
-
-    <br>
-
-    <label>
-        <input type="checkbox" id="declaration" required>
-        मैं उपरोक्त घोषणा से सहमत हूँ / I agree to the above declaration <span style="color:red">*</span>
-    </label>
-</section>
+            <p>
+                मैं, यह घोषणा करता/करती हूँ कि ऊपर दी गई सभी सूचना सही है तथा मेरा नामांकन वर्तमान में किसी अन्य निजी/सरकारी विद्यालय में नहीं है। मैं नियमित रूप से विद्यालय में उपस्थित रहूँगा/रहूँगी। 75% से कम उपस्थिति होने पर मुझे किसी भी प्रकार का सरकारी लाभ देय नहीं होगा।
+            </p>
+            <br>
+            <p><strong>महत्वपूर्ण:</strong> गलत जानकारी देने पर आवेदन रद्द किया जा सकता है।</p>
+            <br>
+            <p>
+                I hereby declare that all information provided is true and correct. I am not currently enrolled in any other school. Below 75% attendance disqualifies me from government benefits.
+            </p>
+            <br>
+            <label>
+                <input type="checkbox" id="declaration" required>
+                मैं उपरोक्त घोषणा से सहमत हूँ / I agree to the above declaration <span style="color:red">*</span>
+            </label>
+        </section>
 
         <section class="form-section" id="uploadSection" style="display:none;">
-    <h3>फोटो एवं हस्ताक्षर अपलोड</h3>
-
-    <div class="grid-2">
-        <div class="photo-box">
-            <label>छात्र का फोटो <span style="color:red">*</span></label>
-            <p class="upload-note">पासपोर्ट आकार फोटो (3.5cm × 3.0cm)<br>फाइल आकार: 50KB से 100KB</p>
-            <div id="photoPreview">फोटो यहाँ दिखाई देगा</div>
-            <input type="file" id="studentPhoto" accept="image/jpeg,image/jpg,image/png" required>
-        </div>
-
-        <div class="photo-box">
-            <label>छात्र का हस्ताक्षर <span style="color:red">*</span></label>
-            <p class="upload-note">हस्ताक्षर (3.5cm × 1.1cm)<br>फाइल आकार: 5KB से 20KB</p>
-            <div id="signaturePreview">हस्ताक्षर यहाँ दिखाई देगा</div>
-            <input type="file" id="studentSignature" accept="image/jpeg,image/jpg,image/png" required>
-        </div>
-    </div>
-</section>
+            <h3>फोटो एवं हस्ताक्षर अपलोड</h3>
+            <div class="grid-2">
+                <div class="photo-box">
+                    <label>छात्र का फोटो <span style="color:red">*</span></label>
+                    <p class="upload-note">पासपोर्ट आकार फोटो (3.5cm × 3.0cm)<br>फाइल आकार: 50KB से 100KB</p>
+                    <div id="photoPreview">फोटो यहाँ दिखाई देगा</div>
+                    <input type="file" id="studentPhoto" accept="image/jpeg,image/jpg,image/png" required>
+                </div>
+                <div class="photo-box">
+                    <label>छात्र का हस्ताक्षर <span style="color:red">*</span></label>
+                    <p class="upload-note">हस्ताक्षर (3.5cm × 1.1cm)<br>फाइल आकार: 5KB से 20KB</p>
+                    <div id="signaturePreview">हस्ताक्षर यहाँ दिखाई देगा</div>
+                    <input type="file" id="studentSignature" accept="image/jpeg,image/jpg,image/png" required>
+                </div>
+            </div>
+        </section>
 
         <div class="form-actions" id="formActions" style="display:none;">
             <button type="button" id="previewBtn">👁 आवेदन पूर्वावलोकन</button>
@@ -339,57 +333,55 @@
             <button type="reset">🗑 सभी जानकारी हटाएँ</button>
         </div>
 
-<section class="form-section">
-    <h3>यदि आपने पहले से नामांकन प्रपत्र भर रखा है, तो आवेदन डाउनलोड कर विद्यालय में जमा करें</h3>
+        <section class="form-section">
+            <h3>यदि आपने पहले से नामांकन प्रपत्र भर रखा है, तो आवेदन डाउनलोड कर विद्यालय में जमा करें</h3>
+            <div class="grid-2">
+                <div>
+                    <label>कक्षा <span style="color:red">*</span></label>
+                    <select id="searchClass">
+                        <option value="">-- कक्षा चुनें --</option>
+                        <option value="1">Class I</option>
+                        <option value="2">Class II</option>
+                        <option value="3">Class III</option>
+                        <option value="4">Class IV</option>
+                        <option value="5">Class V</option>
+                        <option value="6">Class VI</option>
+                        <option value="7">Class VII</option>
+                        <option value="8">Class VIII</option>
+                        <option value="9">Class IX</option>
+                        <option value="10">Class X</option>
+                        <option value="11">Class XI</option>
+                        <option value="12">Class XII</option>
+                    </select>
+                </div>
 
-    <div class="grid-2">
+                <div id="searchTypeBlock" style="display:none;">
+                    <label>खोजने का प्रकार</label>
+                    <select id="searchType">
+                        <option value="appId">Application ID</option>
+                        <option value="pen">PEN Number</option>
+                    </select>
+                </div>
 
-        <div>
-            <label>कक्षा <span style="color:red">*</span></label>
-            <select id="searchClass">
-                <option value="">-- कक्षा चुनें --</option>
-                <option value="1">Class I</option>
-                <option value="2">Class II</option>
-                <option value="3">Class III</option>
-                <option value="4">Class IV</option>
-                <option value="5">Class V</option>
-                <option value="6">Class VI</option>
-                <option value="7">Class VII</option>
-                <option value="8">Class VIII</option>
-                <option value="9">Class IX</option>
-                <option value="10">Class X</option>
-                <option value="11">Class XI</option>
-                <option value="12">Class XII</option>
-            </select>
-        </div>
+                <div id="searchApplicationBlock" style="display:none;">
+                    <label>Application ID</label>
+                    <input type="text" id="searchApplicationId" placeholder="Enter Application ID">
+                    <small style="color:#2563eb;">Application ID से खोजें।</small>
+                </div>
 
-        <div id="searchApplicationBlock" style="display:none;">
-            <label>Application ID</label>
-            <input
-                type="text"
-                id="searchApplicationId"
-                placeholder="Enter Application ID">
-            <small style="color:#2563eb;">Class I के लिए Application ID से खोजें।</small>
-        </div>
+                <div id="searchPenBlock" style="display:none;">
+                    <label>PEN संख्या</label>
+                    <input type="text" id="searchPen" maxlength="11" placeholder="Enter 11-digit PEN Number">
+                    <small style="color:#2563eb;">PEN Number से खोजें।</small>
+                </div>
+            </div>
 
-        <div id="searchPenBlock" style="display:none;">
-            <label>PEN संख्या</label>
-            <input
-                type="text"
-                id="searchPen"
-                maxlength="11"
-                placeholder="Enter 11-digit PEN Number">
-            <small style="color:#2563eb;">Class II–XII के लिए PEN Number से खोजें।</small>
-        </div>
-
-    </div>
-
-    <div style="margin-top:15px;">
-        <button type="button" id="downloadExistingBtn">
-            📄 आवेदन डाउनलोड करें
-        </button>
-    </div>
-</section>
+            <div style="margin-top:15px;">
+                <button type="button" id="downloadExistingBtn">
+                    📄 आवेदन डाउनलोड करें
+                </button>
+            </div>
+        </section>
 
     </form>
 </div>
@@ -398,11 +390,8 @@
 (function () {
     const today = new Date();
     const year = today.getFullYear();
-
-    // Academic session changes automatically every April
     const startYear = today.getMonth() >= 3 ? year : year - 1;
     const endYear = startYear + 1;
-
     const sessionEl = document.getElementById('academicSession');
     if (sessionEl) {
         sessionEl.textContent = `${startYear}-${String(endYear).slice(-2)}`;
@@ -429,7 +418,10 @@
     const previousUdiseField = document.getElementById('previousUdise');
     const previousUdiseLabel = document.getElementById('previousUdiseLabel');
     const previousUdiseNote = document.getElementById('previousUdiseNote');
+    
     const searchClass = document.getElementById('searchClass');
+    const searchType = document.getElementById('searchType');
+    const searchTypeBlock = document.getElementById('searchTypeBlock');
     const searchPenBlock = document.getElementById('searchPenBlock');
     const searchApplicationBlock = document.getElementById('searchApplicationBlock');
 
@@ -444,7 +436,6 @@
 
     function updateBankFields(){
         const cls = parseInt(classSelect.value || '0',10);
-
         const showSections = cls >= 1;
         if (formActions) {
             formActions.style.display = showSections ? 'flex' : 'none';
@@ -473,29 +464,23 @@
             penField.required = false;
             penNote.style.display = 'block';
             penLabel.innerHTML = 'विद्यार्थी का PEN संख्या';
-        } else {
-            penField.required = true;
-            penNote.style.display = 'none';
-            penLabel.innerHTML = 'विद्यार्थी का PEN संख्या <span style="color:red">*</span>';
-        }
-
-        // Aadhaar requirement and note logic for student
-        if (cls === 1) {
+            
             aadhaarField.required = false;
             aadhaarNote.style.display = 'block';
             aadhaarLabel.innerHTML = 'विद्यार्थी का आधार संख्या';
-        } else {
-            aadhaarField.required = true;
-            aadhaarNote.style.display = 'none';
-            aadhaarLabel.innerHTML = 'विद्यार्थी का आधार संख्या <span style="color:red">*</span>';
-        }
 
-        // Previous School UDISE code requirement and note logic
-        if (cls === 1) {
             previousUdiseField.required = false;
             previousUdiseNote.style.display = 'block';
             previousUdiseLabel.innerHTML = 'पूर्व विद्यालय का UDISE कोड';
         } else {
+            penField.required = true;
+            penNote.style.display = 'none';
+            penLabel.innerHTML = 'विद्यार्थी का PEN संख्या <span style="color:red">*</span>';
+
+            aadhaarField.required = true;
+            aadhaarNote.style.display = 'none';
+            aadhaarLabel.innerHTML = 'विद्यार्थी का आधार संख्या <span style="color:red">*</span>';
+
             previousUdiseField.required = true;
             previousUdiseNote.style.display = 'none';
             previousUdiseLabel.innerHTML = 'पूर्व विद्यालय का UDISE कोड <span style="color:red">*</span>';
@@ -512,24 +497,20 @@
 
         if(cls >= 9){
             relationBlock.style.display = 'none';
-
             accountHolder.value = studentName.value || '';
             accountHolder.readOnly = true;
             accountHolder.style.background = '#f3f4f6';
         }
         else if(cls >= 1){
             relationBlock.style.display = 'block';
-
             accountHolder.readOnly = false;
             accountHolder.style.background = '';
         }
     }
 
     classSelect.addEventListener('change', updateBankFields);
-
     studentName.addEventListener('input', () => {
         const cls = parseInt(classSelect.value || '0',10);
-
         if(cls >= 9){
             accountHolder.value = studentName.value;
         }
@@ -537,25 +518,30 @@
 
     function updateSearchMode(){
         const cls = parseInt(searchClass?.value || '0',10);
-
+        
         if(cls === 1){
+            searchTypeBlock.style.display = 'none';
             searchApplicationBlock.style.display = 'block';
             searchPenBlock.style.display = 'none';
         } else if(cls >= 2){
-            searchApplicationBlock.style.display = 'none';
-            searchPenBlock.style.display = 'block';
+            searchTypeBlock.style.display = 'block';
+            if(searchType.value === 'appId') {
+                searchApplicationBlock.style.display = 'block';
+                searchPenBlock.style.display = 'none';
+            } else {
+                searchApplicationBlock.style.display = 'none';
+                searchPenBlock.style.display = 'block';
+            }
         } else {
+            searchTypeBlock.style.display = 'none';
             searchApplicationBlock.style.display = 'none';
             searchPenBlock.style.display = 'none';
         }
     }
 
-    if(searchClass){
-        searchClass.addEventListener('change', updateSearchMode);
-    }
-
+    if(searchClass){ searchClass.addEventListener('change', updateSearchMode); }
+    if(searchType){ searchType.addEventListener('change', updateSearchMode); }
     updateSearchMode();
-
     updateBankFields();
 })();
 </script>

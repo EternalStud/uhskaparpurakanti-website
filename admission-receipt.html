@@ -100,7 +100,7 @@ table.t td.lbl{
   background:#f8fafc;
   color:#1e3a8a;
   white-space:nowrap;
-  width:1%;          /* shrink to content */
+  width:1%;
   padding-right:6px;
 }
 table.t td.val{color:#111}
@@ -154,9 +154,6 @@ table.t td.val{color:#111}
   line-height:1.4;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   PRINT STYLES — everything that makes it fit on one A4 page
-   ═══════════════════════════════════════════════════════════════════════════ */
 @media print{
   @page{size:A4 portrait;margin:6mm 6mm 6mm 6mm}
   body{background:#fff;padding:0}
@@ -169,16 +166,12 @@ table.t td.val{color:#111}
 <body>
 
 <div class="page-wrap">
-
-  <!-- Screen-only action bar -->
   <div class="action-bar">
     <button class="btn-print" id="printBtn">📄 PDF डाउनलोड / प्रिंट</button>
     <button class="btn-close" onclick="window.close()">✖ बंद करें</button>
   </div>
 
   <div class="receipt">
-
-    <!-- ── HEADER ──────────────────────────────────────────────────── -->
     <div class="hd">
       <div class="hd-center">
         <h1 id="schoolHindi">उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
@@ -196,7 +189,6 @@ table.t td.val{color:#111}
       </div>
     </div>
 
-    <!-- ── STUDENT DETAILS (6-col dense table) ──────────────────────── -->
     <div class="st">विद्यार्थी विवरण</div>
     <table class="t">
       <tr>
@@ -224,7 +216,6 @@ table.t td.val{color:#111}
       </tr>
     </table>
 
-    <!-- ── PARENT + ADDRESS side by side ────────────────────────────── -->
     <div class="cols2" style="margin-top:4px;gap:6px;">
       <div>
         <div class="st">अभिभावक विवरण</div>
@@ -246,7 +237,6 @@ table.t td.val{color:#111}
       </div>
     </div>
 
-    <!-- ── HEALTH + BANK side by side ───────────────────────────────── -->
     <div class="cols2" style="margin-top:4px;gap:6px;">
       <div>
         <div class="st">स्वास्थ्य एवं सामाजिक विवरण</div>
@@ -272,7 +262,6 @@ table.t td.val{color:#111}
       </div>
     </div>
 
-    <!-- bank overflow: name + relation + bank name in one row -->
     <table class="t" style="margin-top:0">
       <tr>
         <td class="lbl">बैंक का नाम</td><td class="val" id="bankName"></td>
@@ -281,7 +270,6 @@ table.t td.val{color:#111}
       </tr>
     </table>
 
-    <!-- ── DECLARATION ───────────────────────────────────────────────── -->
     <div class="st" style="margin-top:4px">घोषणा</div>
     <div class="decl">
       मैं, यह घोषणा करता/करती हूँ कि ऊपर दी गई सभी सूचना सही है तथा मेरा नामांकन वर्तमान में किसी अन्य निजी/सरकारी विद्यालय में नहीं है।
@@ -289,7 +277,6 @@ table.t td.val{color:#111}
       <strong>महत्वपूर्ण:</strong> गलत जानकारी देने पर आवेदन रद्द किया जा सकता है।
     </div>
 
-    <!-- ── SIGNATURES ─────────────────────────────────────────────────── -->
     <div class="sig-strip">
       <div class="sig-box" id="studentSignatureArea">
         <span>छात्र/छात्रा का हस्ताक्षर</span>
@@ -302,7 +289,6 @@ table.t td.val{color:#111}
       </div>
     </div>
 
-    <!-- ── OFFICE USE ─────────────────────────────────────────────────── -->
     <div class="st" style="margin-top:4px">केवल विद्यालय उपयोग हेतु (FOR OFFICE USE ONLY)</div>
     <div class="office-strip">
       <div class="oc"><b>नामांकन संख्या</b><span id="admissionNumber">&nbsp;</span></div>
@@ -310,13 +296,13 @@ table.t td.val{color:#111}
       <div class="oc"><b>सत्यापन टिप्पणी</b>&nbsp;</div>
     </div>
 
-  </div><!-- /.receipt -->
-</div><!-- /.page-wrap -->
+  </div>
+</div>
 
 <script>
+// MAKE SURE THIS MATCHES YOUR LIVE DEPLOYMENT URL!
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyWfDYM6KB0YErFOKgJ8p8nkgjx5FuChsx4EFD-yaxi4UuFRUb-Xe2AvTFY4rYDEknpRA/exec';
 
-// ── Print: wait for images ────────────────────────────────────────────────
 document.getElementById('printBtn').addEventListener('click', function () {
   const btn = this;
   const imgs = Array.from(document.querySelectorAll('img'));
@@ -331,18 +317,25 @@ document.getElementById('printBtn').addEventListener('click', function () {
   });
 });
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function setText(id, v) {
   const el = document.getElementById(id);
   if (el) el.textContent = v || '';
 }
 
+// FIX 1: Safely extracts the ID from Apps Script Drive URLs to bypass browser image blocking
 function driveUrl(raw) {
   if (!raw) return '';
   if (raw.startsWith('data:')) return raw;
-  const m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w400`;
-  if (/^[a-zA-Z0-9_-]{25,}$/.test(raw)) return `https://drive.google.com/thumbnail?id=${raw}&sz=w400`;
+  
+  let id = '';
+  const m1 = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const m2 = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/); // Catches the 'id=' format
+  
+  if (m1) id = m1[1];
+  else if (m2) id = m2[1];
+  else if (/^[a-zA-Z0-9_-]{25,}$/.test(raw)) id = raw;
+  
+  if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
   return raw;
 }
 
@@ -359,17 +352,19 @@ async function toBase64(url) {
       fr.onerror = () => rej();
       fr.readAsDataURL(blob);
     });
-  } catch { return url; }
+  } catch { 
+    return url; // Fallback to standard URL if fetch is blocked
+  }
 }
 
 async function setImage(id, raw, label) {
   const el = document.getElementById(id);
   if (!el || !raw) return;
   const src = await toBase64(driveUrl(raw));
-  el.src = src; el.alt = label;
+  el.src = src; 
+  el.alt = label;
 }
 
-// ── Populate ──────────────────────────────────────────────────────────────
 async function populatePage(d) {
   setText('applicationId', d.applicationId);
   if (d.submittedAt) {
@@ -378,10 +373,23 @@ async function populatePage(d) {
   }
   setText('status', d.status || 'Pending');
 
-  // DOB safe parse
+  // FIX 2: Correctly format ISO Date Strings to standard DD/MM/YYYY
   if (d.dob) {
-    const parts = String(d.dob).split('-');
-    setText('dob', parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : d.dob);
+    let dobStr = String(d.dob);
+    if (dobStr.includes('T')) {
+        const dt = new Date(dobStr);
+        if(!isNaN(dt)) {
+            const dd = String(dt.getDate()).padStart(2, '0');
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const yyyy = dt.getFullYear();
+            setText('dob', `${dd}/${mm}/${yyyy}`);
+        } else {
+            setText('dob', dobStr);
+        }
+    } else {
+        const parts = dobStr.split('-');
+        setText('dob', parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dobStr);
+    }
   }
 
   setText('studentName2', d.studentNameEnglish);
@@ -395,7 +403,6 @@ async function populatePage(d) {
   setText('religion',     d.religion);
   setText('bloodGroup',   d.bloodGroup);
 
-  // Stream row (Class 11/12 only)
   const is1112 = /(11|12|XI|XII)/i.test(String(d.admissionClass || ''));
   const streamRow = document.getElementById('streamRow');
   if (streamRow) streamRow.style.display = is1112 ? 'table-row' : 'none';
@@ -411,7 +418,6 @@ async function populatePage(d) {
   setText('pinCode',      d.pinCode);
   setText('previousUdise',d.previousUdise);
   setText('distance',     d.distance);
-
   setText('cwsn',         d.cwsn);
   setText('income',       d.income);
   setText('height',       d.height);
@@ -426,18 +432,15 @@ async function populatePage(d) {
   setText('admissionNumber', d.admissionNumber || '');
   setText('admissionDate',   d.admissionDate   || '');
 
-  // School name / UDISE switch
   const isSenior = /(9|10|11|12|IX|X|XI|XII)/i.test(String(d.admissionClass || ''));
   document.getElementById('schoolHindi').textContent   = isSenior ? 'उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर'                  : 'म.वि. कपरपुरा, काँटी, मुजफ्फरपुर';
   document.getElementById('schoolEnglish').textContent = isSenior ? 'UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR' : 'MADHYA VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR';
   document.getElementById('schoolUdise').textContent   = isSenior ? '10140616812' : '10140616801';
 
-  // Session
   const now = new Date(); const yr = now.getFullYear();
   const sy = now.getMonth() >= 3 ? yr : yr - 1;
   setText('academicSession', `${sy}-${String(sy+1).slice(-2)}`);
 
-  // Photo / signature
   const photoRaw = d.photoPreview || d.photoUrl || d.photo || '';
   const signRaw  = d.signaturePreview || d.signatureUrl || d.signature || '';
 
@@ -447,36 +450,32 @@ async function populatePage(d) {
   } else {
     await setImage('studentPhotoPreview', photoRaw, 'Student Photo');
     if (signRaw) {
-      const sig = await toBase64(driveUrl(signRaw));
+      const sigSrc = await toBase64(driveUrl(signRaw));
       document.getElementById('studentSignatureArea').innerHTML =
-        `<img src="${sig}" style="max-height:30px;max-width:130px;object-fit:contain;margin-bottom:2px">
+        `<img src="${sigSrc}" style="max-height:30px;max-width:130px;object-fit:contain;margin-bottom:2px">
          <span>छात्र/छात्रा का हस्ताक्षर</span>`;
     }
   }
 }
 
-// ── Load: URL param → server → fallback localStorage ────────────────────
 (async function () {
   const params = new URLSearchParams(window.location.search);
   const appId  = params.get('id');
-  const pen    = params.get('pen');
-
   let data = {};
 
-  if (appId || pen) {
+  if (appId === 'PREVIEW') {
+    try { data = JSON.parse(sessionStorage.getItem('previewAdmissionData') || '{}'); } catch {}
+  } else if (appId) {
     try {
-      const url = appId
-        ? `${WEB_APP_URL}?applicationId=${encodeURIComponent(appId)}`
-        : `${WEB_APP_URL}?pen=${encodeURIComponent(pen)}`;
-      const res    = await fetch(url);
+      const url = `${WEB_APP_URL}?applicationId=${encodeURIComponent(appId)}`;
+      const res = await fetch(url);
       const result = await res.json();
       if (result.success && result.record) data = result.record;
     } catch (err) { console.error('Server fetch failed:', err); }
   }
 
-  // Fallback to localStorage (preview mode)
   if (!data.applicationId) {
-    try { data = JSON.parse(localStorage.getItem('lastAdmissionData') || '{}'); } catch {}
+    try { data = JSON.parse(sessionStorage.getItem('previewAdmissionData') || '{}'); } catch {}
   }
 
   await populatePage(data);
