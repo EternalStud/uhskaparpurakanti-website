@@ -5,6 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>उच्चतर माध्यमिक विद्यालय कपरपुरा | UCHCH MADHYAMIK VIDYALAYA KAPARPURA</title>
 <meta name="description" content="Official website of Uchch Madhyamik Vidyalaya Kaparpura, Kanti, Muzaffarpur, Bihar. UDISE Code: 10140616812">
+<link rel="canonical" href="https://uhskaparpurakanti.in/">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph -->
+<meta property="og:title" content="उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर">
+<meta property="og:description" content="Government Senior Secondary School — Uchch Madhyamik Vidyalaya Kaparpura (UDISE: 10140616812).">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://uhskaparpurakanti.in/">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="उच्चतर माध्यमिक विद्यालय कपरपुरा">
+<meta name="twitter:description" content="Government Senior Secondary School — Uchch Madhyamik Vidyalaya Kaparpura (UDISE: 10140616812).">
+
+<meta name="theme-color" content="#0f172a">
+
+<!-- Content Security Policy (relatively permissive to avoid breakage) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://www.youtube.com https://maps.app.goo.gl;">
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230f172a'/><text y='68' x='50' text-anchor='middle' font-size='60'>🏫</text></svg>">
 
@@ -12,10 +30,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 
+<link rel="preload" href="/style.css" as="style">
 <link rel="stylesheet" href="style.css">
+
+<!-- JSON-LD Organization/School -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "School",
+  "name": "उच्चतर माध्यमिक विद्यालय कपरपुरा",
+  "url": "https://uhskaparpurakanti.in/",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Kanti",
+    "addressRegion": "Muzaffarpur",
+    "addressCountry": "IN"
+  },
+  "sameAs": []
+}
+</script>
 </head>
 <body>
-<button id="theme-toggle" class="theme-toggle">🌙</button>
+<a class="skip-link" href="#home" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to content</a>
+<noscript><div style="background:#fffbeb;color:#92400e;padding:10px;text-align:center;">This site works best with JavaScript enabled.</div></noscript>
+<button id="theme-toggle" class="theme-toggle" aria-label="टॉपिक टॉगल">🌙</button>
 
 <!-- L: Scroll to top button -->
 <button id="scroll-top" class="scroll-top" aria-label="ऊपर जाएँ">↑</button>
@@ -94,13 +132,12 @@
   </div>
 </section>
 
-<!-- H: Brief school intro added above stats -->
 <section id="about" class="section">
   <div class="container">
     <h2>विद्यालय एक नज़र में</h2>
     <p class="section-subtitle">नामांकन, शिक्षक एवं कार्यालय कर्मियों की जानकारी</p>
 
-   
+    
 
     <div class="about-grid">
       <div>
@@ -148,7 +185,6 @@
   </div>
 </section>
 
-<!-- G: h2 added, subtitle starts empty -->
 <section id="principal" class="section">
   <div class="container">
     <h2>प्रधानाध्यापक का संदेश</h2>
@@ -187,8 +223,8 @@
     <p>Block: काँटी | District: Muzaffarpur | State: Bihar</p>
     <p>Government Senior Secondary School</p>
     <p>Matric Code: 51375 | Inter Code: 31445</p>
-    <p>Classes: IX to XII | Streams: Arts & Science</p>
-    <p><a href="https://maps.app.goo.gl/J5Jp2DG2oXMSZ6RQ7?g_st=ac" target="_blank">📍 View School on Google Maps</a></p>
+    <p>Classes: IX to XII | Streams: Arts &amp; Science</p>
+    <p><a href="https://maps.app.goo.gl/J5Jp2DG2oXMSZ6RQ7?g_st=ac" target="_blank" rel="noopener noreferrer">📍 View School on Google Maps</a></p>
   </div>
 </section>
 
@@ -204,7 +240,7 @@
 <div id="gallery-lightbox" class="gallery-lightbox">
   <button id="lightbox-close" class="lightbox-close">✕</button>
   <button id="lightbox-prev" class="lightbox-nav">◀</button>
-  <img id="lightbox-image" src="" alt="Gallery Photo">
+  <img id="lightbox-image" src="" alt="Gallery Photo" loading="lazy">
   <button id="lightbox-next" class="lightbox-nav">▶</button>
 </div>
 
@@ -218,6 +254,6 @@
   </div>
 </footer>
 
-<script src="script.js"></script>
+<script src="script.js" defer></script>
 </body>
 </html>
