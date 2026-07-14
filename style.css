@@ -597,7 +597,7 @@ footer {
     font-size: .95rem;
 }
 
-.notice-card::after {
+/* .notice-card::after {
     content: 'सक्रिय';
     position: absolute;
     top: 16px;
@@ -608,6 +608,31 @@ footer {
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 999px;
+} */
+
+.btn-notice-share {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(217, 119, 6, 0.1);
+    color: var(--accent);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s, transform 0.2s, color 0.2s;
+    font-family: inherit;
+}
+
+.btn-notice-share:hover {
+    background: var(--accent);
+    color: white;
+    transform: scale(1.05);
 }
 
 .notice-card h3 {

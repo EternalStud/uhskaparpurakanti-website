@@ -132,11 +132,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            noticeContainer.innerHTML = notices.map(notice => {
+            noticeContainer.innerHTML = notices.map((notice, index) => {
                 const priorityClass = notice.priority === 'High' ? 'notice-high' : 'notice-normal';
                 const details = notice.details || '';
+                const shareLink = `https://uhskaparpurakanti.in/#notice-${index}`;
                 return `
-                    <div class="notice-card ${priorityClass}">
+                    <div class="notice-card ${priorityClass}" id="notice-${index}">
+                        <button class="btn-notice-share" type="button" 
+                                data-title="${encodeURIComponent(notice.title || '')}" 
+                                data-text="${encodeURIComponent(details)}" 
+                                data-url="${shareLink}">
+                            🔗 साझा करें
+                        </button>
                         <div class="notice-category">${notice.category || ''}</div>
                         <h3>${notice.title || ''}</h3>
                         <p class="notice-text collapsed">${details}</p>
@@ -172,6 +179,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         text.classList.remove('collapsed');
                         text.classList.add('expanded');
                         button.textContent = 'कम करें ▲';
+                    }
+                });
+            });
+
+            // Share handler
+            noticeContainer.querySelectorAll('.btn-notice-share').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const title = decodeURIComponent(button.dataset.title);
+                    const text = decodeURIComponent(button.dataset.text);
+                    const url = button.dataset.url;
+
+                    const fullShareMessage = `${title}\n\n${text}\n\nपढ़ें: ${url}`;
+
+                    if (navigator.share) {
+                        try {
+                            await navigator.share({
+                                title: title,
+                                text: fullShareMessage,
+                                url: url
+                            });
+                        } catch (err) {
+                            console.log('Share canceled or failed:', err);
+                        }
+                    } else {
+                        // Fallback: Copy link to clipboard
+                        try {
+                            await navigator.clipboard.writeText(fullShareMessage);
+                            alert('लिंक क्लिपबोर्ड पर कॉपी हो गया है! अब आप इसे कहीं भी शेयर कर सकते हैं।');
+                        } catch (copyErr) {
+                            alert('लिंक कॉपी करने में त्रुटि हुई।');
+                        }
                     }
                 });
             });
