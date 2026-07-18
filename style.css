@@ -1318,3 +1318,30 @@ footer {
     .skeleton-gallery-card { height: 220px; }
 
     #visitor-count { font-size: .95rem; }
+
+}
+
+/* =====================
+   ADMISSION PULSE
+   ===================== */
+@keyframes admissionPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 4px 25px rgba(46, 204, 113, 0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+  }
+}
+.admission-pulse {
+  animation: admissionPulse 2s infinite ease-in-out;
+}
+.admission-pulse:hover {
+  background-color: #2ecc71 !important;
+  opacity: 0.9;
+}

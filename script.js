@@ -1,5 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    function formatDriveUrl(url) {
+        if (!url) return '';
+        if (url.includes('drive.google.com/thumbnail?id=')) {
+            const idMatch = url.match(/[?&]id=([^&]+)/);
+            if (idMatch && idMatch[1]) {
+                return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+            }
+        }
+        return url;
+    }
+
     // =====================
     // THEME TOGGLE
     // =====================
@@ -234,7 +245,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(GALLERY_API_URL, {
                 cache: 'no-store'
             });
-            const categories = await response.json();
+            const rawCategories = await response.json();
+            const categories = rawCategories.map(cat => ({
+                ...cat,
+                cover: formatDriveUrl(cat.cover),
+                photos: (cat.photos || []).map(photo => ({
+                    ...photo,
+                    url: formatDriveUrl(photo.url)
+                }))
+            }));
 
             let currentPhotos = [];
             let currentIndex = 0;
@@ -360,6 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 cache: 'no-store'
             });
             const data = await response.json();
+            if (data.principalPhoto) data.principalPhoto = formatDriveUrl(data.principalPhoto);
+            if (data.staffPhoto) data.staffPhoto = formatDriveUrl(data.staffPhoto);
 
             const nameEl        = document.getElementById('principal-name');
             const desigEl       = document.getElementById('principal-designation');
@@ -578,8 +599,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =====================
+    // PORTAL ADMISSION SETTING
+    // =====================
+    async function checkAdmissionStatus() {
+        const ADMIN_API_URL = "https://script.google.com/macros/s/AKfycbyhhOW12LuQhroFQEywpX-fz6-WRG6wT-_OmD4T0kstYccIxVT7nn-MwiKniERkh_jD/exec";
+        try {
+            const response = await fetch(`${ADMIN_API_URL}?action=public.settings.get`, {
+                cache: 'no-store'
+            });
+            const data = await response.json();
+            if (data.success && data.settings) {
+                if (data.settings.admission_open) {
+                    // Calculate dynamic session (starting in April)
+                    const today = new Date();
+                    const currentYear = today.getFullYear();
+                    const startYear = today.getMonth() >= 3 ? currentYear : currentYear - 1;
+                    const endYear = startYear + 1;
+                    const sessionStr = `${startYear}-${String(endYear).slice(-2)}`;
+
+                    const sessionTextSpan = document.getElementById('admission-session-text');
+                    if (sessionTextSpan) {
+                        sessionTextSpan.textContent = sessionStr;
+                    }
+
+                    // Show Hero section banner
+                    const banner = document.getElementById('admission-banner-container');
+                    if (banner) banner.style.display = 'block';
+
+                    // Proactively add admission link to the Desktop Nav bar
+                    const desktopNav = document.querySelector('.desktop-nav');
+                    if (desktopNav && !desktopNav.querySelector('a[href="admission.html"]')) {
+                        const link = document.createElement('a');
+                        link.href = 'admission.html';
+                        link.style.color = '#2ecc71';
+                        link.style.fontWeight = '700';
+                        link.textContent = 'नामांकन (Online Admission)';
+                        desktopNav.appendChild(link);
+                    }
+
+                    // Proactively add admission link to the Nav Drawer
+                    const drawerNav = document.querySelector('.nav-drawer nav');
+                    if (drawerNav && !drawerNav.querySelector('a[href="admission.html"]')) {
+                        const link = document.createElement('a');
+                        link.href = 'admission.html';
+                        link.className = 'drawer-link';
+                        link.style.color = '#2ecc71';
+                        link.style.fontWeight = '700';
+                        link.textContent = '📝 ऑनलाइन नामांकन';
+                        drawerNav.appendChild(link);
+                        
+                        // Re-bind click event to close drawer
+                        link.addEventListener('click', () => {
+                            const drawer = document.getElementById('nav-drawer');
+                            const overlay = document.getElementById('nav-overlay');
+                            if (drawer) drawer.classList.remove('active');
+                            if (overlay) overlay.classList.remove('active');
+                            document.body.style.overflow = '';
+                        });
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load admission settings:', error);
+        }
+    }
+
+    // =====================
     // INIT
     // =====================
+    checkAdmissionStatus();
     loadNotices();
     loadGallery();
     loadSchoolStats();
