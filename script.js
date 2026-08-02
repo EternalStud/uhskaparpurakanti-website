@@ -113,6 +113,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =====================
+    // API CACHE HELPER
+    // =====================
+    async function fetchWithCache(url, cacheKey, ttlMinutes = 30) {
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                const { timestamp, data } = JSON.parse(cached);
+                if (Date.now() - timestamp < ttlMinutes * 60 * 1000) {
+                    return data;
+                }
+            }
+        } catch (e) {
+            console.warn("Cache read error", e);
+        }
+
+        const response = await fetch(url, { cache: 'no-store' });
+        const data = await response.json();
+
+        try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+                timestamp: Date.now(),
+                data: data
+            }));
+        } catch (e) {
+            console.warn("Cache write error", e);
+        }
+        return data;
+    }
+
+    // =====================
     // NOTICES
     // =====================
     async function loadNotices() {
@@ -122,10 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const NOTICE_API_URL = 'https://script.google.com/macros/s/AKfycbzJ_s1J02Q3bs9PVV6nREQLacFYUr_p5d9etNChGntnq4RzirSYZBrntZp4IMl2bhrY/exec';
 
         try {
-            const response = await fetch(NOTICE_API_URL, {
-                cache: 'no-store'
-            });
-            let notices = await response.json();
+            let notices = await fetchWithCache(NOTICE_API_URL, 'cache_notices', 30);
 
             // Auto-hide expired notices
             const today = new Date();
@@ -242,10 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbzojAlGSjnTcE5_BfkbmO4E1ga2ptIct9cbbsOTaf18Pffow9bu1FlIVq5tFzZrLF2R/exec';
 
         try {
-            const response = await fetch(GALLERY_API_URL, {
-                cache: 'no-store'
-            });
-            const rawCategories = await response.json();
+            const rawCategories = await fetchWithCache(GALLERY_API_URL, 'cache_gallery', 30);
             const categories = rawCategories.map(cat => ({
                 ...cat,
                 cover: formatDriveUrl(cat.cover),
@@ -375,10 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const API_URL = 'https://script.google.com/macros/s/AKfycbxRHACdvIq2cdOZsVB8ZcRTSdkrZ-7QuwnwE2diPJH-Sgt14XGqhe58z2p4_IlBnVme/exec';
 
         try {
-            const response = await fetch(API_URL, {
-                cache: 'no-store'
-            });
-            const data = await response.json();
+            const data = await fetchWithCache(API_URL, 'cache_principal', 30);
             if (data.principalPhoto) data.principalPhoto = formatDriveUrl(data.principalPhoto);
             if (data.staffPhoto) data.staffPhoto = formatDriveUrl(data.staffPhoto);
 
@@ -443,10 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const API_URL = 'https://script.google.com/macros/s/AKfycbw586WFslTxwTECtYWwu0XWiUD9czAeZ5BDg8zTnRSafE0PgF0PMc8W3rdU1h4BS1rS/exec';
 
         try {
-            const response = await fetch(API_URL, {
-                cache: 'no-store'
-            });
-            const data = await response.json();
+            const data = await fetchWithCache(API_URL, 'cache_school_stats', 30);
 
             const statsArea = document.getElementById('stats-cards-area');
             if (statsArea) {
@@ -577,11 +595,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toLocaleDateString('en-CA');
             const lastVisit = localStorage.getItem('uhs-last-visit');
             const action = lastVisit !== today ? 'visit' : 'get';
-
-            const response = await fetch(`${API_URL}?action=${action}`);
-            const data = await response.json();
-
-            if (action === 'visit') localStorage.setItem('uhs-last-visit', today);
+            let data;
+            if (action === 'get') {
+                data = await fetchWithCache(`${API_URL}?action=get`, 'cache_visitor_count', 60);
+            } else {
+                const response = await fetch(`${API_URL}?action=visit`);
+                data = await response.json();
+                localStorage.setItem('uhs-last-visit', today);
+            }
 
             const count = Number(data.count || 0);
 
@@ -602,13 +623,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // PORTAL ADMISSION SETTING
     // =====================
     async function checkAdmissionStatus() {
-        const ADMIN_API_URL = "https://script.google.com/macros/s/AKfycbyhhOW12LuQhroFQEywpX-fz6-WRG6wT-_OmD4T0kstYccIxVT7nn-MwiKniERkh_jD/exec";
+        const ADMIN_API_URL = "https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec";
         try {
-            const response = await fetch(`${ADMIN_API_URL}?action=public.settings.get`, {
-                cache: 'no-store'
-            });
-            const data = await response.json();
-            if (data.success && data.settings) {
+            const data = await fetchWithCache(`${ADMIN_API_URL}?action=public.settings.get`, 'cache_admission_status', 10);
+            if (data && data.success && data.settings) {
                 if (data.settings.admission_open) {
                     // Calculate dynamic session (starting in April)
                     const today = new Date();
@@ -665,14 +683,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =====================
-    // INIT
+    // INIT & OPTIMIZED LOADING
     // =====================
-    checkAdmissionStatus();
-    loadNotices();
-    loadGallery();
-    loadSchoolStats();
-    loadPrincipalSection();
-    updateVisitorCount();
+    async function init() {
+        // Critical components first
+        checkAdmissionStatus();
+        loadNotices();
+        
+        // Stagger non-critical components to prevent GAS API throttling and browser connection exhaustion
+        setTimeout(() => {
+            loadPrincipalSection();
+        }, 500);
+
+        setTimeout(() => {
+            loadSchoolStats();
+        }, 1000);
+
+        setTimeout(() => {
+            loadGallery();
+        }, 1500);
+
+        setTimeout(() => {
+            updateVisitorCount();
+        }, 2000);
+    }
+    
+    init();
 
     console.log('UCHCH MADHYAMIK VIDYALAYA KAPARPURA website loaded successfully.');
 });
