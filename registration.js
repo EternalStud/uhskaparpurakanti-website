@@ -134,12 +134,12 @@ if(bankName) {
     });
 }
 
-// Basic text and punctuation for marks and addresses
+// Basic text for marks and addresses (no punctuation allowed)
 ['mark1', 'mark2', 'address', 'townCity', 'district'].forEach(id => {
     const field = document.getElementById(id);
     if(field) {
         field.addEventListener('input', function() {
-            this.value = this.value.replace(/[^a-zA-Z0-9\u0900-\u097F\s.,\-\/()]/g, '');
+            this.value = this.value.replace(/[^a-zA-Z0-9\u0900-\u097F\s]/g, '');
         });
     }
 });
@@ -224,25 +224,23 @@ function populateForm(student) {
     
     let dobVal = student.dob || '';
     if (dobVal) {
-        if (dobVal.includes("T")) {
-            dobVal = dobVal.split("T")[0];
-        } else if (dobVal.includes("/")) {
-            const parts = dobVal.split("/");
-            if (parts.length === 3) {
-                if(parts[2].length === 4) { // DD/MM/YYYY
-                    dobVal = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-                } else { // YYYY/MM/DD
-                    dobVal = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
-                }
-            }
-        } else {
+        try {
             const d = new Date(dobVal);
             if (!isNaN(d.getTime())) {
                 const year = d.getFullYear();
                 const month = String(d.getMonth() + 1).padStart(2, '0');
                 const day = String(d.getDate()).padStart(2, '0');
                 dobVal = `${year}-${month}-${day}`;
+            } else {
+                const dateRegex = /([a-zA-Z]{3}) (\d{1,2}) (\d{4})/;
+                const match = String(student.dob).match(dateRegex);
+                if(match) {
+                    const months = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+                    dobVal = `${match[3]}-${months[match[1]]}-${match[2].padStart(2, '0')}`;
+                }
             }
+        } catch(e) {
+            console.log("Date parsing error", e);
         }
     }
     document.getElementById('dob').value = dobVal;
