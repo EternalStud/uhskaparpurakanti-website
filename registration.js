@@ -144,9 +144,12 @@ if(bankName) {
     }
 });
 
-// Email basic blur validation
+// Email strict input and blur validation
 const emailF = document.getElementById('email');
 if(emailF) {
+    emailF.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z0-9.@_-]/g, '');
+    });
     emailF.addEventListener('blur', function() {
         if(this.value && !this.value.includes('@')) {
             alert('Please enter a valid email.');
