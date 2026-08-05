@@ -105,14 +105,31 @@ if (signInput) {
     }
 });
 
+// Class change listener
+document.getElementById('regClass').addEventListener('change', function() {
+    const streamBlock = document.getElementById('searchStreamBlock');
+    if (this.value === '11') {
+        streamBlock.style.display = 'block';
+    } else {
+        streamBlock.style.display = 'none';
+        document.getElementById('searchStream').value = '';
+    }
+});
+
 // Fetch Student
 document.getElementById('btnFetchStudent').addEventListener('click', async () => {
     const classNum = document.getElementById('regClass').value;
+    const streamVal = document.getElementById('searchStream') ? document.getElementById('searchStream').value : "";
     const studentCode = document.getElementById('regStudentCode').value.trim();
     const fetchMsg = document.getElementById('fetchMessage');
 
     if (!classNum || !studentCode) {
         alert("कृपया कक्षा और छात्र कोड दर्ज करें। (Please enter Class and Student Code)");
+        return;
+    }
+    
+    if (classNum === '11' && !streamVal) {
+        alert("कृपया संकाय (Stream) चुनें। (Please select Stream)");
         return;
     }
 
@@ -126,15 +143,18 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
 
         if (data.success && data.student) {
             fetchedStudentData = data.student;
+            // Overwrite stream with chosen one for class 11
+            if (classNum === '11') {
+                fetchedStudentData.stream = streamVal;
+            }
             populateForm(data.student);
             document.getElementById('registrationDetails').style.display = 'block';
             fetchMsg.textContent = "विद्यार्थी मिल गया! कृपया शेष विवरण भरें। (Student found! Please fill remaining details.)";
             fetchMsg.style.color = "#16a34a";
         } else {
             document.getElementById('registrationDetails').style.display = 'none';
-            fetchMsg.textContent = "विद्यार्थी नहीं मिला। कृपया कोड और कक्षा जाँचें। (Student not found. Check code and class.)";
+            fetchMsg.textContent = "आप फॉर्म भरने के योग्य नहीं हैं। (You are not eligible to fill the form.)";
             fetchMsg.style.color = "#dc2626";
-            alert(data.error || "Student not found.");
         }
     } catch (err) {
         document.getElementById('registrationDetails').style.display = 'none';
@@ -171,7 +191,6 @@ function populateForm(student) {
     // Handle Subjects
     const existingMsg = document.getElementById('existingSubjectsMsg');
     const subjGrid = document.getElementById('subjectGrid');
-    const streamSel = document.getElementById('streamSelector');
     
     const classNum = parseInt(student.className, 10);
     
@@ -179,7 +198,6 @@ function populateForm(student) {
         // They already have tags
         document.getElementById('hasExistingSubjects').value = "true";
         existingMsg.style.display = 'block';
-        streamSel.style.display = 'none';
         
         let tagsHtml = `<div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px;">`;
         student.subjects.forEach(sub => {
@@ -194,13 +212,8 @@ function populateForm(student) {
         subjGrid.innerHTML = '';
         
         if (classNum === 11) {
-            streamSel.style.display = 'block';
-            document.getElementById('regStream').value = "";
-            document.getElementById('regStream').onchange = () => {
-                loadSubjectDropdowns(11, document.getElementById('regStream').value);
-            };
+            loadSubjectDropdowns(11, fetchedStudentData.stream);
         } else {
-            streamSel.style.display = 'none';
             loadSubjectDropdowns(9, "");
         }
     }
@@ -234,6 +247,18 @@ function renderSubjectDropdowns(classNum) {
     const grid = document.getElementById('subjectGrid');
     let html = '';
     
+    if (classNum === 9) {
+        html += `<div style="grid-column: 1 / -1; margin-bottom: 15px;">
+            <p style="font-weight: bold; margin-bottom: 5px;">अनिवार्य विषय (Compulsory Subjects):</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <span style="background: #f1f5f9; padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1;">Mathematics</span>
+                <span style="background: #f1f5f9; padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1;">Science</span>
+                <span style="background: #f1f5f9; padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1;">Social Science</span>
+                <span style="background: #f1f5f9; padding: 6px 12px; border-radius: 4px; border: 1px solid #cbd5e1;">English</span>
+            </div>
+        </div>`;
+    }
+
     const l1Opts = currentSubjectsConfig.filter(s => s.group === "Language 1");
     const l2Opts = currentSubjectsConfig.filter(s => s.group === "Language 2");
     
@@ -278,6 +303,16 @@ function getSelectedSubjects() {
             subs.push(sel.value);
         }
     });
+    
+    // Auto append compulsory subjects for Class 9
+    const classNum = parseInt(fetchedStudentData.className, 10);
+    if (classNum === 9) {
+        subs.push("Mathematics");
+        subs.push("Science");
+        subs.push("Social Science");
+        subs.push("English");
+    }
+    
     return subs;
 }
 
