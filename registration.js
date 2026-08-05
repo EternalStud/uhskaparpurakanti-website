@@ -213,12 +213,26 @@ function populateForm(student) {
     document.getElementById('motherName').value = student.motherName || '';
     
     let dobVal = student.dob || '';
-    if (dobVal && dobVal.includes("T")) {
-        dobVal = dobVal.split("T")[0];
-    } else if (dobVal && dobVal.includes("/")) {
-        const parts = dobVal.split("/");
-        if (parts.length === 3) {
-            dobVal = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+    if (dobVal) {
+        if (dobVal.includes("T")) {
+            dobVal = dobVal.split("T")[0];
+        } else if (dobVal.includes("/")) {
+            const parts = dobVal.split("/");
+            if (parts.length === 3) {
+                if(parts[2].length === 4) { // DD/MM/YYYY
+                    dobVal = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                } else { // YYYY/MM/DD
+                    dobVal = `${parts[0]}-${parts[1].padStart(2,'0')}-${parts[2].padStart(2,'0')}`;
+                }
+            }
+        } else {
+            const d = new Date(dobVal);
+            if (!isNaN(d.getTime())) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                dobVal = `${year}-${month}-${day}`;
+            }
         }
     }
     document.getElementById('dob').value = dobVal;
