@@ -308,6 +308,7 @@ document.getElementById('registrationForm').addEventListener('submit', async (e)
 
     const payload = {
         studentCode: fetchedStudentData.studentCode,
+        rollNo: fetchedStudentData.rollNo,
         className: fetchedStudentData.className,
         academicSession: document.getElementById('academicSession') ? document.getElementById('academicSession').textContent : fetchedStudentData.academicYear,
         stream: fetchedStudentData.stream || (document.getElementById('regStream') ? document.getElementById('regStream').value : ""),
