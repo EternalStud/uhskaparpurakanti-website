@@ -676,6 +676,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 }
+
+                // Check for registration setting and show link
+                if (data.settings.registration_open) {
+                    const desktopNav = document.querySelector('.desktop-nav');
+                    if (desktopNav && !desktopNav.querySelector('a[href="registration.html"]')) {
+                        const link = document.createElement('a');
+                        link.href = 'registration.html';
+                        link.style.color = '#eab308'; // Gold color to stand out
+                        link.style.fontWeight = '700';
+                        link.textContent = 'पंजीयन (Registration)';
+                        desktopNav.appendChild(link);
+                    }
+
+                    const drawerNav = document.querySelector('.nav-drawer nav');
+                    if (drawerNav && !drawerNav.querySelector('a[href="registration.html"]')) {
+                        const link = document.createElement('a');
+                        link.href = 'registration.html';
+                        link.className = 'drawer-link';
+                        link.style.color = '#eab308';
+                        link.style.fontWeight = '700';
+                        link.textContent = '📋 ऑनलाइन पंजीयन';
+                        drawerNav.appendChild(link);
+                        
+                        link.addEventListener('click', () => {
+                            const drawer = document.getElementById('nav-drawer');
+                            const overlay = document.getElementById('nav-overlay');
+                            if (drawer) drawer.classList.remove('active');
+                            if (overlay) overlay.classList.remove('active');
+                            document.body.style.overflow = '';
+                        });
+                    }
+                }
             }
         } catch (error) {
             console.error('Failed to load admission settings:', error);

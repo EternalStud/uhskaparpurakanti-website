@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Registration Form - UHS Kaparpura</title>
+    <link rel="stylesheet" href="admission.css">
+    <style>
+        .fetch-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .readonly-field {
+            background-color: #f1f5f9;
+            color: #475569;
+            cursor: not-allowed;
+        }
+        .hint-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admission-container">
+
+    <div class="form-header">
+        <div class="header-top-row">
+            <div class="school-info">
+                <h1>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+                <h2>UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</h2>
+            </div>
+            <div class="header-badges">
+                <span class="udise-badge">UDISE: 10140616812</span>
+                <span class="session-badge">सत्र: <span id="academicSession"></span></span>
+            </div>
+        </div>
+        <div class="admission-title">
+            ऑनलाइन पंजीयन प्रपत्र (Registration Form)
+        </div>
+        <p class="header-note">
+            अपना छात्र कोड (Student Code) दर्ज कर विवरण प्राप्त करें तथा शेष जानकारी भरें।
+        </p>
+    </div>
+
+    <form id="registrationForm">
+
+        <section class="form-section fetch-box">
+            <h3>विद्यार्थी की खोज (Search Student)</h3>
+            <div class="grid-2">
+                <div>
+                    <label>कक्षा (Class) <span style="color:red">*</span></label>
+                    <select id="regClass" required>
+                        <option value="">-- चुनें --</option>
+                        <option value="9">Class 9</option>
+                        <option value="11">Class 11</option>
+                    </select>
+                </div>
+                <div>
+                    <label>छात्र कोड (Student Code) <span style="color:red">*</span></label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="regStudentCode" placeholder="Enter Student Code" required style="flex: 1;">
+                        <button type="button" id="btnFetchStudent" class="btn-primary" style="padding: 10px 20px;">खोजें (Search)</button>
+                    </div>
+                    <span class="hint-text">विद्यालय द्वारा दिया गया कोड दर्ज करें।</span>
+                </div>
+            </div>
+            <div id="fetchMessage" style="margin-top: 10px; font-weight: bold;"></div>
+        </section>
+
+        <div id="registrationDetails" style="display: none;">
+            
+            <section class="form-section">
+                <h3>मूल विवरण (Basic Details)</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>विद्यार्थी का नाम (Student Name) <span style="color:red">*</span></label>
+                        <input type="text" id="studentName" required class="readonly-field" readonly>
+                    </div>
+                    <div>
+                        <label>पिता का नाम (Father's Name) <span style="color:red">*</span></label>
+                        <input type="text" id="fatherName" required class="readonly-field" readonly>
+                    </div>
+                    <div>
+                        <label>माता का नाम (Mother's Name) <span style="color:red">*</span></label>
+                        <input type="text" id="motherName" required class="readonly-field" readonly>
+                    </div>
+                    <div>
+                        <label>जन्म तिथि (Date of Birth) <span style="color:red">*</span></label>
+                        <input type="date" id="dob" required>
+                    </div>
+                    <div>
+                        <label>आधार संख्या (Aadhaar Number) <span style="color:red">*</span></label>
+                        <input type="text" id="aadhaar" maxlength="12" required>
+                    </div>
+                    <div>
+                        <label>मोबाइल संख्या (Mobile Number) <span style="color:red">*</span></label>
+                        <input type="text" id="mobile" maxlength="10" required>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h3>बैंक विवरण (Bank Details)</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>बैंक खाता संख्या (Account Number) <span style="color:red">*</span></label>
+                        <input type="text" id="bankAccount" required>
+                    </div>
+                    <div>
+                        <label>IFSC कोड (IFSC Code) <span style="color:red">*</span></label>
+                        <input type="text" id="bankIFSC" required>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h3>अतिरिक्त जानकारी (Additional Details)</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>APAAR ID (अपार आईडी) <span style="color:red">*</span></label>
+                        <input type="text" id="apaarId" maxlength="12" required>
+                    </div>
+                    <div>
+                        <label>Email (ईमेल)</label>
+                        <input type="email" id="email" placeholder="Optional">
+                    </div>
+                    <div>
+                        <label>जाति (Caste) <span style="color:red">*</span></label>
+                        <select id="caste" required>
+                            <option value="">-- चुनें --</option>
+                            <option>GEN</option>
+                            <option>EBC</option>
+                            <option>BC</option>
+                            <option>SC</option>
+                            <option>ST</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>वैवाहिक स्थिति (Marital Status) <span style="color:red">*</span></label>
+                        <select id="maritalStatus" required>
+                            <option value="">-- चुनें --</option>
+                            <option value="Unmarried">अविवाहित (Unmarried)</option>
+                            <option value="Married">विवाहित (Married)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>दिव्यांग (Differently Abled) <span style="color:red">*</span></label>
+                        <select id="differentlyAbled" required>
+                            <option value="No">नहीं (No)</option>
+                            <option value="Yes">हाँ (Yes)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>दृष्टिबाधित (Visually Impaired) <span style="color:red">*</span></label>
+                        <select id="visuallyImpaired" required>
+                            <option value="No">नहीं (No)</option>
+                            <option value="Yes">हाँ (Yes)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>पहचान चिह्न 1 (Identification Mark 1) <span style="color:red">*</span></label>
+                        <input type="text" id="mark1" placeholder="e.g. A mole on face" required>
+                    </div>
+                    <div>
+                        <label>पहचान चिह्न 2 (Identification Mark 2)</label>
+                        <input type="text" id="mark2" placeholder="Optional">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h3>पता (Address Details)</h3>
+                <div class="grid-2">
+                    <div style="grid-column: 1 / -1;">
+                        <label>पूरा पता (Full Address) <span style="color:red">*</span></label>
+                        <input type="text" id="address" required>
+                    </div>
+                    <div>
+                        <label>शहर/गाँव (Town/City) <span style="color:red">*</span></label>
+                        <input type="text" id="townCity" required>
+                    </div>
+                    <div>
+                        <label>जिला (District) <span style="color:red">*</span></label>
+                        <input type="text" id="district" value="Muzaffarpur" required>
+                    </div>
+                    <div>
+                        <label>पिन कोड (Pin Code) <span style="color:red">*</span></label>
+                        <input type="text" id="pinCode" maxlength="6" required>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section" id="subjectSection">
+                <h3>विषय का चयन (Subjects Offered)</h3>
+                <div id="streamSelector" style="display: none; margin-bottom: 15px;">
+                    <label>संकाय (Stream) <span style="color:red">*</span></label>
+                    <select id="regStream">
+                        <option value="">-- चुनें --</option>
+                        <option value="Arts">Arts (कला)</option>
+                        <option value="Science">Science (विज्ञान)</option>
+                        <option value="Commerce">Commerce (वाणिज्य)</option>
+                    </select>
+                </div>
+                
+                <div id="existingSubjectsMsg" style="display: none; margin-bottom: 10px; color: #16a34a; font-weight: bold;">
+                    आपके विषय पहले से चुने गए हैं (Subjects already tagged):
+                </div>
+
+                <div class="grid-2" id="subjectGrid">
+                    <!-- Dropdowns will be populated dynamically -->
+                </div>
+                <input type="hidden" id="hasExistingSubjects" value="false">
+            </section>
+
+            <section class="form-section" id="uploadSection">
+                <h3>फोटो एवं हस्ताक्षर अपलोड (Upload Photo & Signature)</h3>
+                <div class="grid-2">
+                    <div class="photo-box">
+                        <label>छात्र का फोटो (Student Photo) <span style="color:red">*</span></label>
+                        <p class="upload-note">पासपोर्ट आकार फोटो (3.5cm × 3.0cm)<br>फाइल आकार: 50KB से 100KB</p>
+                        <div id="photoPreview">फोटो यहाँ दिखाई देगा</div>
+                        <input type="file" id="studentPhoto" accept="image/jpeg,image/jpg,image/png" required>
+                    </div>
+                    <div class="photo-box">
+                        <label>छात्र का हस्ताक्षर (Student Signature) <span style="color:red">*</span></label>
+                        <p class="upload-note">हस्ताक्षर (3.5cm × 1.1cm)<br>फाइल आकार: 5KB से 20KB</p>
+                        <div id="signaturePreview">हस्ताक्षर यहाँ दिखाई देगा</div>
+                        <input type="file" id="studentSignature" accept="image/jpeg,image/jpg,image/png" required>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-actions" id="formActions">
+                <button type="button" id="previewBtn">👁 पूर्वावलोकन (Preview)</button>
+                <button type="submit" id="submitBtn">✅ जमा करें (Submit)</button>
+            </div>
+            
+        </div>
+    </form>
+</div>
+
+<!-- Loader -->
+<div id="loader" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.8); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+    <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #2563eb; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+    <p style="margin-top: 10px; font-weight: bold; color: #2563eb;">कृपया प्रतीक्षा करें...</p>
+</div>
+<style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+
+<script>
+(function () {
+    const today = new Date();
+    const year = today.getFullYear();
+    const startYear = today.getMonth() >= 3 ? year : year - 1;
+    const endYear = startYear + 2; // 2-year session (e.g. 2026-2028)
+    const sessionEl = document.getElementById('academicSession');
+    if (sessionEl) {
+        sessionEl.textContent = `${startYear}-${String(endYear).slice(-2)}`;
+    }
+})();
+</script>
+<script src="registration.js"></script>
+</body>
+</html>
