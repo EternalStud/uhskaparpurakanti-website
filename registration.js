@@ -102,7 +102,7 @@ if (signInput) {
 }
 
 // Validation inputs
-['mobile', 'pinCode', 'aadhaar', 'apaarId', 'bankAccount'].forEach(id => {
+['mobile', 'pinCode', 'aadhaar', 'apaarId', 'bankAccount', 'regStudentCode'].forEach(id => {
     const field = document.getElementById(id);
     if (field) {
         field.addEventListener('input', function () {
@@ -133,6 +133,16 @@ if(bankName) {
         this.value = this.value.replace(/[^a-zA-Z ]/g, '');
     });
 }
+
+// Basic text and punctuation for marks and addresses
+['mark1', 'mark2', 'address', 'townCity', 'district'].forEach(id => {
+    const field = document.getElementById(id);
+    if(field) {
+        field.addEventListener('input', function() {
+            this.value = this.value.replace(/[^a-zA-Z0-9\u0900-\u097F\s.,\-\/()]/g, '');
+        });
+    }
+});
 
 // Email basic blur validation
 const emailF = document.getElementById('email');
