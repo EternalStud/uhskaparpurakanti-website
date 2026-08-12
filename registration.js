@@ -157,6 +157,27 @@ if(emailF) {
     });
 }
 
+// Search Mode Radio listener
+const searchByCodeRadio = document.getElementById('searchByCode');
+const searchByRollDobRadio = document.getElementById('searchByRollDob');
+if (searchByCodeRadio && searchByRollDobRadio) {
+    const toggleSearchMode = () => {
+        const isCode = searchByCodeRadio.checked;
+        document.getElementById('searchCodeGroup').style.display = isCode ? 'block' : 'none';
+        document.getElementById('searchRollGroup').style.display = isCode ? 'none' : 'block';
+        document.getElementById('searchDobGroup').style.display = isCode ? 'none' : 'block';
+        
+        if (isCode) {
+            document.getElementById('searchRollNo').value = '';
+            document.getElementById('searchDob').value = '';
+        } else {
+            document.getElementById('regStudentCode').value = '';
+        }
+    };
+    searchByCodeRadio.addEventListener('change', toggleSearchMode);
+    searchByRollDobRadio.addEventListener('change', toggleSearchMode);
+}
+
 // Class change listener
 const regClass = document.getElementById('regClass');
 if(regClass) {
@@ -175,16 +196,30 @@ if(regClass) {
 document.getElementById('btnFetchStudent').addEventListener('click', async () => {
     const classNum = document.getElementById('regClass').value;
     const streamVal = document.getElementById('searchStream') ? document.getElementById('searchStream').value : "";
-    const studentCode = document.getElementById('regStudentCode').value.trim();
+    const isCodeSearch = document.getElementById('searchByCode') ? document.getElementById('searchByCode').checked : true;
+    
+    const studentCode = document.getElementById('regStudentCode') ? document.getElementById('regStudentCode').value.trim() : "";
+    const rollNo = document.getElementById('searchRollNo') ? document.getElementById('searchRollNo').value.trim() : "";
+    const searchDob = document.getElementById('searchDob') ? document.getElementById('searchDob').value.trim() : "";
     const fetchMsg = document.getElementById('fetchMessage');
 
-    if (!classNum || !studentCode) {
-        alert("कृपया कक्षा और छात्र कोड दर्ज करें।");
+    if (!classNum) {
+        alert("कृपया कक्षा का चयन करें।");
         return;
     }
-    
+
     if (classNum === '11' && !streamVal) {
         alert("कृपया संकाय (Stream) चुनें।");
+        return;
+    }
+
+    if (isCodeSearch && !studentCode) {
+        alert("कृपया छात्र कोड दर्ज करें।");
+        return;
+    }
+
+    if (!isCodeSearch && (!rollNo || !searchDob)) {
+        alert("कृपया क्रमांक (Roll No.) एवं जन्म तिथि (Date of Birth) दोनों दर्ज करें।");
         return;
     }
 
@@ -192,7 +227,13 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
     fetchMsg.textContent = "";
 
     try {
-        const url = `${ADMIN_API_URL}?action=public.registration.getStudent&className=${classNum}&studentCode=${studentCode}`;
+        let url = `${ADMIN_API_URL}?action=public.registration.getStudent&className=${classNum}`;
+        if (isCodeSearch) {
+            url += `&studentCode=${encodeURIComponent(studentCode)}`;
+        } else {
+            url += `&rollNo=${encodeURIComponent(rollNo)}&dob=${encodeURIComponent(searchDob)}`;
+        }
+
         const response = await fetch(url);
         const data = await response.json();
 
@@ -208,7 +249,7 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
             updateProgressStep(2);
         } else {
             document.getElementById('registrationDetails').style.display = 'none';
-            fetchMsg.textContent = "आप फॉर्म भरने के योग्य नहीं हैं। (You are not eligible to fill the form.)";
+            fetchMsg.textContent = "आप फॉर्म भरने के योग्य नहीं हैं या विवरण सुलभ नहीं है। (You are not eligible or details not found.)";
             fetchMsg.style.color = "#ef4444";
         }
     } catch (err) {
@@ -554,9 +595,9 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
     const subs = getSelectedSubjects();
 
     const payload = {
-        studentCode: fetchedStudentData.studentCode,
-        rollNo: fetchedStudentData.rollNo,
-        className: fetchedStudentData.className,
+        studentCode: fetchedStudentData.studentCode || "",
+        rollNo: fetchedStudentData.rollNo || "",
+        className: fetchedStudentData.className || "",
         academicSession: document.getElementById('academicSession') ? document.getElementById('academicSession').textContent : fetchedStudentData.academicYear,
         stream: fetchedStudentData.stream || (document.getElementById('regStream') ? document.getElementById('regStream').value : ""),
         studentName: document.getElementById('studentName').value,
@@ -593,8 +634,10 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
         const data = await response.json();
         
         if (data.success) {
-            alert("पंजीयन सफलतापूर्वक जमा हो गया! (Registration submitted successfully!)");
-            window.location.reload();
+            const regId = data.regId || (payload.studentName.replace(/[^A-Za-z]/g, '').substring(0, 4).toUpperCase() + payload.rollNo);
+            document.getElementById('successRegId').textContent = regId;
+            document.getElementById('successModal').style.display = 'block';
+            updateProgressStep(3);
         } else {
             alert("त्रुटि: " + (data.error || "Failed to submit."));
         }
@@ -604,3 +647,18 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
         hideLoader();
     }
 });
+
+// Success Modal Buttons
+const btnPrintApp = document.getElementById('btnPrintApplication');
+if (btnPrintApp) {
+    btnPrintApp.addEventListener('click', () => {
+        window.print();
+    });
+}
+
+const btnDoneReg = document.getElementById('btnDoneRegistration');
+if (btnDoneReg) {
+    btnDoneReg.addEventListener('click', () => {
+        window.location.reload();
+    });
+}
