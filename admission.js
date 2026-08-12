@@ -40,29 +40,44 @@ function showSuccessModal(applicationId, studentName = '', admissionClass = '') 
     modal = document.createElement('div');
     modal.id = 'successModal';
     modal.innerHTML = `
-        <div style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:100000;">
-            <div style="background:#fff;padding:28px;border-radius:14px;width:420px;max-width:92%;text-align:center;box-shadow:0 12px 35px rgba(0,0,0,.25);">
-                <div style="font-size:52px;">✅</div>
-                <h2 style="margin:8px 0;color:#15803d;">Application Submitted Successfully</h2>
-                <div style="margin-top:12px;font-size:14px;color:#555;">Student Name</div>
-                <div style="font-size:18px;font-weight:600;color:#111827;margin:4px 0;">${studentName}</div>
-                <div style="margin-top:8px;font-size:14px;color:#555;">Class</div>
-                <div style="font-size:18px;font-weight:600;color:#111827;margin:4px 0;">${admissionClass}</div>
-                <div style="margin-top:10px;font-size:14px;color:#555;">Application ID</div>
-                <div style="font-size:22px;font-weight:700;color:#1e3a8a;margin:8px 0;">${applicationId}</div>
-                <div style="margin-top:14px;padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:14px;line-height:1.6;color:#166534;">
-                    आवेदन सफलतापूर्वक जमा हो गया है।<br>
-                    कृपया अपना <strong>Application ID</strong> सुरक्षित रखें।<br><br>
-                    आवेदन डाउनलोड कर विद्यालय में जमा करें।
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:100000;padding:15px;backdrop-filter:blur(4px);">
+            <div style="background:#fff;padding:32px 25px;border-radius:18px;width:480px;max-width:95%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.3);border-top:5px solid #10b981;">
+                <div style="font-size:52px;line-height:1;margin-bottom:10px;">🎉</div>
+                <h2 style="margin:0 0 6px 0;color:#059669;font-size:1.5rem;">ऑनलाइन नामांकन फॉर्म जमा हुआ!</h2>
+                <p style="color:#64748b;font-size:0.9rem;margin:0 0 20px 0;">Application Submitted Successfully</p>
+
+                <div style="background:#f0fdf4;border:2px dashed #34d399;border-radius:12px;padding:16px;margin-bottom:20px;">
+                    <div style="font-size:0.8rem;color:#047857;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Application ID</div>
+                    <div style="font-size:1.8rem;font-weight:800;color:#065f46;margin-top:4px;letter-spacing:1px;">${applicationId}</div>
+                    <div style="font-size:0.95rem;color:#1e293b;font-weight:600;margin-top:8px;">${studentName} (Class ${admissionClass})</div>
                 </div>
-                <div style="margin-top:15px;">
-                    <button id="closeSuccessModalBtn" style="background:#2563eb;color:#fff;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;font-weight:600;">
-                        OK
+
+                <div style="padding:14px;background:#fef3c7;border:1px solid #fde047;border-radius:10px;font-size:0.9rem;line-height:1.6;color:#92400e;text-align:left;margin-bottom:22px;">
+                    <strong>📢 महत्वपूर्ण निर्देश:</strong><br>
+                    1. कृपया अपनी <strong>Application ID (${applicationId})</strong> नोट करके रखें।<br>
+                    2. नीचे दिए गए बटन पर क्लिक करके अपना <strong>नामांकन रसीद (PDF)</strong> डाउनलोड / प्रिंट करें।<br>
+                    3. प्रिंट की गई रसीद पर हस्ताक्षर करके अपने विद्यालय में <strong>नामांकन प्रभारी (शिक्षक)</strong> को जमा करें।
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                    <button id="printReceiptBtn" style="background:#059669;color:#fff;border:none;padding:12px 22px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.95rem;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+                        🖨️ नामांकन रसीद डाउनलोड / प्रिंट करें
+                    </button>
+                    <button id="closeSuccessModalBtn" style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;padding:12px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.9rem;">
+                        समाप्त करें (Done)
                     </button>
                 </div>
             </div>
         </div>`;
     document.body.appendChild(modal);
+
+    const printBtn = document.getElementById('printReceiptBtn');
+    if (printBtn) {
+        printBtn.addEventListener('click', () => {
+            openAdmissionReceipt(applicationId);
+        });
+    }
+
     const closeBtn = document.getElementById('closeSuccessModalBtn');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => { modal.remove(); });
