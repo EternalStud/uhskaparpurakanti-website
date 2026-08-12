@@ -389,8 +389,16 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: black !important; padding: 0 !important; }
+            .admission-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .form-header, .progress-container, section.form-section, #loader, #successModal button, .modal-footer { display: none !important; }
+            .modal-overlay { position: static !important; background: transparent !important; z-index: auto !important; }
+            .modal-content { box-shadow: none !important; border: 1px solid #333 !important; max-width: 100% !important; padding: 15px !important; }
+            #previewModal { display: block !important; }
+            #successModal { display: none !important; }
+        }
     </style>
 </head>
 <body>
