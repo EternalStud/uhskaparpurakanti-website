@@ -301,7 +301,7 @@ table.t td.val{color:#111}
 
 <script>
 // MAKE SURE THIS MATCHES YOUR LIVE DEPLOYMENT URL!
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyWfDYM6KB0YErFOKgJ8p8nkgjx5FuChsx4EFD-yaxi4UuFRUb-Xe2AvTFY4rYDEknpRA/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
 
 document.getElementById('printBtn').addEventListener('click', function () {
   const btn = this;
@@ -467,7 +467,7 @@ async function populatePage(d) {
     try { data = JSON.parse(sessionStorage.getItem('previewAdmissionData') || '{}'); } catch {}
   } else if (appId) {
     try {
-      const url = `${WEB_APP_URL}?applicationId=${encodeURIComponent(appId)}`;
+      const url = `${WEB_APP_URL}?action=public.admission.get&applicationId=${encodeURIComponent(appId)}`;
       const res = await fetch(url);
       const result = await res.json();
       if (result.success && result.record) data = result.record;

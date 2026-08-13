@@ -1,5 +1,5 @@
 // MAKE SURE THIS MATCHES YOUR LIVE DEPLOYMENT URL!
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyWfDYM6KB0YErFOKgJ8p8nkgjx5FuChsx4EFD-yaxi4UuFRUb-Xe2AvTFY4rYDEknpRA/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
 let photoBase64 = '';
 let signatureBase64 = '';
 
@@ -317,7 +317,7 @@ if (form) {
         updateProgress(20, 'Validating form...');
         updateProgress(clsSelected >= 9 ? 60 : 40, clsSelected >= 9 ? 'Uploading photo, signature and saving application...' : 'Saving application...');
 
-        fetch(WEB_APP_URL, {
+        fetch(WEB_APP_URL + '?action=public.admission.submit', {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
@@ -526,10 +526,10 @@ if (downloadExistingBtn) {
         let requestUrl = '';
         if (searchClass === 1 || searchType === 'appId') {
             if (!applicationId) { alert('कृपया Application ID दर्ज करें।'); return; }
-            requestUrl = `${WEB_APP_URL}?applicationId=${encodeURIComponent(applicationId)}`;
+            requestUrl = `${WEB_APP_URL}?action=public.admission.get&applicationId=${encodeURIComponent(applicationId)}`;
         } else {
             if (!enteredPen) { alert('कृपया PEN Number दर्ज करें।'); return; }
-            requestUrl = `${WEB_APP_URL}?pen=${encodeURIComponent(enteredPen)}`;
+            requestUrl = `${WEB_APP_URL}?action=public.admission.get&pen=${encodeURIComponent(enteredPen)}`;
         }
 
         showProgressModal('Searching for application record...');
