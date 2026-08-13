@@ -246,21 +246,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const text = decodeURIComponent(button.dataset.text);
                     const url = button.dataset.url;
 
-                    const fullShareMessage = `${title}\n\n${text}\n\nपढ़ें: ${url}`;
-
                     if (navigator.share) {
                         try {
                             await navigator.share({
                                 title: title,
-                                text: fullShareMessage,
+                                text: `${title}\n\n${text}`,
                                 url: url
                             });
                         } catch (err) {
-                            console.log('Share canceled or failed:', err);
+                            if (err.name !== 'AbortError') {
+                                console.log('Share canceled or failed:', err);
+                            }
                         }
                     } else {
                         // Fallback: Copy link to clipboard
                         try {
+                            const fullShareMessage = `${title}\n\n${text}\n\nपढ़ें: ${url}`;
                             await navigator.clipboard.writeText(fullShareMessage);
                             alert('लिंक क्लिपबोर्ड पर कॉपी हो गया है! अब आप इसे कहीं भी शेयर कर सकते हैं।');
                         } catch (copyErr) {
