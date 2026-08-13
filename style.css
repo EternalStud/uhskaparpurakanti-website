@@ -218,7 +218,7 @@ body {
 }
 
 /* =====================
-   HERO - Cinematic Zoom & Frosted Glass Frame
+   HERO - Majestic Cinematic Zoom & Frosted Glass Frame
    ===================== */
 .hero {
     min-height: 100vh;
@@ -228,17 +228,21 @@ body {
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    background: #0f172a;
+    background: #0b1120;
 }
 
 .hero-bg {
     position: absolute;
-    inset: -20px; /* Overscan buffer for smooth hardware-accelerated scaling */
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
     background-image: url('images/hero.jpg');
     background-size: cover;
-    background-position: center;
+    background-position: center 30%;
+    transform-origin: center center;
     transform: scale3d(1, 1, 1);
-    animation: heroCinematicZoom 7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: heroCinematicZoom 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     will-change: transform;
     z-index: 1;
 }
@@ -248,16 +252,15 @@ body {
         transform: scale3d(1, 1, 1);
     }
     100% {
-        transform: scale3d(1.08, 1.08, 1);
+        transform: scale3d(1.18, 1.18, 1);
     }
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.78) 100%);
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.76) 100%);
     z-index: 2;
-    backdrop-filter: blur(1px);
 }
 
 .hero-content {
@@ -267,19 +270,19 @@ body {
     width: min(920px, 92%);
     padding: 38px 30px;
     border-radius: 28px;
-    background: rgba(15, 23, 42, 0.62);
+    background: rgba(15, 23, 42, 0.65);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22);
     opacity: 0;
-    transform: translate3d(0, 32px, 0) scale(0.97);
+    transform: translate3d(0, 36px, 0) scale(0.96);
     animation: heroGlassEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
     will-change: opacity, transform;
 }
 
-/* Tricolor Top Shimmer Border */
-.hero-content::before {
+/* Tricolor Top Shimmer Ribbon (Only Active on 15th August) */
+.hero-content.has-festive-ribbon::before {
     content: '';
     position: absolute;
     top: 0;
@@ -288,7 +291,7 @@ body {
     height: 3px;
     border-radius: 3px;
     background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-    box-shadow: 0 0 12px rgba(255, 153, 51, 0.45), 0 0 12px rgba(19, 136, 8, 0.45);
+    box-shadow: 0 0 14px rgba(255, 153, 51, 0.45), 0 0 14px rgba(19, 136, 8, 0.45);
     opacity: 0;
     animation: tricolorShimmerFade 1.2s ease-out 1.2s forwards;
 }
@@ -296,7 +299,7 @@ body {
 @keyframes heroGlassEntrance {
     0% {
         opacity: 0;
-        transform: translate3d(0, 32px, 0) scale(0.97);
+        transform: translate3d(0, 36px, 0) scale(0.96);
     }
     100% {
         opacity: 1;
@@ -309,35 +312,39 @@ body {
     100% { opacity: 1; transform: scaleX(1); }
 }
 
-/* Festive Independence Day Badge */
+/* Floating Independence Day Badge */
 .festive-badge {
-    display: inline-flex;
+    display: none; /* Controlled by script.js: only visible on 15th August */
     align-items: center;
     gap: 8px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 6px 18px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    padding: 7px 18px;
     border-radius: 999px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #f8fafc;
-    letter-spacing: 0.3px;
-    margin-bottom: 16px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.35px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(255, 153, 51, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: floatBadge 3.2s ease-in-out infinite;
+    will-change: transform;
 }
 
-.festive-badge:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.35);
-    transform: translateY(-1px);
+@keyframes floatBadge {
+    0%, 100% {
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        transform: translate3d(0, -6px, 0);
+    }
 }
 
 .festive-flag {
-    font-size: 1.15rem;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    font-size: 1.2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
 }
 
 .hero-content h1 {

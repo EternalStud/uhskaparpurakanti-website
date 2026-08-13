@@ -50,6 +50,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =====================
+    // INDEPENDENCE DAY FESTIVE CHECK (Only displays on 15th August)
+    // =====================
+    const today = new Date();
+    const is15thAugust = (today.getMonth() === 7 && today.getDate() === 15);
+    const festiveBadge = document.getElementById('festive-badge');
+    const heroContent = document.querySelector('.hero-content');
+    
+    if (festiveBadge) {
+        if (is15thAugust) {
+            festiveBadge.style.display = 'inline-flex';
+            if (heroContent) heroContent.classList.add('has-festive-ribbon');
+        } else {
+            festiveBadge.style.display = 'none';
+            if (heroContent) heroContent.classList.remove('has-festive-ribbon');
+        }
+    }
+
+    // =====================
     // HAMBURGER MENU
     // =====================
     const hamburger = document.getElementById('hamburger');
