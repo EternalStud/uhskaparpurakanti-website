@@ -66,24 +66,24 @@
         </section>
 
         <section class="form-section" id="studentSection" style="display:none;">
-            <h3>विद्यार्थी का विवरण</h3>
+            <h3>विद्यार्थी का विवरण (Student Details)</h3>
 
             <div class="grid-2">
                 <div>
-                    <label id="penLabel">विद्यार्थी का PEN संख्या <span style="color:red">*</span></label>
-                    <input type="text" id="penNumber" maxlength="11" placeholder="Enter 11-digit PEN Number" required>
+                    <label id="aadhaarLabel">विद्यार्थी का आधार संख्या (Primary Identifier) <span style="color:red">*</span></label>
+                    <input type="text" id="studentAadhaar" maxlength="12" placeholder="Enter 12-digit Aadhaar Number" required>
+                    <small id="aadhaarNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए आधार संख्या वैकल्पिक है।</small>
+                </div>
+
+                <div>
+                    <label id="penLabel">विद्यार्थी का PEN संख्या</label>
+                    <input type="text" id="penNumber" maxlength="11" placeholder="Enter 11-digit PEN (यदि उपलब्ध हो)">
                     <small id="penNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए PEN संख्या वैकल्पिक है।</small>
                 </div>
 
                 <div>
                     <label>विद्यार्थी का APAAR ID</label>
                     <input type="text" id="apaarId" maxlength="12" placeholder="Enter 12-digit APAAR ID">
-                </div>
-
-                <div>
-                    <label id="aadhaarLabel">विद्यार्थी का आधार संख्या <span style="color:red">*</span></label>
-                    <input type="text" id="studentAadhaar" maxlength="12" placeholder="Enter 12-digit Aadhaar Number" required>
-                    <small id="aadhaarNote" style="display:none;color:#2563eb;">Class I के विद्यार्थियों के लिए आधार संख्या वैकल्पिक है।</small>
                 </div>
 
                 <div>
@@ -356,11 +356,18 @@
                 </div>
 
                 <div id="searchTypeBlock" style="display:none;">
-                    <label>खोजने का प्रकार</label>
+                    <label>खोजने का प्रकार (Search By)</label>
                     <select id="searchType">
+                        <option value="aadhaar">आधार संख्या (Aadhaar Number)</option>
                         <option value="appId">Application ID</option>
                         <option value="pen">PEN Number</option>
                     </select>
+                </div>
+
+                <div id="searchAadhaarBlock" style="display:none;">
+                    <label>आधार संख्या (Student Aadhaar)</label>
+                    <input type="text" id="searchAadhaar" maxlength="12" placeholder="Enter 12-digit Student Aadhaar">
+                    <small style="color:#2563eb;">विद्यार्थी के 12 अंकों के आधार नंबर से खोजें।</small>
                 </div>
 
                 <div id="searchApplicationBlock" style="display:none;">
@@ -378,7 +385,7 @@
 
             <div style="margin-top:15px;">
                 <button type="button" id="downloadExistingBtn">
-                    📄 आवेदन डाउनलोड करें
+                    📄 आवेदन डाउनलोड करें (Search & Download PDF)
                 </button>
             </div>
         </section>
@@ -422,8 +429,9 @@
     const searchClass = document.getElementById('searchClass');
     const searchType = document.getElementById('searchType');
     const searchTypeBlock = document.getElementById('searchTypeBlock');
-    const searchPenBlock = document.getElementById('searchPenBlock');
+    const searchAadhaarBlock = document.getElementById('searchAadhaarBlock');
     const searchApplicationBlock = document.getElementById('searchApplicationBlock');
+    const searchPenBlock = document.getElementById('searchPenBlock');
 
     const studentSection = document.getElementById('studentSection');
     const parentSection = document.getElementById('parentSection');
@@ -473,9 +481,9 @@
             previousUdiseNote.style.display = 'block';
             previousUdiseLabel.innerHTML = 'पूर्व विद्यालय का UDISE कोड';
         } else {
-            penField.required = true;
+            penField.required = false; // PEN is secondary
             penNote.style.display = 'none';
-            penLabel.innerHTML = 'विद्यार्थी का PEN संख्या <span style="color:red">*</span>';
+            penLabel.innerHTML = 'विद्यार्थी का PEN संख्या (वैकल्पिक)';
 
             aadhaarField.required = true;
             aadhaarNote.style.display = 'none';
@@ -520,20 +528,40 @@
         const cls = parseInt(searchClass?.value || '0',10);
         
         if(cls === 1){
-            searchTypeBlock.style.display = 'none';
-            searchApplicationBlock.style.display = 'block';
-            searchPenBlock.style.display = 'none';
-        } else if(cls >= 2){
             searchTypeBlock.style.display = 'block';
-            if(searchType.value === 'appId') {
-                searchApplicationBlock.style.display = 'block';
+            const sType = searchType.value;
+            if(sType === 'aadhaar') {
+                searchAadhaarBlock.style.display = 'block';
+                searchApplicationBlock.style.display = 'none';
                 searchPenBlock.style.display = 'none';
-            } else {
+            } else if(sType === 'pen') {
+                searchAadhaarBlock.style.display = 'none';
                 searchApplicationBlock.style.display = 'none';
                 searchPenBlock.style.display = 'block';
+            } else {
+                searchAadhaarBlock.style.display = 'none';
+                searchApplicationBlock.style.display = 'block';
+                searchPenBlock.style.display = 'none';
+            }
+        } else if(cls >= 2){
+            searchTypeBlock.style.display = 'block';
+            const sType = searchType.value;
+            if(sType === 'appId') {
+                searchAadhaarBlock.style.display = 'none';
+                searchApplicationBlock.style.display = 'block';
+                searchPenBlock.style.display = 'none';
+            } else if(sType === 'pen') {
+                searchAadhaarBlock.style.display = 'none';
+                searchApplicationBlock.style.display = 'none';
+                searchPenBlock.style.display = 'block';
+            } else {
+                searchAadhaarBlock.style.display = 'block';
+                searchApplicationBlock.style.display = 'none';
+                searchPenBlock.style.display = 'none';
             }
         } else {
             searchTypeBlock.style.display = 'none';
+            searchAadhaarBlock.style.display = 'none';
             searchApplicationBlock.style.display = 'none';
             searchPenBlock.style.display = 'none';
         }

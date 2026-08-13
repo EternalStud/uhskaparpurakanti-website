@@ -3,6 +3,49 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCm
 let photoBase64 = '';
 let signatureBase64 = '';
 
+/**
+ * Verhoeff Checksum Algorithm for Indian Aadhaar Number Validation
+ * Rejects invalid prefixes (0, 1), repeated numbers (999999999999), and checksum mismatches.
+ */
+const Verhoeff = {
+    d: [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+        [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+        [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+        [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+        [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+        [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+        [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+        [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    ],
+    p: [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+        [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+        [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+        [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+        [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+        [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+        [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+    ],
+    validate: function (aadhaarNumber) {
+        if (!aadhaarNumber || typeof aadhaarNumber !== 'string') return false;
+        const clean = aadhaarNumber.replace(/\s+/g, '');
+        if (!/^\d{12}$/.test(clean)) return false;
+        if (clean[0] === '0' || clean[0] === '1') return false;
+        if (/^(\d)\1{11}$/.test(clean)) return false;
+
+        let c = 0;
+        const invertedArray = clean.split('').map(Number).reverse();
+        for (let i = 0; i < invertedArray.length; i++) {
+            c = this.d[c][this.p[i % 8][invertedArray[i]]];
+        }
+        return c === 0;
+    }
+};
+
 function showProgressModal(message = 'Processing Application...') {
     let modal = document.getElementById('progressModal');
     if (!modal) {
@@ -185,22 +228,32 @@ if (form) {
             alert('यदि ई-शिक्षाकोष ID दर्ज की गई है तो वह 15 अंकों की होनी चाहिए।'); return;
         }
 
-        if (clsSelected !== 1 && !/^\d{11}$/.test(pen)) {
-            alert('कृपया 11 अंकों का सही PEN नंबर दर्ज करें।'); return;
+        if (clsSelected !== 1) {
+            if (!aadhaar) {
+                alert('कृपया विद्यार्थी का 12 अंकों का आधार नंबर दर्ज करें।'); return;
+            }
+            if (!Verhoeff.validate(aadhaar)) {
+                alert('कृपया विद्यार्थी का 12 अंकों का सही एवं वैध आधार नंबर दर्ज करें (Invalid Aadhaar - Checksum Failed).\n\nकृपया आधार कार्ड देखकर सही नंबर दर्ज करें।');
+                document.getElementById('studentAadhaar')?.focus();
+                return;
+            }
         }
-        if (clsSelected === 1 && pen && !/^\d{11}$/.test(pen)) {
+        if (clsSelected === 1 && aadhaar) {
+            if (!Verhoeff.validate(aadhaar)) {
+                alert('यदि आधार संख्या दर्ज की गई है तो वह वैध 12 अंकों की होनी चाहिए (Invalid Aadhaar - Checksum Failed)।');
+                document.getElementById('studentAadhaar')?.focus();
+                return;
+            }
+        }
+
+        if (pen && !/^\d{11}$/.test(pen)) {
             alert('यदि PEN संख्या दर्ज की गई है तो वह 11 अंकों की होनी चाहिए।'); return;
         }
 
-        if (clsSelected !== 1 && !/^\d{12}$/.test(aadhaar)) {
-            alert('कृपया 12 अंकों का सही आधार नंबर दर्ज करें।'); return;
-        }
-        if (clsSelected === 1 && aadhaar && !/^\d{12}$/.test(aadhaar)) {
-            alert('यदि आधार संख्या दर्ज की गई है तो वह 12 अंकों की होनी चाहिए।'); return;
-        }
-
-        if (!/^\d{12}$/.test(parentAadhaar)) {
-            alert('कृपया अभिभावक का 12 अंकों का सही आधार नंबर दर्ज करें।'); return;
+        if (!parentAadhaar || !Verhoeff.validate(parentAadhaar)) {
+            alert('कृपया अभिभावक (माता/पिता) का 12 अंकों का सही एवं वैध आधार नंबर दर्ज करें (Invalid Parent Aadhaar).\n\nकृपया आधार कार्ड देखकर सही नंबर दर्ज करें।');
+            document.getElementById('parentAadhaar')?.focus();
+            return;
         }
 
         if (!parentAadhaarType) {
@@ -367,11 +420,17 @@ function openAdmissionReceipt(applicationId = '') {
 const previewBtn = document.getElementById('previewBtn');
 if (previewBtn) {
     previewBtn.addEventListener('click', function () {
-        const pen = document.getElementById('penNumber')?.value || '';
+        const aadhaar = document.getElementById('studentAadhaar')?.value?.trim() || '';
+        const pen = document.getElementById('penNumber')?.value?.trim() || '';
         const clsSelected = parseInt(document.getElementById('admissionClass')?.value || '0', 10);
 
-        if (clsSelected !== 1 && !pen) {
-            alert('कृपया PEN Number दर्ज करें।'); return;
+        if (clsSelected !== 1) {
+            if (!aadhaar) {
+                alert('कृपया विद्यार्थी का 12 अंकों का आधार नंबर दर्ज करें।'); return;
+            }
+            if (!Verhoeff.validate(aadhaar)) {
+                alert('कृपया विद्यार्थी का वैध आधार नंबर दर्ज करें (Invalid Aadhaar - Checksum Failed)।'); return;
+            }
         }
 
         const previewData = {
@@ -379,7 +438,7 @@ if (previewBtn) {
             stream: document.getElementById('stream')?.value || '',
             penNumber: pen || 'Yet to be Generated',
             apaarId: document.getElementById('apaarId')?.value || '',
-            studentAadhaar: document.getElementById('studentAadhaar')?.value || (clsSelected === 1 ? 'Not Available' : ''),
+            studentAadhaar: aadhaar || (clsSelected === 1 ? 'Not Available' : ''),
             studentNameEnglish: document.getElementById('studentNameEnglish')?.value || '',
             dob: document.getElementById('dob')?.value || '',
             gender: document.getElementById('gender')?.value || '',
@@ -462,11 +521,32 @@ if (studentNameField) {
 updateAccountHolderRules();
 
 // Forces inputs to be NUMBERS only
-['penNumber', 'studentAadhaar', 'parentAadhaar', 'mobile', 'pinCode', 'apaarId', 'eshikshakoshId', 'previousUdise', 'accountNumber'].forEach(id => {
+['searchAadhaar', 'searchPen', 'penNumber', 'studentAadhaar', 'parentAadhaar', 'mobile', 'pinCode', 'apaarId', 'eshikshakoshId', 'previousUdise', 'accountNumber'].forEach(id => {
     const field = document.getElementById(id);
     if (field) {
         field.addEventListener('input', function () {
             this.value = this.value.replace(/\D/g, '');
+        });
+    }
+});
+
+// Live visual feedback for Aadhaar validation
+['studentAadhaar', 'parentAadhaar', 'searchAadhaar'].forEach(id => {
+    const field = document.getElementById(id);
+    if (field) {
+        field.addEventListener('blur', function () {
+            const val = this.value.trim();
+            if (val.length === 12) {
+                if (Verhoeff.validate(val)) {
+                    this.style.borderColor = '#10b981';
+                } else {
+                    this.style.borderColor = '#ef4444';
+                }
+            } else if (val.length > 0) {
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.style.borderColor = '';
+            }
         });
     }
 });
@@ -476,14 +556,10 @@ updateAccountHolderRules();
     const field = document.getElementById(id);
     if (field) {
         field.addEventListener('input', function () {
-            // Remove any non-numeric characters
             let val = this.value.replace(/\D/g, '');
-            
-            // Strictly prevent typing more than 3 digits
             if (val.length > 3) {
                 val = val.substring(0, 3);
             }
-            
             this.value = val;
         });
     }
@@ -501,7 +577,6 @@ updateAccountHolderRules();
 
 // IFSC Code: uppercase alphanumeric only, max 11 chars
 const ifscField = document.getElementById('ifsc');
-
 if (ifscField) {
     ifscField.addEventListener('input', function () {
         this.value = this.value
@@ -515,7 +590,8 @@ const downloadExistingBtn = document.getElementById('downloadExistingBtn');
 if (downloadExistingBtn) {
     downloadExistingBtn.addEventListener('click', async () => {
         const searchClass = parseInt(document.getElementById('searchClass')?.value || '0', 10);
-        const searchType = document.getElementById('searchType')?.value;
+        const searchType = document.getElementById('searchType')?.value || (searchClass === 1 ? 'appId' : 'aadhaar');
+        const enteredAadhaar = document.getElementById('searchAadhaar')?.value?.trim() || '';
         const enteredPen = document.getElementById('searchPen')?.value?.trim() || '';
         const applicationId = document.getElementById('searchApplicationId')?.value?.trim() || '';
 
@@ -524,12 +600,21 @@ if (downloadExistingBtn) {
         }
 
         let requestUrl = '';
-        if (searchClass === 1 || searchType === 'appId') {
+        if (searchType === 'appId') {
             if (!applicationId) { alert('कृपया Application ID दर्ज करें।'); return; }
             requestUrl = `${WEB_APP_URL}?action=public.admission.get&applicationId=${encodeURIComponent(applicationId)}`;
-        } else {
+        } else if (searchType === 'pen') {
             if (!enteredPen) { alert('कृपया PEN Number दर्ज करें।'); return; }
             requestUrl = `${WEB_APP_URL}?action=public.admission.get&pen=${encodeURIComponent(enteredPen)}`;
+        } else {
+            // Default: Aadhaar Search (Primary Key)
+            if (!enteredAadhaar) { alert('कृपया विद्यार्थी का 12 अंकों का आधार नंबर दर्ज करें।'); return; }
+            if (!Verhoeff.validate(enteredAadhaar)) {
+                alert('कृपया विद्यार्थी का 12 अंकों का वैध आधार नंबर दर्ज करें (Invalid Aadhaar - Checksum Failed)।');
+                document.getElementById('searchAadhaar')?.focus();
+                return;
+            }
+            requestUrl = `${WEB_APP_URL}?action=public.admission.get&aadhaar=${encodeURIComponent(enteredAadhaar)}`;
         }
 
         showProgressModal('Searching for application record...');
@@ -540,7 +625,7 @@ if (downloadExistingBtn) {
             hideProgressModal();
 
             if (!data.success) {
-                alert(data.message || 'रिकॉर्ड नहीं मिला।'); return;
+                alert(data.message || 'रिकॉर्ड नहीं मिला। कृपया आधार नंबर / Application ID की जाँच करें।'); return;
             }
 
             openAdmissionReceipt(data.record.applicationId || '');

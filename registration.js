@@ -5,6 +5,49 @@ let signatureBase64 = '';
 let fetchedStudentData = null;
 let currentSubjectsConfig = [];
 
+/**
+ * Verhoeff Checksum Algorithm for Indian Aadhaar Number Validation
+ * Rejects invalid prefixes (0, 1), repeated numbers (999999999999), and checksum mismatches.
+ */
+const Verhoeff = {
+    d: [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 2, 3, 4, 0, 6, 7, 8, 9, 5],
+        [2, 3, 4, 0, 1, 7, 8, 9, 5, 6],
+        [3, 4, 0, 1, 2, 8, 9, 5, 6, 7],
+        [4, 0, 1, 2, 3, 9, 5, 6, 7, 8],
+        [5, 9, 8, 7, 6, 0, 4, 3, 2, 1],
+        [6, 5, 9, 8, 7, 1, 0, 4, 3, 2],
+        [7, 6, 5, 9, 8, 2, 1, 0, 4, 3],
+        [8, 7, 6, 5, 9, 3, 2, 1, 0, 4],
+        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    ],
+    p: [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        [1, 5, 7, 6, 2, 8, 3, 0, 9, 4],
+        [5, 8, 0, 3, 7, 9, 6, 1, 4, 2],
+        [8, 9, 1, 6, 0, 4, 3, 5, 2, 7],
+        [9, 4, 5, 3, 1, 2, 6, 8, 7, 0],
+        [4, 2, 8, 6, 5, 7, 3, 9, 0, 1],
+        [2, 7, 9, 3, 8, 0, 6, 4, 1, 5],
+        [7, 0, 4, 6, 9, 1, 3, 2, 5, 8]
+    ],
+    validate: function (aadhaarNumber) {
+        if (!aadhaarNumber || typeof aadhaarNumber !== 'string') return false;
+        const clean = aadhaarNumber.replace(/\s+/g, '');
+        if (!/^\d{12}$/.test(clean)) return false;
+        if (clean[0] === '0' || clean[0] === '1') return false;
+        if (/^(\d)\1{11}$/.test(clean)) return false;
+
+        let c = 0;
+        const invertedArray = clean.split('').map(Number).reverse();
+        for (let i = 0; i < invertedArray.length; i++) {
+            c = this.d[c][this.p[i % 8][invertedArray[i]]];
+        }
+        return c === 0;
+    }
+};
+
 function showLoader(message = 'कृपया प्रतीक्षा करें...') {
     const loader = document.getElementById('loader');
     if (loader) {
@@ -34,33 +77,38 @@ function updateProgressStep(step) {
     });
 }
 
-// Photo & Signature Logic
+// Photo & Signature Logic (Strict JPEG/JPG Only)
 const photoInput = document.getElementById('studentPhoto');
 const photoPreview = document.getElementById('photoPreview');
 if (photoInput) {
     photoInput.addEventListener('change', function () {
         const file = this.files[0];
         if (!file) return;
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-            alert('कृपया केवल वैध इमेज फाइल (JPG या PNG) अपलोड करें।');
-            this.value = ''; return;
+
+        // 1. Strict JPEG/JPG Check (Reject PNG and others)
+        const validTypes = ['image/jpeg', 'image/jpg'];
+        if (!validTypes.includes(file.type) || !/\.(jpe?g)$/i.test(file.name)) {
+            alert('कृपया केवल वैध JPEG / JPG इमेज फाइल अपलोड करें। (PNG या अन्य फॉर्मेट मान्य नहीं है)');
+            this.value = ''; photoBase64 = ''; return;
         }
+
+        // 2. Strict File Size Check: 40KB to 100KB
         const sizeKB = file.size / 1024;
-        if (sizeKB < 50 || sizeKB > 100) {
-            alert('फोटो का आकार 50KB से 100KB के बीच होना चाहिए।');
-            this.value = ''; return;
+        if (sizeKB < 40 || sizeKB > 100) {
+            alert(`फोटो का आकार 40KB से 100KB के बीच होना चाहिए।\n(वर्तमान आकार: ${sizeKB.toFixed(1)} KB)`);
+            this.value = ''; photoBase64 = ''; return;
         }
+
         const reader = new FileReader();
         reader.onload = function (e) {
             const img = new Image();
             img.onload = function() {
                 photoBase64 = e.target.result.split(',')[1];
-                photoPreview.innerHTML = `<img src="${e.target.result}" alt="Photo" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+                photoPreview.innerHTML = `<img src="${e.target.result}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover;">`;
             };
             img.onerror = function() {
                 alert('यह फाइल करप्ट है या फोटो नहीं है।');
-                photoInput.value = '';
+                photoInput.value = ''; photoBase64 = '';
             };
             img.src = e.target.result;
         };
@@ -74,16 +122,21 @@ if (signInput) {
     signInput.addEventListener('change', function () {
         const file = this.files[0];
         if (!file) return;
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-            alert('कृपया केवल वैध इमेज फाइल (JPG या PNG) अपलोड करें।');
-            this.value = ''; return;
+
+        // 1. Strict JPEG/JPG Check (Reject PNG and others)
+        const validTypes = ['image/jpeg', 'image/jpg'];
+        if (!validTypes.includes(file.type) || !/\.(jpe?g)$/i.test(file.name)) {
+            alert('कृपया केवल वैध JPEG / JPG हस्ताक्षर फाइल अपलोड करें। (PNG या अन्य फॉर्मेट मान्य नहीं है)');
+            this.value = ''; signatureBase64 = ''; return;
         }
+
+        // 2. Strict File Size Check: 5KB to 20KB
         const sizeKB = file.size / 1024;
         if (sizeKB < 5 || sizeKB > 20) {
-            alert('हस्ताक्षर का आकार 5KB से 20KB के बीच होना चाहिए।');
-            this.value = ''; return;
+            alert(`हस्ताक्षर का आकार 5KB से 20KB के बीच होना चाहिए।\n(वर्तमान आकार: ${sizeKB.toFixed(1)} KB)`);
+            this.value = ''; signatureBase64 = ''; return;
         }
+
         const reader = new FileReader();
         reader.onload = function (e) {
             const img = new Image();
@@ -93,7 +146,7 @@ if (signInput) {
             };
             img.onerror = function() {
                 alert('यह फाइल करप्ट है या हस्ताक्षर नहीं है।');
-                signInput.value = '';
+                signInput.value = ''; signatureBase64 = '';
             };
             img.src = e.target.result;
         };
@@ -102,7 +155,7 @@ if (signInput) {
 }
 
 // Validation inputs
-['mobile', 'pinCode', 'aadhaar', 'apaarId', 'bankAccount', 'regStudentCode'].forEach(id => {
+['mobile', 'pinCode', 'aadhaar', 'apaarId', 'bankAccount', 'regStudentCode', 'downloadAadhaar'].forEach(id => {
     const field = document.getElementById(id);
     if (field) {
         field.addEventListener('input', function () {
@@ -110,6 +163,25 @@ if (signInput) {
         });
     }
 });
+
+// Live visual feedback for Aadhaar validation
+const aadhaarInput = document.getElementById('aadhaar');
+if (aadhaarInput) {
+    aadhaarInput.addEventListener('blur', function () {
+        const val = this.value.trim();
+        if (val.length === 12) {
+            if (Verhoeff.validate(val)) {
+                this.style.borderColor = '#10b981';
+            } else {
+                this.style.borderColor = '#ef4444';
+            }
+        } else if (val.length > 0) {
+            this.style.borderColor = '#ef4444';
+        } else {
+            this.style.borderColor = '';
+        }
+    });
+}
 
 const bankIFSC = document.getElementById('bankIFSC');
 if (bankIFSC) {
@@ -237,6 +309,40 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
         const response = await fetch(url);
         const data = await response.json();
 
+        const arCard = document.getElementById('alreadyRegisteredCard');
+        if (arCard) arCard.style.display = 'none';
+
+        const isAlready = data.alreadyRegistered || (data.student && data.student.alreadyRegistered);
+
+        if (isAlready) {
+            document.getElementById('registrationDetails').style.display = 'none';
+            fetchMsg.textContent = "";
+            if (arCard) {
+                arCard.style.display = 'block';
+                const stObj = data.student?.student || data.student || {};
+                const regId = data.regId || data.student?.regId || stObj.regId || '-';
+                const stName = stObj.studentName || data.student?.studentName || '-';
+                const roll = stObj.rollNo || data.student?.rollNo || '-';
+                const stStatus = data.status || data.student?.status || 'Pending';
+
+                document.getElementById('arStudentName').textContent = stName;
+                document.getElementById('arRegId').textContent = regId;
+                document.getElementById('arClassRoll').textContent = `Class ${classNum}, Roll: ${roll}`;
+                document.getElementById('arStatus').textContent = (stStatus.toLowerCase() === 'verified') ? '✓ Verified (सत्यापित)' : '⏳ Pending (सत्यापन लंबित)';
+                
+                const btnAr = document.getElementById('btnArDownloadReceipt');
+                if (btnAr) {
+                    btnAr.onclick = () => {
+                        if (regId && regId !== '-') {
+                            window.open(`registration-receipt.html?id=${encodeURIComponent(regId)}`, '_blank');
+                        }
+                    };
+                }
+            }
+            updateProgressStep(1);
+            return;
+        }
+
         if (data.success && data.student) {
             fetchedStudentData = data.student;
             if (classNum === '11') {
@@ -249,7 +355,7 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
             updateProgressStep(2);
         } else {
             document.getElementById('registrationDetails').style.display = 'none';
-            fetchMsg.textContent = "आप फॉर्म भरने के योग्य नहीं हैं या विवरण सुलभ नहीं है। (You are not eligible or details not found.)";
+            fetchMsg.textContent = data.message || "आप फॉर्म भरने के योग्य नहीं हैं या विवरण सुलभ नहीं है। (You are not eligible or details not found.)";
             fetchMsg.style.color = "#ef4444";
         }
     } catch (err) {
@@ -498,6 +604,13 @@ function getSelectedSubjects() {
 document.getElementById('registrationForm').addEventListener('submit', (e) => {
     e.preventDefault();
     if (!fetchedStudentData) return;
+
+    const aadhaarVal = document.getElementById('aadhaar')?.value?.trim();
+    if (!aadhaarVal || !Verhoeff.validate(aadhaarVal)) {
+        alert("कृपया 12 अंकों का वैध आधार नंबर दर्ज करें (Invalid Aadhaar - Checksum Failed)।\n\nकृपया आधार कार्ड देखकर सही नंबर भरें।");
+        document.getElementById('aadhaar')?.focus();
+        return;
+    }
     
     if (!photoBase64 || !signatureBase64) {
         alert("कृपया फोटो और हस्ताक्षर अपलोड करें।");
@@ -638,21 +751,38 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
             document.getElementById('successRegId').textContent = regId;
             document.getElementById('successModal').style.display = 'block';
             updateProgressStep(3);
+
+            // Cache data in sessionStorage for instant receipt rendering
+            const receiptData = {
+                ...payload,
+                regId: regId,
+                photoPreview: photoPreview.querySelector('img')?.src || '',
+                signaturePreview: signPreview.querySelector('img')?.src || ''
+            };
+            sessionStorage.setItem('lastRegistrationData', JSON.stringify(receiptData));
         } else {
             alert("त्रुटि: " + (data.error || "Failed to submit."));
         }
     } catch(err) {
-        alert("Server error.");
+        alert("Server error. कृपया पुनः प्रयास करें।");
     } finally {
         hideLoader();
     }
 });
 
+function openRegistrationReceipt(regId = '') {
+    const url = regId ? `registration-receipt.html?id=${encodeURIComponent(regId)}` : 'registration-receipt.html';
+    const win = window.open(url, '_blank');
+    if (!win) alert('कृपया पॉप-अप की अनुमति दें ताकि पंजीयन रसीद खुल सके।');
+    return win;
+}
+
 // Success Modal Buttons
 const btnPrintApp = document.getElementById('btnPrintApplication');
 if (btnPrintApp) {
     btnPrintApp.addEventListener('click', () => {
-        window.print();
+        const regId = document.getElementById('successRegId')?.textContent?.trim() || '';
+        openRegistrationReceipt(regId);
     });
 }
 
@@ -660,5 +790,58 @@ const btnDoneReg = document.getElementById('btnDoneRegistration');
 if (btnDoneReg) {
     btnDoneReg.addEventListener('click', () => {
         window.location.reload();
+    });
+}
+
+// Toggle Existing Receipt Download Box
+const btnToggleDownloadReceipt = document.getElementById('btnToggleDownloadReceipt');
+const existingReceiptBox = document.getElementById('existingReceiptBox');
+if (btnToggleDownloadReceipt && existingReceiptBox) {
+    btnToggleDownloadReceipt.addEventListener('click', () => {
+        const isHidden = existingReceiptBox.style.display === 'none' || !existingReceiptBox.style.display;
+        existingReceiptBox.style.display = isHidden ? 'block' : 'none';
+        btnToggleDownloadReceipt.textContent = isHidden ? '❌ रसीद खोज बंद करें' : '📄 पूर्व में भरा पंजीयन फॉर्म डाउनलोड करें';
+    });
+}
+
+// Search & Download Existing Registration Receipt
+const btnDownloadExistingReceipt = document.getElementById('btnDownloadExistingReceipt');
+if (btnDownloadExistingReceipt) {
+    btnDownloadExistingReceipt.addEventListener('click', async () => {
+        const downloadRegId = document.getElementById('downloadRegId')?.value?.trim().toUpperCase();
+        const downloadAadhaar = document.getElementById('downloadAadhaar')?.value?.trim();
+
+        if (!downloadRegId && !downloadAadhaar) {
+            alert('कृपया रजिस्ट्रेशन आईडी (जैसे RAJE54) या 12 अंकों का आधार नंबर दर्ज करें।');
+            return;
+        }
+
+        if (downloadAadhaar && !Verhoeff.validate(downloadAadhaar)) {
+            alert('कृपया 12 अंकों का वैध आधार नंबर दर्ज करें (Invalid Aadhaar - Checksum Failed)।');
+            return;
+        }
+
+        showLoader("पंजीयन रसीद खोजी जा रही है...");
+
+        try {
+            let query = '';
+            if (downloadRegId) query = `regId=${encodeURIComponent(downloadRegId)}`;
+            else if (downloadAadhaar) query = `aadhaar=${encodeURIComponent(downloadAadhaar)}`;
+
+            const response = await fetch(`${ADMIN_API_URL}?action=public.registration.get&${query}`);
+            const data = await response.json();
+            hideLoader();
+
+            if (data.success && data.record) {
+                sessionStorage.setItem('lastRegistrationData', JSON.stringify(data.record));
+                openRegistrationReceipt(data.record.regId || downloadRegId);
+            } else {
+                alert(data.message || 'पंजीयन रिकॉर्ड नहीं मिला। कृपया रजिस्ट्रेशन आईडी या आधार नंबर की जाँच करें।');
+            }
+        } catch(err) {
+            hideLoader();
+            console.error(err);
+            alert('Server Error. कृपया पुनः प्रयास करें।');
+        }
     });
 }

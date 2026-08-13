@@ -484,10 +484,56 @@
                     <input type="date" id="searchDob">
                 </div>
             </div>
-            <div style="margin-top: 20px; text-align: right;">
+            <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <button type="button" id="btnToggleDownloadReceipt" class="btn-primary btn-outline" style="font-size: 0.85rem; padding: 8px 16px;">
+                    📄 पूर्व में भरा पंजीयन फॉर्म डाउनलोड करें
+                </button>
                 <button type="button" id="btnFetchStudent" class="btn-primary">खोजें (Search)</button>
             </div>
             <div id="fetchMessage" style="margin-top: 15px; font-weight: 600; text-align: center;"></div>
+
+            <!-- Already Registered Notice Card -->
+            <div id="alreadyRegisteredCard" style="display: none; margin-top: 20px; padding: 22px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 14px; text-align: center;">
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">📋</div>
+                <h3 style="margin: 0 0 8px 0; color: #1e3a8a; font-size: 1.2rem;">आपका पंजीयन फॉर्म पहले ही जमा किया जा चुका है!</h3>
+                <p style="margin: 0 0 15px 0; color: #475569; font-size: 0.95rem;">
+                    (Registration Form Already Submitted - Re-editing is not permitted)
+                </p>
+                <div style="background: white; border: 1px solid #bfdbfe; border-radius: 10px; padding: 15px; display: inline-block; text-align: left; margin-bottom: 18px; min-width: 280px;">
+                    <div style="font-size: 0.9rem; color: #334155; margin-bottom: 4px;"><strong>विद्यार्थी का नाम:</strong> <span id="arStudentName">-</span></div>
+                    <div style="font-size: 0.9rem; color: #334155; margin-bottom: 4px;"><strong>पंजीयन आईडी (Reg ID):</strong> <span id="arRegId" style="color: #d97706; font-weight: 800;">-</span></div>
+                    <div style="font-size: 0.9rem; color: #334155; margin-bottom: 4px;"><strong>कक्षा एवं क्रमांक:</strong> <span id="arClassRoll">-</span></div>
+                    <div style="font-size: 0.9rem; color: #334155;"><strong>स्थिति (Status):</strong> <span id="arStatus" style="font-weight: 700; color: #059669;">-</span></div>
+                </div>
+                <div>
+                    <button type="button" id="btnArDownloadReceipt" class="btn-primary" style="background: #2563eb; border-color: #2563eb; font-size: 1rem; padding: 10px 24px; border-radius: 8px;">
+                        🖨️ पंजीयन रसीद डाउनलोड करें (Download PDF)
+                    </button>
+                </div>
+                <small style="display: block; margin-top: 12px; color: #64748b;">
+                    * यदि फॉर्म में कोई संशोधन आवश्यक है, तो कृपया विद्यालय में पंजीयन प्रभारी शिक्षक से संपर्क करें।
+                </small>
+            </div>
+
+            <!-- Existing Receipt Lookup Box -->
+            <div id="existingReceiptBox" style="display: none; margin-top: 20px; padding: 20px; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px;">
+                <h4 style="margin: 0 0 12px 0; color: #1e3a8a; font-size: 1rem;">🔍 पंजीयन रसीद खोजें एवं डाउनलोड करें</h4>
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>रजिस्ट्रेशन आईडी (Registration ID)</label>
+                        <input type="text" id="downloadRegId" placeholder="उदा. RAJE54">
+                    </div>
+                    <div class="input-group">
+                        <label>या आधार संख्या (Aadhaar Number)</label>
+                        <input type="text" id="downloadAadhaar" maxlength="12" placeholder="12 अंकों का आधार नंबर">
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button type="button" id="btnDownloadExistingReceipt" class="btn-primary" style="background: #d97706; border-color: #d97706;">
+                        🖨️ रसीद डाउनलोड करें (Download PDF)
+                    </button>
+                </div>
+            </div>
         </section>
 
         <div id="registrationDetails" style="display: none;">
@@ -631,16 +677,16 @@
                 <h3>फोटो एवं हस्ताक्षर (Photo & Signature)</h3>
                 <div class="grid-2">
                     <div class="photo-box">
-                        <label>छात्र का फोटो (Student Photo) <span style="color:red">*</span></label>
-                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">50KB से 100KB (JPG/PNG)</p>
-                        <div id="photoPreview" style="width: 150px; height: 180px; margin: 0 auto 15px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background: white;">फोटो</div>
-                        <input type="file" id="studentPhoto" accept="image/jpeg,image/jpg,image/png" required>
+                        <label>छात्र का पासपोर्ट फोटो (Student Photo) <span style="color:red">*</span></label>
+                        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;"><strong>आकार:</strong> 3cm × 3.5cm | <strong>फाइल साइज:</strong> 40KB से 100KB (केवल .JPG / .JPEG)</p>
+                        <div id="photoPreview" style="width: 120px; height: 140px; margin: 0 auto 15px; border: 1.5px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">फोटो (3cm × 3.5cm)</div>
+                        <input type="file" id="studentPhoto" accept=".jpg,.jpeg,image/jpeg" required>
                     </div>
                     <div class="photo-box">
-                        <label>हस्ताक्षर (Student Signature) <span style="color:red">*</span></label>
-                        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">5KB से 20KB (JPG/PNG)</p>
-                        <div id="signaturePreview" style="width: 200px; height: 60px; margin: 0 auto 15px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; background: white;">हस्ताक्षर</div>
-                        <input type="file" id="studentSignature" accept="image/jpeg,image/jpg,image/png" required>
+                        <label>छात्र का हस्ताक्षर (Student Signature) <span style="color:red">*</span></label>
+                        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;"><strong>आकार:</strong> 3.5cm × 1cm | <strong>फाइल साइज:</strong> 5KB से 20KB (केवल .JPG / .JPEG)</p>
+                        <div id="signaturePreview" style="width: 175px; height: 50px; margin: 0 auto 15px; border: 1.5px dashed #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">हस्ताक्षर (3.5cm × 1cm)</div>
+                        <input type="file" id="studentSignature" accept=".jpg,.jpeg,image/jpeg" required>
                     </div>
                 </div>
             </section>

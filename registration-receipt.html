@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Registration Receipt - UHS Kaparpura</title>
+<style>
+/* ── Global Styles ─────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: #dde3ee;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    padding: 16px 8px;
+    color: #0f172a;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+.page-wrap {
+    width: 210mm;
+    max-width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ── Action Bar (Screen Only) ─────────────────────────────────────────────── */
+.action-bar {
+    background: #0f172a;
+    color: #fff;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+}
+.action-bar-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.action-bar-btns {
+    display: flex;
+    gap: 10px;
+}
+.action-bar button {
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 9px 18px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+.btn-print { background: #d97706; color: #fff; }
+.btn-print:hover { background: #b45309; }
+.btn-back { background: #334155; color: #f8fafc; }
+.btn-back:hover { background: #475569; }
+
+/* ── Receipt Content ──────────────────────────────────────────────────────── */
+.receipt-body {
+    padding: 12mm 14mm 10mm;
+    position: relative;
+    background: #fff;
+}
+
+/* Header */
+.rc-header {
+    text-align: center;
+    border-bottom: 2.5px solid #0f172a;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+.rc-board-hi {
+    font-size: 16pt;
+    color: #1e3a8a;
+    font-weight: 800;
+    line-height: 1.2;
+}
+.rc-board-en {
+    font-size: 11pt;
+    color: #b45309;
+    font-weight: 700;
+    margin-top: 1px;
+}
+.rc-school-name {
+    font-size: 12pt;
+    color: #0f172a;
+    font-weight: 800;
+    margin-top: 3px;
+}
+.rc-doc-title {
+    display: inline-block;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 3px 18px;
+    font-size: 9.5pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rc-meta-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin-bottom: 10px;
+    font-size: 8.5pt;
+}
+.rc-meta-item strong { color: #0f172a; }
+.reg-id-badge {
+    background: #fef3c7;
+    border: 1.5px dashed #d97706;
+    color: #92400e;
+    font-weight: 800;
+    font-size: 11pt;
+    padding: 2px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+/* Sections */
+.sec-title {
+    background: #f1f5f9;
+    color: #1e3a8a;
+    font-weight: 800;
+    font-size: 8.5pt;
+    padding: 3px 8px;
+    border-left: 4px solid #d97706;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Tables */
+table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 6px;
+    font-size: 8pt;
+}
+table.data-table td {
+    border: 1px solid #cbd5e1;
+    padding: 3.5px 6px;
+    vertical-align: middle;
+}
+table.data-table td.lbl {
+    font-weight: 700;
+    background: #f8fafc;
+    color: #334155;
+    width: 22%;
+    white-space: nowrap;
+}
+table.data-table td.val {
+    color: #0f172a;
+    font-weight: 600;
+}
+table.data-table td.val-bold {
+    color: #0f172a;
+    font-weight: 800;
+}
+
+/* Subject Grid Table */
+table.sub-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+    font-size: 8pt;
+    text-align: center;
+}
+table.sub-table th {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 4px 6px;
+    font-weight: 700;
+    border: 1px solid #1e3a8a;
+}
+table.sub-table td {
+    border: 1px solid #cbd5e1;
+    padding: 4px 6px;
+    font-weight: 600;
+}
+
+/* Layout Columns */
+.cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Photo & Sign Container */
+.photo-sign-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.photo-frame {
+    width: 30mm;
+    height: 35mm;
+    border: 1.5px solid #0f172a;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.sign-frame {
+    width: 35mm;
+    height: 10mm;
+    border: 1px solid #0f172a;
+    border-radius: 3px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sign-frame img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Declaration Notice */
+.decl-box {
+    border: 1px solid #cbd5e1;
+    background: #fffbeb;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 7.5pt;
+    line-height: 1.4;
+    color: #92400e;
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+/* Signature Rows */
+.sig-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 14px;
+    font-size: 8pt;
+    font-weight: 700;
+    text-align: center;
+}
+.sig-item {
+    width: 23%;
+}
+.sig-line {
+    border-top: 1px solid #0f172a;
+    padding-top: 3px;
+    margin-top: 25px;
+}
+
+/* ── Print Media Optimization ─────────────────────────────────────────────── */
+@media print {
+    body {
+        background: #fff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .action-bar { display: none !important; }
+    .page-wrap {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    .receipt-body {
+        padding: 8mm 10mm 6mm !important;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    body { padding: 4px; }
+    .action-bar { padding: 8px 12px; }
+    .action-bar-title { font-size: 0.85rem; }
+    .action-bar button { padding: 6px 12px; font-size: 0.8rem; }
+    .receipt-body { padding: 10px; }
+    .rc-board-hi { font-size: 13pt; }
+    .rc-board-en { font-size: 9pt; }
+    .rc-school-name { font-size: 10pt; }
+    .cols-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+    <!-- Screen Action Bar -->
+    <div class="action-bar">
+        <div class="action-bar-title">📄 छात्र पंजीयन प्रपत्र (Registration Receipt)</div>
+        <div class="action-bar-btns">
+            <button class="btn-print" onclick="window.print()">🖨️ प्रिंट / PDF डाउनलोड करें</button>
+            <button class="btn-back" onclick="window.history.back()">⬅️ वापस जाएं</button>
+        </div>
+    </div>
+
+    <!-- Receipt Body -->
+    <div class="receipt-body">
+
+        <!-- Board Header -->
+        <div class="rc-header">
+            <div class="rc-board-hi">बिहार विद्यालय परीक्षा समिति, पटना</div>
+            <div class="rc-board-en">BIHAR SCHOOL EXAMINATION BOARD, PATNA</div>
+            <div class="rc-school-name">उच्च माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</div>
+            <div class="rc-doc-title">पंजीयन अनुमति-सह-आवेदन प्रपत्र रसीद (Registration Application Receipt)</div>
+        </div>
+
+        <!-- Meta Strip -->
+        <div class="rc-meta-strip">
+            <div class="rc-meta-item">
+                UDISE: <strong>10140616812</strong> | BSEB Code: <strong id="bsebCode">51375</strong>
+            </div>
+            <div class="rc-meta-item">
+                सत्र (Session): <strong id="academicSession">2026-28</strong>
+            </div>
+            <div class="rc-meta-item">
+                पंजीयन आईडी: <span class="reg-id-badge" id="registrationId">LOADING...</span>
+            </div>
+        </div>
+
+        <!-- Top Profile Grid (Info + Photo Corner) -->
+        <div style="display: flex; gap: 10px; align-items: stretch; margin-bottom: 4px;">
+            <div style="flex: 1;">
+                <div class="sec-title">1. विद्यार्थी का व्यक्तिगत विवरण (Personal Details)</div>
+                <table class="data-table">
+                    <tr>
+                        <td class="lbl">छात्र कोड (Student Code)</td>
+                        <td class="val-bold" id="studentCode">-</td>
+                        <td class="lbl">क्रमांक (Roll No.)</td>
+                        <td class="val-bold" id="rollNo">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">कक्षा (Class)</td>
+                        <td class="val-bold" id="className">-</td>
+                        <td class="lbl">संकाय (Stream/Faculty)</td>
+                        <td class="val-bold" id="stream">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">विद्यार्थी का नाम (Name)</td>
+                        <td class="val-bold" id="studentName" colspan="3" style="text-transform: uppercase;">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">पिता का नाम (Father's Name)</td>
+                        <td class="val" id="fatherName" colspan="3" style="text-transform: uppercase;">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">माता का नाम (Mother's Name)</td>
+                        <td class="val" id="motherName" colspan="3" style="text-transform: uppercase;">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">जन्म तिथि (DOB)</td>
+                        <td class="val-bold" id="dob">-</td>
+                        <td class="lbl">लिंग (Gender)</td>
+                        <td class="val" id="gender">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">आधार संख्या (Aadhaar No.)</td>
+                        <td class="val-bold" id="aadhaar">-</td>
+                        <td class="lbl">मोबाइल (Mobile No.)</td>
+                        <td class="val-bold" id="mobile">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Photo & Signature Box -->
+            <div class="photo-sign-block" style="width: 38mm; flex-shrink: 0; justify-content: flex-start; padding-top: 18px;">
+                <div class="photo-frame" id="photoContainer">
+                    <img id="studentPhoto" src="" alt="Student Photo">
+                </div>
+                <div style="font-size: 6.5pt; color: #64748b; font-weight: 700; text-align: center;">PHOTO (3cm × 3.5cm)</div>
+                
+                <div class="sign-frame" id="signContainer" style="margin-top: 4px;">
+                    <img id="studentSignature" src="" alt="Signature">
+                </div>
+                <div style="font-size: 6.5pt; color: #64748b; font-weight: 700; text-align: center;">SIGNATURE (3.5cm × 1cm)</div>
+            </div>
+        </div>
+
+        <!-- Contact & Additional Details -->
+        <div class="cols-2">
+            <div>
+                <div class="sec-title">2. बैंक एवं अतिरिक्त विवरण (Bank & Identifiers)</div>
+                <table class="data-table">
+                    <tr>
+                        <td class="lbl">बैंक का नाम (Bank)</td>
+                        <td class="val" id="bankName">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">खाता संख्या (A/C No.)</td>
+                        <td class="val-bold" id="bankAccount">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">IFSC कोड</td>
+                        <td class="val-bold" id="bankIFSC">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">APAAR ID</td>
+                        <td class="val" id="apaarId">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">ईमेल (Email)</td>
+                        <td class="val" id="email">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <div class="sec-title">3. सामाजिक एवं अन्य विवरण (Social & Address)</div>
+                <table class="data-table">
+                    <tr>
+                        <td class="lbl">कोटि / जाति (Category)</td>
+                        <td class="val" id="caste">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">वैवाहिक स्थिति / दिव्यांग</td>
+                        <td class="val"><span id="maritalStatus">-</span> / <span id="differentlyAbled">-</span></td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">पहचान चिह्न 1 (Mark 1)</td>
+                        <td class="val" id="mark1">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">पहचान चिह्न 2 (Mark 2)</td>
+                        <td class="val" id="mark2">-</td>
+                    </tr>
+                    <tr>
+                        <td class="lbl">स्थायी पता (Address)</td>
+                        <td class="val" id="fullAddress">-</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Subjects Offered Section -->
+        <div class="sec-title">4. चयनित विषय समूह (Subjects Offered for Board Examination)</div>
+        <table class="sub-table" id="subjectsTable">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">विषय वर्ग (Subject Group)</th>
+                    <th style="width: 50%; text-align: left; padding-left: 12px;">विषय का नाम (Subject Name)</th>
+                    <th style="width: 25%;">पूर्णांक (Total Marks)</th>
+                </tr>
+            </thead>
+            <tbody id="subjectsTableBody">
+                <!-- Populated dynamically -->
+            </tbody>
+        </table>
+
+        <!-- Notice & Instructions -->
+        <div class="decl-box">
+            <strong>📢 घोषणा एवं महत्वपूर्ण निर्देश:</strong><br>
+            1. प्रमाणित किया जाता है कि उपर्युक्त सभी विवरण मेरे द्वारा दिए गए मूल अभिलेखों के अनुसार सत्य एवं सही हैं।<br>
+            2. विद्यार्थी इस रसीद की <strong>हस्ताक्षरित प्रति</strong> आधार कार्ड एवं बैंक पासबुक की छायाप्रति के साथ <strong>पंजीयन प्रभारी शिक्षक</strong> के पास जमा करें।
+        </div>
+
+        <!-- Signature Row -->
+        <div class="sig-row">
+            <div class="sig-item">
+                <div class="sig-line">छात्र / छात्रा का हस्ताक्षर<br>(Student Signature)</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line">माता / पिता का हस्ताक्षर<br>(Parent Signature)</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line">पंजीयन प्रभारी के हस्ताक्षर<br>(Registration In-Charge)</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line">प्रधानाध्यापक के हस्ताक्षर एवं मुहर<br>(Principal Seal & Signature)</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const ADMIN_API_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
+
+function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text || '-';
+}
+
+function formatDate(dobStr) {
+    if (!dobStr) return '-';
+    dobStr = String(dobStr);
+    if (dobStr.includes('T')) {
+        const dt = new Date(dobStr);
+        if (!isNaN(dt.getTime())) {
+            const dd = String(dt.getDate()).padStart(2, '0');
+            const mm = String(dt.getMonth() + 1).padStart(2, '0');
+            const yyyy = dt.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        }
+    }
+    const parts = dobStr.split('-');
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    return dobStr;
+}
+
+function renderSubjects(subjectsList, className) {
+    const tbody = document.getElementById('subjectsTableBody');
+    if (!tbody) return;
+
+    const classNum = parseInt(className, 10);
+    let html = '';
+
+    if (classNum === 9 || classNum === 10) {
+        // Compulsory Matric Subjects
+        const compulsory = ["Mathematics", "Science", "Social Science", "English"];
+        compulsory.forEach(sub => {
+            html += `<tr><td>अनिवार्य (Compulsory)</td><td style="text-align:left; padding-left:12px;">${sub}</td><td>100</td></tr>`;
+        });
+
+        // Other tagged subjects
+        (subjectsList || []).forEach(sub => {
+            if (!compulsory.includes(sub)) {
+                html += `<tr><td>भाषा / ऐच्छिक (Language/Opt)</td><td style="text-align:left; padding-left:12px;">${sub}</td><td>100</td></tr>`;
+            }
+        });
+    } else {
+        // Senior Secondary (Class 11 / 12)
+        (subjectsList || []).forEach((sub, idx) => {
+            let grp = 'ऐच्छिक (Elective)';
+            if (idx === 0) grp = 'अनिवार्य भाषा 1 (MIL)';
+            else if (idx === 1) grp = 'अनिवार्य भाषा 2 (SIL)';
+            else if (idx >= 5) grp = 'अतिरिक्त विषय (Additional)';
+            html += `<tr><td>${grp}</td><td style="text-align:left; padding-left:12px;">${sub}</td><td>100</td></tr>`;
+        });
+    }
+
+    if (!html) {
+        html = `<tr><td colspan="3" style="color:#64748b; padding:10px;">कोई विषय दर्ज नहीं है।</td></tr>`;
+    }
+
+    tbody.innerHTML = html;
+}
+
+function driveUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+    const match = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match) return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    return url;
+}
+
+async function populateReceipt(data) {
+    if (!data) return;
+
+    setText('registrationId', data.regId || (data.studentName ? data.studentName.replace(/[^A-Za-z]/g, '').substring(0, 4).toUpperCase() + (data.rollNo || '') : 'RAJE54'));
+    setText('academicSession', data.academicSession || '2026-28');
+    setText('studentCode', data.studentCode);
+    setText('rollNo', data.rollNo);
+    setText('className', data.className ? `Class ${data.className}` : '-');
+    setText('stream', data.stream || (parseInt(data.className, 10) >= 11 ? 'General' : 'Matric General'));
+
+    const isSenior = parseInt(data.className, 10) >= 11;
+    setText('bsebCode', isSenior ? '31445' : '51375');
+
+    setText('studentName', data.studentName);
+    setText('fatherName', data.fatherName);
+    setText('motherName', data.motherName);
+    setText('dob', formatDate(data.dob));
+    setText('gender', data.gender || 'Not Specified');
+    setText('aadhaar', data.aadhaar);
+    setText('mobile', data.mobile);
+
+    setText('bankName', data.bankName);
+    setText('bankAccount', data.bankAccount);
+    setText('bankIFSC', data.bankIFSC);
+    setText('apaarId', data.apaarId);
+    setText('email', data.email);
+
+    setText('caste', data.caste);
+    setText('maritalStatus', data.maritalStatus);
+    setText('differentlyAbled', data.differentlyAbled === 'Yes' ? 'दिव्यांग (Yes)' : 'सामान्य (No)');
+    setText('mark1', data.mark1);
+    setText('mark2', data.mark2);
+
+    const fullAddr = [data.address, data.townCity, data.district, data.pinCode ? `PIN: ${data.pinCode}` : ''].filter(Boolean).join(', ');
+    setText('fullAddress', fullAddr);
+
+    // Photos & Signatures with multi-CDN fallback
+    const photoEl = document.getElementById('studentPhoto');
+    const photoRaw = data.photoUrl || data.photoPreview || '';
+    if (photoEl && photoRaw) {
+        const match = photoRaw.match(/id=([a-zA-Z0-9_-]+)/) || photoRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        const fileId = match ? match[1] : '';
+        photoEl.setAttribute('referrerpolicy', 'no-referrer');
+        photoEl.onerror = function() {
+            if (!this.dataset.tried && fileId) {
+                this.dataset.tried = '1';
+                this.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
+            } else if (this.dataset.tried === '1' && fileId) {
+                this.dataset.tried = '2';
+                this.src = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+        };
+        photoEl.src = driveUrl(photoRaw);
+        photoEl.style.display = 'block';
+    }
+
+    const signEl = document.getElementById('studentSignature');
+    const signRaw = data.signatureUrl || data.signaturePreview || '';
+    if (signEl && signRaw) {
+        const match = signRaw.match(/id=([a-zA-Z0-9_-]+)/) || signRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        const fileId = match ? match[1] : '';
+        signEl.setAttribute('referrerpolicy', 'no-referrer');
+        signEl.onerror = function() {
+            if (!this.dataset.tried && fileId) {
+                this.dataset.tried = '1';
+                this.src = `https://drive.google.com/thumbnail?id=${fileId}&sz=w800`;
+            } else if (this.dataset.tried === '1' && fileId) {
+                this.dataset.tried = '2';
+                this.src = `https://drive.google.com/uc?export=view&id=${fileId}`;
+            }
+        };
+        signEl.src = driveUrl(signRaw);
+        signEl.style.display = 'block';
+    }
+
+    // Subjects
+    renderSubjects(data.subjects, data.className);
+}
+
+(async function initReceipt() {
+    const params = new URLSearchParams(window.location.search);
+    const regId = params.get('id') || params.get('regId');
+    const studentCode = params.get('code') || params.get('studentCode');
+    const aadhaar = params.get('aadhaar');
+
+    let data = null;
+
+    // 1. Try reading from active sessionStorage
+    try {
+        const stored = sessionStorage.getItem('lastRegistrationData') || sessionStorage.getItem('previewRegistrationData');
+        if (stored) {
+            data = JSON.parse(stored);
+        }
+    } catch(e) {}
+
+    // 2. If ID matches or querying by URL param, fetch from backend API
+    if (regId || studentCode || aadhaar) {
+        if (!data || (regId && data.regId !== regId)) {
+            try {
+                let query = '';
+                if (regId) query = `regId=${encodeURIComponent(regId)}`;
+                else if (studentCode) query = `studentCode=${encodeURIComponent(studentCode)}`;
+                else if (aadhaar) query = `aadhaar=${encodeURIComponent(aadhaar)}`;
+
+                const res = await fetch(`${ADMIN_API_URL}?action=public.registration.get&${query}`);
+                const result = await res.json();
+                if (result.success && result.record) {
+                    data = result.record;
+                }
+            } catch(err) {
+                console.error('Failed to fetch registration data:', err);
+            }
+        }
+    }
+
+    if (data) {
+        await populateReceipt(data);
+    } else {
+        document.querySelector('.receipt-body').innerHTML = `
+            <div style="text-align:center; padding: 50px 20px;">
+                <h2 style="color:#ef4444; margin-bottom:10px;">⚠️ पंजीयन विवरण लोड नहीं हो सका</h2>
+                <p style="color:#64748b; margin-bottom:20px;">कृपया रजिस्ट्रेशन आईडी की जाँच करें या पुनः प्रयास करें।</p>
+                <a href="registration.html" style="background:#1e3a8a; color:#fff; padding:10px 20px; border-radius:6px; text-decoration:none; font-weight:700;">पंजीयन पोर्टल पर जाएं</a>
+            </div>`;
+    }
+})();
+</script>
+</body>
+</html>
