@@ -217,9 +217,9 @@ body {
     display: block;
 }
 
-/* =====================
-   HERO - Majestic Cinematic Zoom & Frosted Glass Frame
-   ===================== */
+/* ====================================================
+   HERO - Grand Cinematic Reveal & Frosted Glass Frame
+   ==================================================== */
 .hero {
     min-height: 100vh;
     position: relative;
@@ -231,6 +231,7 @@ body {
     background: #0b1120;
 }
 
+/* Phase 1: Campus photo starts in full pristine view, zooms smoothly and settles */
 .hero-bg {
     position: absolute;
     top: -5%;
@@ -242,43 +243,75 @@ body {
     background-position: center 30%;
     transform-origin: center center;
     transform: scale3d(1, 1, 1);
-    animation: heroCinematicZoom 7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    will-change: transform;
+    animation: heroCinematicZoom 8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    will-change: transform, filter;
     z-index: 1;
 }
 
 @keyframes heroCinematicZoom {
     0% {
-        transform: scale3d(1, 1, 1);
+        transform: scale3d(1.0, 1.0, 1);
+        filter: blur(0px) brightness(1.02);
+    }
+    30% {
+        /* Keep crystal clear for the first ~2 seconds */
+        transform: scale3d(1.05, 1.05, 1);
+        filter: blur(0px) brightness(1.0);
     }
     100% {
-        transform: scale3d(1.18, 1.18, 1);
+        transform: scale3d(1.15, 1.15, 1);
+        filter: blur(2px) brightness(0.92);
     }
 }
 
+/* Overlay darkens smoothly only after the campus image is appreciated */
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(15, 23, 42, 0.76) 100%);
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.82) 100%);
     z-index: 2;
+    opacity: 0.15;
+    animation: overlayFadeIn 2.2s cubic-bezier(0.25, 1, 0.5, 1) 1.2s forwards;
+    will-change: opacity;
 }
 
+@keyframes overlayFadeIn {
+    0% {
+        opacity: 0.15;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Phase 2: Frosted Glass Card glides up smoothly at t = 1.5s */
 .hero-content {
     position: relative;
     z-index: 3;
     color: white;
     width: min(920px, 92%);
-    padding: 38px 30px;
+    padding: 40px 32px;
     border-radius: 28px;
     background: rgba(15, 23, 42, 0.65);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     opacity: 0;
-    transform: translate3d(0, 36px, 0) scale(0.96);
-    animation: heroGlassEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+    transform: translate3d(0, 50px, 0) scale(0.95);
+    animation: heroGlassGrandReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
     will-change: opacity, transform;
+}
+
+@keyframes heroGlassGrandReveal {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 50px, 0) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
 }
 
 /* Tricolor Top Shimmer Ribbon (Only Active on 15th August) */
@@ -291,24 +324,13 @@ body {
     height: 3px;
     border-radius: 3px;
     background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-    box-shadow: 0 0 14px rgba(255, 153, 51, 0.45), 0 0 14px rgba(19, 136, 8, 0.45);
+    box-shadow: 0 0 16px rgba(255, 153, 51, 0.55), 0 0 16px rgba(19, 136, 8, 0.55);
     opacity: 0;
-    animation: tricolorShimmerFade 1.2s ease-out 1.2s forwards;
-}
-
-@keyframes heroGlassEntrance {
-    0% {
-        opacity: 0;
-        transform: translate3d(0, 36px, 0) scale(0.96);
-    }
-    100% {
-        opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
-    }
+    animation: tricolorShimmerFade 1.4s ease-out 2.2s forwards;
 }
 
 @keyframes tricolorShimmerFade {
-    0% { opacity: 0; transform: scaleX(0.7); }
+    0% { opacity: 0; transform: scaleX(0.6); }
     100% { opacity: 1; transform: scaleX(1); }
 }
 
@@ -318,8 +340,8 @@ body {
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    padding: 7px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 7px 20px;
     border-radius: 999px;
     font-size: 0.92rem;
     font-weight: 700;
@@ -376,7 +398,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    padding: 8px 15px;
+    padding: 8px 16px;
     border-radius: 999px;
     font-size: 0.88rem;
     font-weight: 600;
@@ -388,6 +410,53 @@ body {
     background: rgba(255, 255, 255, 0.2);
     border-color: rgba(255, 255, 255, 0.35);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Floating Scroll Hint Indicator */
+.hero-scroll-hint {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    animation: scrollHintFadeIn 1s ease 2.6s forwards;
+    transition: all 0.25s ease;
+}
+
+.hero-scroll-hint:hover {
+    background: rgba(15, 23, 42, 0.8);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateX(-50%) translateY(-2px);
+}
+
+.hero-scroll-hint .scroll-arrow {
+    display: inline-block;
+    animation: bounceArrow 1.6s ease-in-out infinite;
+}
+
+@keyframes scrollHintFadeIn {
+    0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes bounceArrow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
 }
 
 .btn-primary {
