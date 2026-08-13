@@ -329,7 +329,7 @@ if (form) {
         }
 
         const payload = {
-            _token: 'UHS_KAPARPURA_2026',
+            status: "Pending",
             admissionClass: clsSelected,
             stream: stream,
             penNumber: pen,
