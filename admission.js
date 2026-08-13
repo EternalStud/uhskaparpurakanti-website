@@ -135,16 +135,16 @@ if (photoInput) {
         const file = this.files[0];
         if (!file) return;
 
-        // 1. Strict MIME Type Check
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-            alert('कृपया केवल वैध इमेज फाइल (JPG या PNG) अपलोड करें।');
+        // 1. Strict JPEG/JPG Check (Reject PNG and others)
+        const validTypes = ['image/jpeg', 'image/jpg'];
+        if (!validTypes.includes(file.type) || !/\.(jpe?g)$/i.test(file.name)) {
+            alert('कृपया केवल .jpg या .jpeg प्रारूप में वैध फोटो अपलोड करें (PNG या PDF मान्य नहीं है)।');
             this.value = ''; return;
         }
 
         const sizeKB = file.size / 1024;
-        if (sizeKB < 50 || sizeKB > 100) {
-            alert('फोटो का आकार 50KB से 100KB के बीच होना चाहिए।');
+        if (sizeKB < 40 || sizeKB > 100) {
+            alert('फोटो का आकार 40KB से 100KB के बीच होना चाहिए।');
             this.value = ''; return;
         }
 
@@ -174,10 +174,10 @@ if (signInput) {
         const file = this.files[0];
         if (!file) return;
 
-        // 1. Strict MIME Type Check
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-            alert('कृपया केवल वैध इमेज फाइल (JPG या PNG) अपलोड करें।');
+        // 1. Strict JPEG/JPG Check
+        const validTypes = ['image/jpeg', 'image/jpg'];
+        if (!validTypes.includes(file.type) || !/\.(jpe?g)$/i.test(file.name)) {
+            alert('कृपया केवल .jpg या .jpeg प्रारूप में वैध हस्ताक्षर अपलोड करें।');
             this.value = ''; return;
         }
 
