@@ -424,28 +424,34 @@ body {
 .hero-badges {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
     margin: 24px 0 10px;
 }
 
 .hero-badge-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     background: rgba(255, 255, 255, 0.09) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    padding: 8px 18px !important;
+    padding: 9px 20px !important;
     border-radius: 999px !important;
-    font-size: 0.88rem !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
     color: #f8fafc !important;
+    white-space: nowrap;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .hero-badge-item strong {
     color: #fbbf24;
     font-weight: 700;
-    margin-right: 4px;
+    margin-right: 3px;
 }
 
 .hero-badge-item:hover {
@@ -1422,9 +1428,26 @@ footer {
     .school-stats-preview p { font-size: 2.3rem; }
 
     .hero { min-height: 80vh; }
-    .hero-content h1 { font-size: 2.1rem; }
-    .hero-badges { gap: 8px; }
-    .hero-badges span { font-size: .78rem; padding: 8px 12px; }
+    .hero-content { padding: 30px 18px; width: 95%; }
+    .hero-content h1 { font-size: 1.85rem; }
+    .hero-badges {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 360px;
+        margin: 18px auto 8px;
+    }
+    .hero-badge-item {
+        width: 100%;
+        font-size: 0.82rem !important;
+        padding: 8px 14px !important;
+        white-space: normal !important;
+        box-sizing: border-box;
+        text-align: center;
+        line-height: 1.35;
+    }
 
     .section { padding: 60px 0; }
 
