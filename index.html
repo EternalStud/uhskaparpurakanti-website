@@ -28,7 +28,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="preload" href="/style.css" as="style">
 <link rel="preload" as="image" href="images/hero.jpg" fetchpriority="high">
@@ -61,16 +61,19 @@
 
 <header class="header">
   <div class="container header-inner">
-    <div class="header-text">
-      <h1>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
-      <p class="header-english">UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</p>
-      <p class="header-sub">UDISE: 10140616812</p>
+    <div class="header-brand-wrap">
+      <div class="header-emblem-badge" aria-hidden="true">🏫</div>
+      <div class="header-text">
+        <h1>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+        <p class="header-english">UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI</p>
+        <p class="header-sub">UDISE: 10140616812 • Govt. Senior Secondary School</p>
+      </div>
     </div>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
   </div>
-    <nav class="container" aria-label="Desktop Navigation">
+  <nav class="container" aria-label="Desktop Navigation">
     <div class="desktop-nav">
       <a href="#home" data-section="home">मुख्य पृष्ठ</a>
       <a href="#notices" data-section="notices">महत्वपूर्ण सूचनाएँ</a>
@@ -101,21 +104,21 @@
   <div class="hero-bg"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
+    <div class="hero-motto-banner">
+      <span class="motto-accent">॥</span> ज्ञानं परमं बलम् <span class="motto-accent">॥</span>
+    </div>
     <div class="festive-badge" id="festive-badge" style="display: none;">
       <span class="festive-flag">🇮🇳</span>
       <span>स्वतंत्रता दिवस की हार्दिक शुभकामनाएँ</span>
     </div>
     <h1>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h1>
-    <p>Government Senior Secondary School</p>
-    <p>Recognized by the Department of Education, Bihar</p>
+    <p class="hero-tagline-en">Government Senior Secondary School • Recognized by Department of Education, Bihar</p>
     <div class="hero-badges">
-      <span>🎓 UDISE : 10140616812</span>
-      <span>📝 Matric Code : 51375</span>
-      <span>📚 Inter Code : 31445</span>
-      <span>🏫 कक्षा : IX - XII</span>
-      <span>📝 माध्यम : हिन्दी</span>
-      <span>📖 संकाय : कला एवं विज्ञान</span>
-      <span>✅ संबद्धता : बिहार विद्यालय परीक्षा समिति</span>
+      <span class="hero-badge-item"><strong>UDISE:</strong> 10140616812</span>
+      <span class="hero-badge-item"><strong>Matric Code:</strong> 51375</span>
+      <span class="hero-badge-item"><strong>Inter Code:</strong> 31445</span>
+      <span class="hero-badge-item"><strong>कक्षाएँ:</strong> IX - XII</span>
+      <span class="hero-badge-item"><strong>संकाय:</strong> कला एवं विज्ञान</span>
     </div>
     <div id="admission-banner-container" style="display: none; margin-top: 24px; text-align: center;">
       <a href="admission.html" class="btn-primary admission-pulse" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; text-decoration: none; padding: 12px 28px; font-size: 1.05rem; border-radius: 30px; background: #2ecc71; border: none; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); color: white; transition: all 0.3s ease;">
