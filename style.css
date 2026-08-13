@@ -231,66 +231,63 @@ body {
     background: #0b1120;
 }
 
-/* Phase 1: Campus photo starts in full pristine view, zooms smoothly and settles */
+/* Phase 1: Aerial Pull-Back Zoom-Out: Starts close (1.35) and pulls back to fit screen (1.0) */
 .hero-bg {
     position: absolute;
-    top: -5%;
-    left: -5%;
-    width: 110%;
-    height: 110%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('images/hero.jpg');
     background-size: cover;
-    background-position: center 30%;
+    background-position: center center;
     transform-origin: center center;
-    transform: scale3d(1, 1, 1);
-    animation: heroCinematicZoom 8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    transform: scale3d(1.35, 1.35, 1);
+    animation: heroCinematicZoomOut 4.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     will-change: transform, filter;
     z-index: 1;
 }
 
-@keyframes heroCinematicZoom {
+@keyframes heroCinematicZoomOut {
     0% {
-        transform: scale3d(1.0, 1.0, 1);
-        filter: blur(0px) brightness(1.02);
+        transform: scale3d(1.35, 1.35, 1);
+        filter: blur(0px) brightness(1.04);
     }
-    30% {
-        /* Keep crystal clear for the first ~2 seconds */
-        transform: scale3d(1.05, 1.05, 1);
+    60% {
         filter: blur(0px) brightness(1.0);
     }
     100% {
-        transform: scale3d(1.15, 1.15, 1);
-        filter: blur(2px) brightness(0.92);
+        transform: scale3d(1.0, 1.0, 1);
+        filter: blur(1.5px) brightness(0.92);
     }
 }
 
-/* Overlay darkens smoothly only after the campus image is appreciated */
+/* Overlay darkens smoothly only after the zoom-out reveal completes */
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.82) 100%);
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.42) 0%, rgba(15, 23, 42, 0.82) 100%);
     z-index: 2;
-    opacity: 0.15;
-    animation: overlayFadeIn 2.2s cubic-bezier(0.25, 1, 0.5, 1) 1.2s forwards;
+    opacity: 0.08;
+    animation: overlayFadeIn 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2.4s forwards;
     will-change: opacity;
 }
 
 @keyframes overlayFadeIn {
     0% {
-        opacity: 0.15;
+        opacity: 0.08;
     }
     100% {
         opacity: 1;
     }
 }
 
-/* Phase 2: Frosted Glass Card glides up smoothly at t = 1.5s */
+/* Phase 2: Frosted Glass Card glides up smoothly at t = 2.6s */
 .hero-content {
     position: relative;
     z-index: 3;
     color: white;
     width: min(920px, 92%);
-    padding: 40px 32px;
+    padding: 38px 30px;
     border-radius: 28px;
     background: rgba(15, 23, 42, 0.65);
     backdrop-filter: blur(20px) saturate(180%);
@@ -298,15 +295,15 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     opacity: 0;
-    transform: translate3d(0, 50px, 0) scale(0.95);
-    animation: heroGlassGrandReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+    transform: translate3d(0, 48px, 0) scale(0.95);
+    animation: heroGlassGrandReveal 1.3s cubic-bezier(0.16, 1, 0.3, 1) 2.6s forwards;
     will-change: opacity, transform;
 }
 
 @keyframes heroGlassGrandReveal {
     0% {
         opacity: 0;
-        transform: translate3d(0, 50px, 0) scale(0.95);
+        transform: translate3d(0, 48px, 0) scale(0.95);
     }
     100% {
         opacity: 1;
