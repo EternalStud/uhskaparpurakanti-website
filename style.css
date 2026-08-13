@@ -218,74 +218,169 @@ body {
 }
 
 /* =====================
-   HERO
+   HERO - Cinematic Zoom & Frosted Glass Frame
    ===================== */
 .hero {
     min-height: 100vh;
-    background-image: url('images/hero.jpg');
-    background-size: cover;
-    background-position: center;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    overflow: hidden;
+    background: #0f172a;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: -20px; /* Overscan buffer for smooth hardware-accelerated scaling */
+    background-image: url('images/hero.jpg');
+    background-size: cover;
+    background-position: center;
+    transform: scale3d(1, 1, 1);
+    animation: heroCinematicZoom 7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform;
+    z-index: 1;
+}
+
+@keyframes heroCinematicZoom {
+    0% {
+        transform: scale3d(1, 1, 1);
+    }
+    100% {
+        transform: scale3d(1.08, 1.08, 1);
+    }
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,.55);
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.78) 100%);
+    z-index: 2;
+    backdrop-filter: blur(1px);
 }
 
 .hero-content {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     color: white;
-    width: min(900px, 90%);
-    padding: 30px;
-    border-radius: 24px;
-    background: rgba(0,0,0,.18);
-    backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,.12);
-    box-shadow: 0 25px 60px rgba(0,0,0,.35);
+    width: min(920px, 92%);
+    padding: 38px 30px;
+    border-radius: 28px;
+    background: rgba(15, 23, 42, 0.62);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    opacity: 0;
+    transform: translate3d(0, 32px, 0) scale(0.97);
+    animation: heroGlassEntrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+    will-change: opacity, transform;
+}
+
+/* Tricolor Top Shimmer Border */
+.hero-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 28px;
+    right: 28px;
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+    box-shadow: 0 0 12px rgba(255, 153, 51, 0.45), 0 0 12px rgba(19, 136, 8, 0.45);
+    opacity: 0;
+    animation: tricolorShimmerFade 1.2s ease-out 1.2s forwards;
+}
+
+@keyframes heroGlassEntrance {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 32px, 0) scale(0.97);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes tricolorShimmerFade {
+    0% { opacity: 0; transform: scaleX(0.7); }
+    100% { opacity: 1; transform: scaleX(1); }
+}
+
+/* Festive Independence Day Badge */
+.festive-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f8fafc;
+    letter-spacing: 0.3px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+.festive-badge:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.festive-flag {
+    font-size: 1.15rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
 .hero-content h1 {
-    font-size: clamp(1.9rem,4vw,3.8rem);
-    margin-bottom: 12px;
-    text-shadow: 0 4px 20px rgba(0,0,0,.5);
+    font-size: clamp(1.85rem, 3.8vw, 3.4rem);
+    margin-bottom: 10px;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
     font-weight: 800;
-    letter-spacing: -.5px;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
 }
 
 .hero-content p {
-    opacity: .95;
-    margin-bottom: 6px;
+    opacity: 0.92;
+    margin-bottom: 4px;
+    font-size: 1.02rem;
+    letter-spacing: 0.2px;
 }
 
 .hero-badges {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 12px;
-    margin: 28px 0;
+    gap: 10px;
+    margin: 26px 0 10px;
 }
 
 .hero-badges span {
-    background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(10px);
-    padding: 10px 16px;
+    -webkit-backdrop-filter: blur(10px);
+    padding: 8px 15px;
     border-radius: 999px;
-    font-size: .92rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    transition: all .25s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-badges span:hover {
     transform: translateY(-2px);
-    background: rgba(255,255,255,.22);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .btn-primary {
