@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             noticeContainer.innerHTML = notices.map((notice, index) => {
                 const priorityClass = notice.priority === 'High' ? 'notice-high' : 'notice-normal';
                 const details = notice.details || '';
-                const shareLink = `https://uhskaparpurakanti.in/#notice-${index}`;
+                const shareLink = 'https://uhskaparpurakanti.in/#notices';
                 return `
                     <div class="notice-card ${priorityClass}" id="notice-${index}">
                         <button class="btn-notice-share" type="button" 
