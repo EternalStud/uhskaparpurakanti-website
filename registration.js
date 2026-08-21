@@ -443,6 +443,9 @@ function populateForm(student) {
     document.getElementById('mobile').value = student.mobile || '';
     document.getElementById('bankAccount').value = student.bankAccount || '';
     document.getElementById('bankIFSC').value = student.bankIFSC || '';
+    if (document.getElementById('religion')) {
+        document.getElementById('religion').value = student.religion || '';
+    }
     
     // Always false as we collect via dropdowns even if they have old tags
     document.getElementById('hasExistingSubjects').value = "false";
@@ -697,6 +700,7 @@ function buildPreviewModal(subs) {
         'Bank A/C': document.getElementById('bankAccount').value,
         'IFSC': document.getElementById('bankIFSC').value,
         'Caste': document.getElementById('caste').value,
+        'Religion': document.getElementById('religion')?.value || '-',
         'Marital Status': document.getElementById('maritalStatus').value,
         'Differently Abled': document.getElementById('differentlyAbled').value,
         'Visually Impaired': document.getElementById('visuallyImpaired').value,
@@ -769,6 +773,7 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
         apaarId: document.getElementById('apaarId').value,
         email: document.getElementById('email').value,
         caste: document.getElementById('caste').value,
+        religion: document.getElementById('religion') ? document.getElementById('religion').value : "",
         maritalStatus: document.getElementById('maritalStatus').value,
         differentlyAbled: document.getElementById('differentlyAbled').value,
         visuallyImpaired: document.getElementById('visuallyImpaired').value,

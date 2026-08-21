@@ -467,8 +467,8 @@ table.sub-table td {
                 <div class="sec-title">3. सामाजिक एवं अन्य विवरण (Social & Address)</div>
                 <table class="data-table">
                     <tr>
-                        <td class="lbl">कोटि / जाति (Category)</td>
-                        <td class="val" id="caste">-</td>
+                        <td class="lbl">कोटि / धर्म (Category/Rel.)</td>
+                        <td class="val"><span id="caste">-</span> / <span id="religion">-</span></td>
                     </tr>
                     <tr>
                         <td class="lbl">वैवाहिक स्थिति / दिव्यांग</td>
@@ -630,6 +630,7 @@ async function populateReceipt(data) {
     setText('email', data.email);
 
     setText('caste', data.caste);
+    setText('religion', data.religion);
     setText('maritalStatus', data.maritalStatus);
     setText('differentlyAbled', data.differentlyAbled === 'Yes' ? 'दिव्यांग (Yes)' : 'सामान्य (No)');
     setText('mark1', data.mark1);
