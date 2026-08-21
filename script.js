@@ -379,9 +379,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     titleEl.textContent = `${currentCategoryName} • ${typeLabel}`;
                 }
 
+                const fsBtn = document.getElementById('lightbox-fullscreen-btn');
+                const swipeHint = document.getElementById('lightbox-swipe-hint');
+
                 if (item.isVideo) {
                     if (lightboxImg) lightboxImg.style.display = 'none';
                     if (videoWrap) videoWrap.style.display = 'block';
+                    if (fsBtn) fsBtn.style.display = 'inline-flex';
+                    if (swipeHint) swipeHint.style.display = 'none';
 
                     const directVideoUrl = item.driveId 
                         ? `https://drive.google.com/uc?export=download&id=${item.driveId}`
@@ -416,6 +421,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     if (videoWrap) videoWrap.style.display = 'none';
                     if (videoFrame) videoFrame.src = '';
+                    if (fsBtn) fsBtn.style.display = 'none';
+                    if (swipeHint) swipeHint.style.display = 'block';
+
                     if (videoPlayer) { 
                         videoPlayer.pause(); 
                         videoPlayer.removeAttribute('src'); 
@@ -567,11 +575,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             galleryViewer.style.display = 'none';
 
+            const fsBtn = document.getElementById('lightbox-fullscreen-btn');
             if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
             if (prevBtn)  prevBtn.addEventListener('click', showPrev);
             if (nextBtn)  nextBtn.addEventListener('click', showNext);
             if (mPrevBtn) mPrevBtn.addEventListener('click', showPrev);
             if (mNextBtn) mNextBtn.addEventListener('click', showNext);
+
+            if (fsBtn) {
+                fsBtn.addEventListener('click', () => {
+                    const target = (videoPlayer && videoPlayer.style.display !== 'none') ? videoPlayer : videoFrame;
+                    if (target) {
+                        if (target.requestFullscreen) {
+                            target.requestFullscreen().catch(() => {});
+                        } else if (target.webkitRequestFullscreen) {
+                            target.webkitRequestFullscreen();
+                        } else if (target.webkitEnterFullscreen) {
+                            target.webkitEnterFullscreen();
+                        }
+                    }
+                });
+            }
 
             if (lightbox) {
                 let touchStartX = 0;
