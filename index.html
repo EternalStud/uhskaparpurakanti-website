@@ -31,9 +31,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="preload" href="/style.css?v=2.7.1" as="style">
+<link rel="preload" href="/style.css?v=2.8.0" as="style">
 <link rel="preload" as="image" href="images/hero.jpg" fetchpriority="high">
-<link rel="stylesheet" href="style.css?v=2.7.1">
+<link rel="stylesheet" href="style.css?v=2.8.0">
 
 <!-- JSON-LD Organization/School -->
 <script type="application/ld+json">
@@ -260,15 +260,8 @@
 
 <!-- Gallery Lightbox (Photos & Videos) -->
 <div id="gallery-lightbox" class="gallery-lightbox">
-  <div class="lightbox-header-bar">
-    <div class="lightbox-header-info">
-      <span id="lightbox-counter" class="lightbox-counter"></span>
-      <span id="lightbox-title" class="lightbox-title"></span>
-    </div>
-    <button id="lightbox-close" class="lightbox-close" title="बंद करें (Close)" aria-label="Close">✕</button>
-  </div>
-
-  <button id="lightbox-prev" class="lightbox-nav-desktop" title="पिछला (Previous)">◀</button>
+  <button id="lightbox-close" class="lightbox-close" title="बंद करें (Close)">✕</button>
+  <button id="lightbox-prev" class="lightbox-nav" title="पिछला (Previous)">◀</button>
   
   <div class="lightbox-media-container" id="lightbox-media-container">
     <img id="lightbox-image" src="" alt="Gallery Photo" loading="lazy" referrerpolicy="no-referrer">
@@ -278,19 +271,11 @@
     </div>
   </div>
 
-  <button id="lightbox-next" class="lightbox-nav-desktop" title="अगला (Next)">▶</button>
+  <button id="lightbox-next" class="lightbox-nav" title="अगला (Next)">▶</button>
 
-  <div class="lightbox-bottom-bar" id="lightbox-bottom-bar">
-    <button id="lightbox-mobile-prev" class="lightbox-action-btn" title="पिछला (Previous)">
-      <span>◀</span> पिछला
-    </button>
-    <button id="lightbox-fullscreen-btn" class="lightbox-action-btn lightbox-fullscreen-btn" title="पूर्ण स्क्रीन में देखें (Fullscreen)" style="display: none;">
-      <span>⛶</span> फुलस्क्रीन
-    </button>
-    <div class="lightbox-swipe-hint" id="lightbox-swipe-hint">👈 स्वाइप करें 👉</div>
-    <button id="lightbox-mobile-next" class="lightbox-action-btn" title="अगला (Next)">
-      अगला <span>▶</span>
-    </button>
+  <div id="lightbox-footer" class="lightbox-footer">
+    <span id="lightbox-counter" class="lightbox-counter"></span>
+    <span id="lightbox-title" class="lightbox-title"></span>
   </div>
 </div>
 
@@ -304,6 +289,6 @@
   </div>
 </footer>
 
-<script src="script.js?v=2.7.1" defer></script>
+<script src="script.js?v=2.8.0" defer></script>
 </body>
 </html>
