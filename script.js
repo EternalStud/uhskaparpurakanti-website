@@ -553,6 +553,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mNextBtn) mNextBtn.addEventListener('click', showNext);
 
             if (lightbox) {
+                let touchStartX = 0;
+                let touchEndX = 0;
+
+                lightbox.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, { passive: true });
+
+                lightbox.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchEndX - touchStartX;
+                    if (Math.abs(diff) > 45) {
+                        if (diff < 0) {
+                            showNext();
+                        } else {
+                            showPrev();
+                        }
+                    }
+                }, { passive: true });
+
                 lightbox.addEventListener('click', (e) => {
                     if (e.target === lightbox || e.target === document.getElementById('lightbox-media-container')) {
                         closeLightbox();
