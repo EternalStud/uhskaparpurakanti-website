@@ -968,11 +968,31 @@ footer {
 
 .gallery-photo-count {
     font-size: .88rem;
-    opacity: .8;
+    opacity: .85;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gallery-count-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--text);
+    opacity: 0.9;
+}
+
+.gallery-count-pill {
+    background: rgba(217, 119, 6, 0.12);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.76rem;
 }
 
 .gallery-see-btn {
@@ -1006,32 +1026,161 @@ footer {
     animation: fadeInGallery .4s ease;
 }
 
+.gallery-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
 .gallery-viewer-title {
     color: var(--accent);
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    font-size: 1.4rem;
     font-weight: 700;
+    margin: 0;
+}
+
+.gallery-filter-bar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.gallery-filter-btn {
+    background: rgba(0,0,0,0.04);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.dark .gallery-filter-btn {
+    background: rgba(255,255,255,0.06);
+}
+
+.gallery-filter-btn:hover {
+    background: rgba(217, 119, 6, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.gallery-filter-btn.active {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
 }
 
 .gallery-viewer-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
 }
 
-.gallery-viewer-grid img {
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
+.gallery-media-card {
+    position: relative;
     border-radius: 16px;
+    overflow: hidden;
     cursor: pointer;
-    transition: all .3s ease;
-    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+    aspect-ratio: 4 / 3;
+    background: #0f172a;
 }
 
-.gallery-viewer-grid img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 15px 35px rgba(0,0,0,.20);
+.gallery-media-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 36px rgba(0,0,0,.22);
+}
+
+.gallery-media-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+}
+
+.gallery-media-card:hover img {
+    transform: scale(1.08);
+}
+
+.gallery-video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 56px;
+    height: 56px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+}
+
+.gallery-video-play-btn svg {
+    margin-left: 3px;
+    fill: #ffffff;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+.gallery-media-card:hover .gallery-video-play-btn {
+    background: var(--accent);
+    border-color: #ffffff;
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 25px rgba(217, 119, 6, 0.7);
+}
+
+.gallery-video-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.gallery-media-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 12px 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
 }
 
 @keyframes fadeInGallery {
@@ -1117,58 +1266,164 @@ footer {
 }
 
 /* =====================
-   LIGHTBOX
+   LIGHTBOX (Photos & Videos)
    ===================== */
 .gallery-lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.92);
+    background: rgba(0,0,0,.94);
+    backdrop-filter: blur(10px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 10000;
     padding: 20px;
+    flex-direction: column;
 }
 
 .gallery-lightbox.active { display: flex; }
 
+.lightbox-media-container {
+    position: relative;
+    max-width: 92vw;
+    max-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #lightbox-image {
-    max-width: 90%;
-    max-height: 85vh;
-    border-radius: 14px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    max-width: 90vw;
+    max-height: 80vh;
+    border-radius: 16px;
+    box-shadow: 0 25px 70px rgba(0,0,0,.7);
+    object-fit: contain;
+    animation: zoomInMedia 0.3s ease;
+}
+
+.lightbox-video-wrap {
+    width: 88vw;
+    max-width: 940px;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    max-height: 78vh;
+    background: #000000;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(0,0,0,.85);
+    border: 1px solid rgba(255,255,255,0.15);
+    animation: zoomInMedia 0.3s ease;
+}
+
+.lightbox-video-wrap iframe,
+.lightbox-video-wrap video {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
 }
 
 .lightbox-close {
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border: none;
     border-radius: 50%;
-    background: rgba(255,255,255,.15);
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
     color: white;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: all .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10002;
+}
+
+.lightbox-close:hover {
+    background: #ef4444;
+    transform: scale(1.1);
 }
 
 .lightbox-nav {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
+    width: 54px;
+    height: 54px;
     border: none;
     border-radius: 50%;
-    background: rgba(255,255,255,.15);
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(8px);
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     cursor: pointer;
+    transition: all .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.lightbox-nav:hover {
+    background: var(--accent);
+    transform: translateY(-50%) scale(1.12);
 }
 
 #lightbox-prev { left: 25px; }
 #lightbox-next { right: 25px; }
+
+.lightbox-footer {
+    margin-top: 18px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 90vw;
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.lightbox-counter {
+    background: var(--accent);
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.lightbox-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.95;
+}
+
+@keyframes zoomInMedia {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .lightbox-nav {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+    }
+    #lightbox-prev { left: 10px; }
+    #lightbox-next { right: 10px; }
+    .lightbox-close { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 1.1rem; }
+    .lightbox-video-wrap { width: 95vw; border-radius: 12px; }
+}
 
 /* =====================
    ACHIEVEMENTS

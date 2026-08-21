@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =====================
-    // GALLERY
+    // GALLERY (Photos & Videos)
     // =====================
     async function loadGallery() {
         const galleryContainer = document.getElementById('gallery-categories');
@@ -287,60 +287,168 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbzojAlGSjnTcE5_BfkbmO4E1ga2ptIct9cbbsOTaf18Pffow9bu1FlIVq5tFzZrLF2R/exec';
 
+        function extractDriveId(url) {
+            if (!url) return '';
+            const match = url.match(/id=([a-zA-Z0-9_-]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            return match ? match[1] : '';
+        }
+
+        function isVideoMedia(item) {
+            if (!item) return false;
+            const name = (item.name || '').toLowerCase();
+            const url = (item.url || '').toLowerCase();
+            const mime = (item.mimeType || item.type || '').toLowerCase();
+            return mime.startsWith('video/') ||
+                   name.endsWith('.mp4') || name.endsWith('.mov') || name.endsWith('.webm') ||
+                   name.endsWith('.mkv') || name.endsWith('.m4v') || name.endsWith('.avi') ||
+                   url.includes('.mp4') || url.includes('.webm') || url.includes('video');
+        }
+
+        function processMedia(item) {
+            const isVid = isVideoMedia(item);
+            const driveId = extractDriveId(item.url);
+            const rawName = item.name || (isVid ? 'विद्यालय वीडियो' : 'विद्यालय फोटो');
+            const cleanName = rawName.replace(/\.[^/.]+$/, ''); // Strip extension
+
+            let posterUrl = '';
+            let streamUrl = '';
+            let displayUrl = '';
+
+            if (driveId) {
+                posterUrl = `https://lh3.googleusercontent.com/d/${driveId}`;
+                streamUrl = `https://drive.google.com/file/d/${driveId}/preview`;
+                displayUrl = isVid ? posterUrl : `https://lh3.googleusercontent.com/d/${driveId}`;
+            } else {
+                posterUrl = item.url;
+                streamUrl = item.url;
+                displayUrl = item.url;
+            }
+
+            return {
+                ...item,
+                name: cleanName,
+                isVideo: isVid,
+                driveId: driveId,
+                url: displayUrl,
+                posterUrl: posterUrl,
+                streamUrl: streamUrl
+            };
+        }
+
         try {
             const rawCategories = await fetchWithCache(GALLERY_API_URL, 'cache_gallery', 30);
-            const categories = rawCategories.map(cat => ({
-                ...cat,
-                cover: formatDriveUrl(cat.cover),
-                photos: (cat.photos || []).map(photo => ({
-                    ...photo,
-                    url: formatDriveUrl(photo.url)
-                }))
-            }));
+            const categories = (rawCategories || []).map(cat => {
+                const processedMedia = (cat.photos || []).map(processMedia);
+                const photoCount = processedMedia.filter(m => !m.isVideo).length;
+                const videoCount = processedMedia.filter(m => m.isVideo).length;
 
-            let currentPhotos = [];
+                return {
+                    ...cat,
+                    cover: formatDriveUrl(cat.cover),
+                    photos: processedMedia,
+                    photoCount: photoCount,
+                    videoCount: videoCount,
+                    totalCount: processedMedia.length
+                };
+            });
+
+            let currentMediaList = [];
+            let activeFilter = 'all';
             let currentIndex = 0;
 
-            const lightbox    = document.getElementById('gallery-lightbox');
-            const lightboxImg = document.getElementById('lightbox-image');
-            const closeBtn    = document.getElementById('lightbox-close');
-            const prevBtn     = document.getElementById('lightbox-prev');
-            const nextBtn     = document.getElementById('lightbox-next');
+            const lightbox      = document.getElementById('gallery-lightbox');
+            const lightboxImg   = document.getElementById('lightbox-image');
+            const videoWrap     = document.getElementById('lightbox-video-wrap');
+            const videoFrame    = document.getElementById('lightbox-video-frame');
+            const videoPlayer   = document.getElementById('lightbox-video-player');
+            const closeBtn      = document.getElementById('lightbox-close');
+            const prevBtn       = document.getElementById('lightbox-prev');
+            const nextBtn       = document.getElementById('lightbox-next');
+            const counterEl     = document.getElementById('lightbox-counter');
+            const titleEl       = document.getElementById('lightbox-title');
+
+            function renderLightboxSlide(index) {
+                if (!currentMediaList.length) return;
+                currentIndex = (index + currentMediaList.length) % currentMediaList.length;
+                const item = currentMediaList[currentIndex];
+
+                if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${currentMediaList.length}`;
+                if (titleEl) titleEl.textContent = `${item.name} ${item.isVideo ? '(🎥 वीडियो)' : '(📸 फोटो)'}`;
+
+                if (item.isVideo) {
+                    if (lightboxImg) lightboxImg.style.display = 'none';
+                    if (videoWrap) videoWrap.style.display = 'block';
+
+                    if (item.driveId) {
+                        if (videoPlayer) videoPlayer.style.display = 'none';
+                        if (videoFrame) {
+                            videoFrame.style.display = 'block';
+                            videoFrame.src = item.streamUrl;
+                        }
+                    } else {
+                        if (videoFrame) {
+                            videoFrame.style.display = 'none';
+                            videoFrame.src = '';
+                        }
+                        if (videoPlayer) {
+                            videoPlayer.style.display = 'block';
+                            videoPlayer.src = item.streamUrl;
+                            videoPlayer.play().catch(() => {});
+                        }
+                    }
+                } else {
+                    if (videoWrap) videoWrap.style.display = 'none';
+                    if (videoFrame) videoFrame.src = '';
+                    if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ''; }
+
+                    if (lightboxImg) {
+                        lightboxImg.style.display = 'block';
+                        lightboxImg.src = item.url;
+                    }
+                }
+            }
 
             function openLightbox(index) {
-                currentIndex = index;
-                lightboxImg.src = currentPhotos[currentIndex].url;
-                lightbox.classList.add('active');
-                document.body.style.overflow = 'hidden';
+                renderLightboxSlide(index);
+                if (lightbox) {
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
             }
 
             function closeLightbox() {
-                lightbox.classList.remove('active');
-                document.body.style.overflow = '';
+                if (videoFrame) videoFrame.src = '';
+                if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ''; }
+                if (lightbox) {
+                    lightbox.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             }
 
             function showPrev() {
-                currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
-                lightboxImg.src = currentPhotos[currentIndex].url;
+                renderLightboxSlide(currentIndex - 1);
             }
 
             function showNext() {
-                currentIndex = (currentIndex + 1) % currentPhotos.length;
-                lightboxImg.src = currentPhotos[currentIndex].url;
+                renderLightboxSlide(currentIndex + 1);
             }
 
             if (!categories.length) {
-                galleryContainer.innerHTML = '<div class="gallery-loading">कोई फोटो उपलब्ध नहीं है।</div>';
+                galleryContainer.innerHTML = '<div class="gallery-loading">कोई मीडिया उपलब्ध नहीं है।</div>';
                 return;
             }
 
             galleryContainer.innerHTML = categories.map(category => `
                 <div class="gallery-category-card" data-category="${category.category}">
-                    <img src="${category.cover}" alt="${category.category}">
+                    <img src="${category.cover}" alt="${category.category}" loading="lazy">
                     <div class="gallery-category-info">
                         <h3>${category.category}</h3>
                         <div class="gallery-photo-count">
-                            <span>📸 ${category.count} फोटो</span>
+                            <div class="gallery-count-badges">
+                                ${category.photoCount > 0 ? `<span class="gallery-count-pill">📸 ${category.photoCount} फोटो</span>` : ''}
+                                ${category.videoCount > 0 ? `<span class="gallery-count-pill" style="background: rgba(239,68,68,0.12); color: #ef4444;">🎥 ${category.videoCount} वीडियो</span>` : ''}
+                                ${category.photoCount === 0 && category.videoCount === 0 ? `<span class="gallery-count-pill">${category.count || 0} मीडिया</span>` : ''}
+                            </div>
                             <span class="gallery-see-btn">देखें →</span>
                         </div>
                     </div>
@@ -348,28 +456,86 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
 
             function renderCategory(category) {
-                currentPhotos = category.photos;
+                activeFilter = 'all';
+
+                function renderFilteredMedia() {
+                    if (activeFilter === 'photos') {
+                        currentMediaList = category.photos.filter(m => !m.isVideo);
+                    } else if (activeFilter === 'videos') {
+                        currentMediaList = category.photos.filter(m => m.isVideo);
+                    } else {
+                        currentMediaList = category.photos;
+                    }
+
+                    const grid = document.getElementById('category-media-grid');
+                    if (!grid) return;
+
+                    if (!currentMediaList.length) {
+                        grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; font-weight: 600;">इस श्रेणी में कोई मीडिया उपलब्ध नहीं है।</div>';
+                        return;
+                    }
+
+                    grid.innerHTML = currentMediaList.map((item, i) => `
+                        <div class="gallery-media-card ${item.isVideo ? 'video-card' : 'photo-card'}" data-index="${i}" title="${item.name}">
+                            <img src="${item.posterUrl || item.url}" alt="${item.name}" loading="lazy">
+                            ${item.isVideo ? `
+                                <div class="gallery-video-play-btn">
+                                    <svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                                <div class="gallery-video-badge">🎥 Video</div>
+                            ` : ''}
+                            <div class="gallery-media-caption">${item.name}</div>
+                        </div>
+                    `).join('');
+
+                    grid.querySelectorAll('.gallery-media-card').forEach(card => {
+                        card.addEventListener('click', () => {
+                            const idx = parseInt(card.dataset.index, 10);
+                            openLightbox(idx);
+                        });
+                    });
+                }
+
                 galleryViewer.innerHTML = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:20px;">
-                        <h3 class="gallery-viewer-title">📸 ${category.category}</h3>
-                        <button id="close-gallery" class="btn-primary">⬅ सभी श्रेणियाँ देखें</button>
+                    <div class="gallery-viewer-header">
+                        <h3 class="gallery-viewer-title">📸 🎥 ${category.category}</h3>
+                        <div class="gallery-filter-bar">
+                            <button class="gallery-filter-btn active" data-filter="all">
+                                🌟 सभी (${category.photos.length})
+                            </button>
+                            ${category.photoCount > 0 ? `
+                            <button class="gallery-filter-btn" data-filter="photos">
+                                📸 फोटो (${category.photoCount})
+                            </button>` : ''}
+                            ${category.videoCount > 0 ? `
+                            <button class="gallery-filter-btn" data-filter="videos">
+                                🎥 वीडियो (${category.videoCount})
+                            </button>` : ''}
+                            <button id="close-gallery" class="btn-primary" style="margin-left: 8px; font-size: 0.84rem; padding: 7px 16px;">
+                                ⬅ सभी श्रेणियाँ
+                            </button>
+                        </div>
                     </div>
-                    <div class="gallery-viewer-grid">
-                        ${category.photos.map((photo, i) => `
-                            <img src="${photo.url}" alt="${photo.name}" loading="lazy" data-index="${i}">
-                        `).join('')}
-                    </div>
+                    <div class="gallery-viewer-grid" id="category-media-grid"></div>
                 `;
                 galleryViewer.style.display = 'block';
 
-                galleryViewer.querySelectorAll('.gallery-viewer-grid img').forEach(img => {
-                    img.addEventListener('click', () => openLightbox(parseInt(img.dataset.index, 10)));
+                // Wire filter buttons
+                galleryViewer.querySelectorAll('.gallery-filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        galleryViewer.querySelectorAll('.gallery-filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        activeFilter = btn.dataset.filter;
+                        renderFilteredMedia();
+                    });
                 });
 
                 document.getElementById('close-gallery').addEventListener('click', () => {
                     galleryViewer.style.display = 'none';
                     galleryContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
+
+                renderFilteredMedia();
             }
 
             galleryViewer.style.display = 'none';
@@ -378,10 +544,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (prevBtn)  prevBtn.addEventListener('click', showPrev);
             if (nextBtn)  nextBtn.addEventListener('click', showNext);
 
-            lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+            if (lightbox) {
+                lightbox.addEventListener('click', (e) => {
+                    if (e.target === lightbox || e.target === document.getElementById('lightbox-media-container')) {
+                        closeLightbox();
+                    }
+                });
+            }
 
             document.addEventListener('keydown', (e) => {
-                if (!lightbox.classList.contains('active')) return;
+                if (!lightbox || !lightbox.classList.contains('active')) return;
                 
                 // Block default page scrolling behavior when shifting lightbox slides
                 if (['ArrowLeft', 'ArrowRight', 'Escape'].includes(e.key)) {

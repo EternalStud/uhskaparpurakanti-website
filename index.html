@@ -80,7 +80,7 @@
       <a href="#notices" data-section="notices">महत्वपूर्ण सूचनाएँ</a>
       <a href="#about" data-section="about">विद्यालय एक नज़र में</a>
       <a href="#highlights" data-section="highlights">मुख्य उपलब्धियाँ</a>
-      <a href="#gallery" data-section="gallery">फोटो गैलरी</a>
+      <a href="#gallery" data-section="gallery">गैलरी (Photos/Videos)</a>
       <a href="#principal" data-section="principal">प्रधानाध्यापक का संदेश</a>
       <a href="#contact" data-section="contact">संपर्क</a>
     </div>
@@ -95,7 +95,7 @@
     <a href="#notices" class="drawer-link" data-section="notices">📢 महत्वपूर्ण सूचनाएँ</a>
     <a href="#about" class="drawer-link" data-section="about">📊 विद्यालय एक नज़र में</a>
     <a href="#highlights" class="drawer-link" data-section="highlights">🏆 मुख्य उपलब्धियाँ</a>
-    <a href="#gallery" class="drawer-link" data-section="gallery">📸 फोटो गैलरी</a>
+    <a href="#gallery" class="drawer-link" data-section="gallery">📸 🎥 फोटो एवं वीडियो गैलरी</a>
     <a href="#principal" class="drawer-link" data-section="principal">👨‍🏫 प्रधानाध्यापक का संदेश</a>
     <a href="#contact" class="drawer-link" data-section="contact">📞 संपर्क</a>
   </nav>
@@ -193,8 +193,8 @@
 
 <section id="gallery" class="section">
   <div class="container">
-    <h2>📸 फोटो गैलरी</h2>
-    <p class="gallery-subtitle">विद्यालय की विभिन्न गतिविधियों, आयोजनों एवं उपलब्धियों की झलकियाँ</p>
+    <h2>📸 🎥 फोटो एवं वीडियो गैलरी</h2>
+    <p class="gallery-subtitle">विद्यालय की विभिन्न गतिविधियों, आयोजनों, उत्सवों एवं उपलब्धियों की जीवंत झलकियाँ</p>
     <!-- A: Skeleton for gallery -->
     <div id="gallery-categories" class="gallery-categories">
       <div class="skeleton-gallery-card"></div>
@@ -257,12 +257,25 @@
   </div>
 </div>
 
-<!-- Gallery Lightbox -->
+<!-- Gallery Lightbox (Photos & Videos) -->
 <div id="gallery-lightbox" class="gallery-lightbox">
-  <button id="lightbox-close" class="lightbox-close">✕</button>
-  <button id="lightbox-prev" class="lightbox-nav">◀</button>
-  <img id="lightbox-image" src="" alt="Gallery Photo" loading="lazy">
-  <button id="lightbox-next" class="lightbox-nav">▶</button>
+  <button id="lightbox-close" class="lightbox-close" title="बंद करें (Close)">✕</button>
+  <button id="lightbox-prev" class="lightbox-nav" title="पिछला (Previous)">◀</button>
+  
+  <div class="lightbox-media-container" id="lightbox-media-container">
+    <img id="lightbox-image" src="" alt="Gallery Photo" loading="lazy">
+    <div id="lightbox-video-wrap" class="lightbox-video-wrap" style="display: none;">
+      <iframe id="lightbox-video-frame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <video id="lightbox-video-player" controls playsinline style="display: none;"></video>
+    </div>
+  </div>
+
+  <button id="lightbox-next" class="lightbox-nav" title="अगला (Next)">▶</button>
+
+  <div id="lightbox-footer" class="lightbox-footer">
+    <span id="lightbox-counter" class="lightbox-counter"></span>
+    <span id="lightbox-title" class="lightbox-title"></span>
+  </div>
 </div>
 
 
