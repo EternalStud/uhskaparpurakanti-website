@@ -70,6 +70,36 @@
             pointer-events: none;
         }
 
+        .header-top-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .school-info-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            text-align: center;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .school-info-link:hover {
+            opacity: 0.94;
+            transform: translateY(-1px);
+        }
+
+        .school-info {
+            text-align: center;
+            width: 100%;
+        }
+
         .school-info h1 {
             font-size: 1.85rem;
             font-weight: 800;
@@ -77,35 +107,39 @@
             letter-spacing: 0.3px;
             line-height: 1.25;
             color: #ffffff;
+            text-align: center;
         }
         .school-info h2 {
             font-size: 0.95rem;
             font-weight: 600;
             color: #93c5fd;
             letter-spacing: 0.8px;
-            margin: 0 0 16px 0;
+            margin: 0 0 14px 0;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .header-badges {
             display: inline-flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 16px;
+            align-items: center;
+            margin: 0 auto 16px auto;
         }
         
         .udise-badge, .session-badge {
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 6px 14px;
+            padding: 6px 16px;
             border-radius: 30px;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-weight: 600;
             backdrop-filter: blur(8px);
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
         .session-badge { color: #fde68a; border-color: rgba(253, 230, 138, 0.4); }
 
