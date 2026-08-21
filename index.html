@@ -21,8 +21,9 @@
 
 <meta name="theme-color" content="#0f172a">
 
-<!-- Content Security Policy (relatively permissive to avoid breakage) -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://www.youtube.com https://maps.app.goo.gl;">
+<!-- Content Security Policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https: 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https: https://*.googleusercontent.com https://drive.google.com; connect-src 'self' https:; frame-src 'self' https://drive.google.com https://docs.google.com https://www.youtube.com https://maps.app.goo.gl https://*.google.com;">
+<meta name="referrer" content="no-referrer-when-downgrade">
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%230f172a'/><text y='68' x='50' text-anchor='middle' font-size='60'>🏫</text></svg>">
 
@@ -263,9 +264,9 @@
   <button id="lightbox-prev" class="lightbox-nav" title="पिछला (Previous)">◀</button>
   
   <div class="lightbox-media-container" id="lightbox-media-container">
-    <img id="lightbox-image" src="" alt="Gallery Photo" loading="lazy">
+    <img id="lightbox-image" src="" alt="Gallery Photo" loading="lazy" referrerpolicy="no-referrer">
     <div id="lightbox-video-wrap" class="lightbox-video-wrap" style="display: none;">
-      <iframe id="lightbox-video-frame" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <iframe id="lightbox-video-frame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="no-referrer"></iframe>
       <video id="lightbox-video-player" controls playsinline style="display: none;"></video>
     </div>
   </div>

@@ -2,11 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function formatDriveUrl(url) {
         if (!url) return '';
-        if (url.includes('drive.google.com/thumbnail?id=')) {
-            const idMatch = url.match(/[?&]id=([^&]+)/);
-            if (idMatch && idMatch[1]) {
-                return `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
-            }
+        const match = url.match(/[?&]id=([^&]+)/) || url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1200`;
         }
         return url;
     }
@@ -442,9 +440,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            galleryContainer.innerHTML = categories.map(category => `
+            galleryContainer.innerHTML = categories.map(category => {
+                const firstId = category.photos[0] ? category.photos[0].driveId : '';
+                return `
                 <div class="gallery-category-card" data-category="${category.category}">
-                    <img src="${category.cover}" alt="${category.category}" loading="lazy">
+                    <img src="${category.cover}" alt="${category.category}" loading="lazy" referrerpolicy="no-referrer" data-driveid="${firstId}" onerror="if(!this.dataset.fb && this.dataset.driveid){this.dataset.fb='1'; this.src='https://drive.google.com/thumbnail?id=' + this.dataset.driveid + '&sz=w1200';}">
                     <div class="gallery-category-info">
                         <h3>${category.category}</h3>
                         <div class="gallery-photo-count">
@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;}).join('');
 
             function renderCategory(category) {
                 activeFilter = 'all';
@@ -482,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     grid.innerHTML = currentMediaList.map((item, i) => `
                         <div class="gallery-media-card ${item.isVideo ? 'video-card' : 'photo-card'}" data-index="${i}">
-                            <img src="${item.posterUrl || item.url}" alt="${category.category}" loading="lazy">
+                            <img src="${item.url}" alt="${category.category}" loading="lazy" referrerpolicy="no-referrer" data-driveid="${item.driveId || ''}" onerror="if(!this.dataset.fb && this.dataset.driveid){this.dataset.fb='1'; this.src='https://drive.google.com/thumbnail?id=' + this.dataset.driveid + '&sz=w1200';}">
                             ${item.isVideo ? `
                                 <div class="gallery-video-play-btn">
                                     <svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z"/></svg>
