@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const galleryViewer = document.getElementById('gallery-viewer');
         if (!galleryContainer || !galleryViewer) return;
 
-        const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbzojAlGSjnTcE5_BfkbmO4E1ga2ptIct9cbbsOTaf18Pffow9bu1FlIVq5tFzZrLF2R/exec';
+        const GALLERY_API_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec?action=public.gallery.get';
 
         function extractDriveId(url) {
             if (!url) return '';
@@ -295,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function isVideoMedia(item) {
             if (!item) return false;
+            if (item.isVideo !== undefined) return Boolean(item.isVideo);
             const name = (item.name || '').toLowerCase();
             const url = (item.url || '').toLowerCase();
             const mime = (item.mimeType || item.type || '').toLowerCase();
@@ -306,27 +307,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function processMedia(item) {
             const isVid = isVideoMedia(item);
-            const driveId = extractDriveId(item.url);
-            const rawName = item.name || (isVid ? 'विद्यालय वीडियो' : 'विद्यालय फोटो');
-            const cleanName = rawName.replace(/\.[^/.]+$/, ''); // Strip extension
+            const driveId = item.id || extractDriveId(item.url);
 
             let posterUrl = '';
             let streamUrl = '';
             let displayUrl = '';
 
             if (driveId) {
-                posterUrl = `https://lh3.googleusercontent.com/d/${driveId}`;
+                posterUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1200`;
                 streamUrl = `https://drive.google.com/file/d/${driveId}/preview`;
                 displayUrl = isVid ? posterUrl : `https://lh3.googleusercontent.com/d/${driveId}`;
             } else {
                 posterUrl = item.url;
-                streamUrl = item.url;
+                streamUrl = item.streamUrl || item.url;
                 displayUrl = item.url;
             }
 
             return {
                 ...item,
-                name: cleanName,
                 isVideo: isVid,
                 driveId: driveId,
                 url: displayUrl,
@@ -336,8 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const rawCategories = await fetchWithCache(GALLERY_API_URL, 'cache_gallery', 30);
-            const categories = (rawCategories || []).map(cat => {
+            const resData = await fetchWithCache(GALLERY_API_URL, 'cache_gallery_v3', 5);
+            const rawCategories = resData && resData.categories ? resData.categories : (Array.isArray(resData) ? resData : []);
+            
+            const categories = rawCategories.map(cat => {
                 const processedMedia = (cat.photos || []).map(processMedia);
                 const photoCount = processedMedia.filter(m => !m.isVideo).length;
                 const videoCount = processedMedia.filter(m => m.isVideo).length;
@@ -355,6 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let currentMediaList = [];
             let activeFilter = 'all';
             let currentIndex = 0;
+            let currentCategoryName = '';
 
             const lightbox      = document.getElementById('gallery-lightbox');
             const lightboxImg   = document.getElementById('lightbox-image');
@@ -373,7 +374,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = currentMediaList[currentIndex];
 
                 if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${currentMediaList.length}`;
-                if (titleEl) titleEl.textContent = `${item.name} ${item.isVideo ? '(🎥 वीडियो)' : '(📸 फोटो)'}`;
+                if (titleEl) {
+                    const typeLabel = item.isVideo ? '🎥 वीडियो' : '📸 फोटो';
+                    titleEl.textContent = `${currentCategoryName} • ${typeLabel}`;
+                }
 
                 if (item.isVideo) {
                     if (lightboxImg) lightboxImg.style.display = 'none';
@@ -457,6 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function renderCategory(category) {
                 activeFilter = 'all';
+                currentCategoryName = category.category;
 
                 function renderFilteredMedia() {
                     if (activeFilter === 'photos') {
@@ -476,15 +481,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     grid.innerHTML = currentMediaList.map((item, i) => `
-                        <div class="gallery-media-card ${item.isVideo ? 'video-card' : 'photo-card'}" data-index="${i}" title="${item.name}">
-                            <img src="${item.posterUrl || item.url}" alt="${item.name}" loading="lazy">
+                        <div class="gallery-media-card ${item.isVideo ? 'video-card' : 'photo-card'}" data-index="${i}">
+                            <img src="${item.posterUrl || item.url}" alt="${category.category}" loading="lazy">
                             ${item.isVideo ? `
                                 <div class="gallery-video-play-btn">
                                     <svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z"/></svg>
                                 </div>
                                 <div class="gallery-video-badge">🎥 Video</div>
                             ` : ''}
-                            <div class="gallery-media-caption">${item.name}</div>
                         </div>
                     `).join('');
 
