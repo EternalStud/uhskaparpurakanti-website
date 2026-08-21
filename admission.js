@@ -637,3 +637,32 @@ if (downloadExistingBtn) {
         }
     });
 }
+
+// Check portal admission settings on load
+async function checkAdmissionSettings() {
+    try {
+        const res = await fetch(`${WEB_APP_URL}?action=public.settings.get`);
+        const data = await res.json();
+        if (data && data.success && data.settings) {
+            if (!data.settings.admission_open) {
+                const classSec = document.getElementById('classSection');
+                const studentSec = document.getElementById('studentSection');
+                const header = document.querySelector('.form-header');
+                
+                if (classSec) classSec.style.display = 'none';
+                if (studentSec) studentSec.style.display = 'none';
+
+                const closedAlert = document.createElement('div');
+                closedAlert.style.cssText = 'background: #fffbeb; border: 2px solid #f59e0b; border-radius: 16px; padding: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(245,158,11,0.15);';
+                closedAlert.innerHTML = `
+                    <h3 style="color: #92400e; font-size: 1.3rem; margin: 0 0 8px 0;">📢 ऑनलाइन नामांकन वर्तमान में बंद है (Admission Closed)</h3>
+                    <p style="color: #78350f; font-size: 0.95rem; margin: 0 0 15px 0;">नए विद्यार्थियों का ऑनलाइन नामांकन प्रपत्र वर्तमान में बंद कर दिया गया है।<br>यदि आपने पूर्व में आवेदन किया है, तो नीचे से अपनी रसीद खोजें एवं डाउनलोड करें।</p>
+                `;
+                if (header) header.insertAdjacentElement('afterend', closedAlert);
+            }
+        }
+    } catch (e) {
+        console.warn("Admission settings check failed:", e);
+    }
+}
+window.addEventListener('DOMContentLoaded', checkAdmissionSettings);

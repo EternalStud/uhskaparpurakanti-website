@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function checkAdmissionStatus() {
         const ADMIN_API_URL = "https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec";
         try {
-            const data = await fetchWithCache(`${ADMIN_API_URL}?action=public.settings.get`, 'cache_admission_status', 10);
+            const data = await fetchWithCache(`${ADMIN_API_URL}?action=public.settings.get`, 'cache_admission_status', 1);
             if (data && data.success && data.settings) {
                 if (data.settings.admission_open) {
                     // Calculate dynamic session (starting in April)

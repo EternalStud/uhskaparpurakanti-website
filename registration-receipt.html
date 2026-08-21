@@ -5,15 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Registration Receipt - UHS Kaparpura</title>
 <style>
-/* ── Global Styles ─────────────────────────────────────────────────────────── */
+/* ── Reset & Page Settings ─────────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page {
+    size: A4 portrait;
+    margin: 4mm 6mm 4mm 6mm;
+}
+
 body {
-    background: #dde3ee;
+    background: #e2e8f0;
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-    padding: 16px 8px;
+    padding: 12px 6px;
     color: #0f172a;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    font-size: 8pt;
+    line-height: 1.2;
 }
 
 .page-wrap {
@@ -22,9 +30,11 @@ body {
     margin: 0 auto;
     background: #fff;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
     position: relative;
+    page-break-inside: avoid;
+    page-break-after: avoid;
 }
 
 /* ── Action Bar (Screen Only) ─────────────────────────────────────────────── */
@@ -35,7 +45,7 @@ body {
     gap: 12px;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 10px 18px;
     position: sticky;
     top: 0;
     z-index: 9999;
@@ -53,8 +63,8 @@ body {
     border: none;
     cursor: pointer;
     border-radius: 6px;
-    padding: 9px 18px;
-    font-size: 0.9rem;
+    padding: 8px 16px;
+    font-size: 0.85rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -66,50 +76,52 @@ body {
 .btn-back { background: #334155; color: #f8fafc; }
 .btn-back:hover { background: #475569; }
 
-/* ── Receipt Content ──────────────────────────────────────────────────────── */
+/* ── Receipt Content & Watermarks ─────────────────────────────────────────── */
 .receipt-body {
-    padding: 12mm 14mm 10mm;
+    padding: 5mm 8mm 3mm 8mm;
     position: relative;
-    background: #fff;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='130' viewBox='0 0 280 130'><text x='50%' y='50%' fill='rgba(0,0,0,0.026)' font-size='12' font-family='sans-serif' font-weight='bold' text-anchor='middle' transform='rotate(-22 140 65)'>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</text></svg>");
+    background-repeat: repeat;
 }
 
 /* Header */
 .rc-header {
     text-align: center;
-    border-bottom: 2.5px solid #0f172a;
-    padding-bottom: 8px;
-    margin-bottom: 10px;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 4px;
+    margin-bottom: 5px;
 }
 .rc-board-hi {
-    font-size: 16pt;
+    font-size: 13.5pt;
     color: #1e3a8a;
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.15;
 }
 .rc-board-en {
-    font-size: 11pt;
+    font-size: 9pt;
     color: #b45309;
     font-weight: 700;
     margin-top: 1px;
 }
 .rc-school-name {
-    font-size: 12pt;
+    font-size: 10.5pt;
     color: #0f172a;
     font-weight: 800;
-    margin-top: 3px;
+    margin-top: 2px;
 }
 .rc-doc-title {
     display: inline-block;
     background: #f1f5f9;
     border: 1px solid #cbd5e1;
-    border-radius: 20px;
-    padding: 3px 18px;
-    font-size: 9.5pt;
+    border-radius: 14px;
+    padding: 2px 14px;
+    font-size: 8pt;
     font-weight: 800;
     color: #0f172a;
-    margin-top: 6px;
+    margin-top: 3px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
 .rc-meta-strip {
@@ -117,22 +129,22 @@ body {
     justify-content: space-between;
     align-items: center;
     background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 6px 12px;
-    margin-bottom: 10px;
-    font-size: 8.5pt;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 4px;
+    font-size: 7.5pt;
 }
 .rc-meta-item strong { color: #0f172a; }
 .reg-id-badge {
     background: #fef3c7;
-    border: 1.5px dashed #d97706;
+    border: 1px dashed #d97706;
     color: #92400e;
     font-weight: 800;
-    font-size: 11pt;
-    padding: 2px 10px;
+    font-size: 9.5pt;
+    padding: 1px 8px;
     border-radius: 4px;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
 }
 
 /* Sections */
@@ -140,25 +152,25 @@ body {
     background: #f1f5f9;
     color: #1e3a8a;
     font-weight: 800;
-    font-size: 8.5pt;
-    padding: 3px 8px;
-    border-left: 4px solid #d97706;
-    margin-top: 8px;
-    margin-bottom: 4px;
+    font-size: 7.5pt;
+    padding: 2px 6px;
+    border-left: 3px solid #d97706;
+    margin-top: 4px;
+    margin-bottom: 2px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 /* Tables */
 table.data-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 6px;
-    font-size: 8pt;
+    margin-bottom: 2px;
+    font-size: 7.2pt;
 }
 table.data-table td {
     border: 1px solid #cbd5e1;
-    padding: 3.5px 6px;
+    padding: 2px 4px;
     vertical-align: middle;
 }
 table.data-table td.lbl {
@@ -181,20 +193,21 @@ table.data-table td.val-bold {
 table.sub-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 8px;
-    font-size: 8pt;
+    margin-bottom: 3px;
+    font-size: 7.2pt;
     text-align: center;
 }
 table.sub-table th {
     background: #1e3a8a;
     color: #fff;
-    padding: 4px 6px;
+    padding: 2.5px 4px;
     font-weight: 700;
     border: 1px solid #1e3a8a;
+    font-size: 7.2pt;
 }
 table.sub-table td {
     border: 1px solid #cbd5e1;
-    padding: 4px 6px;
+    padding: 2.2px 4px;
     font-weight: 600;
 }
 
@@ -202,7 +215,7 @@ table.sub-table td {
 .cols-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* Photo & Sign Container */
@@ -210,14 +223,14 @@ table.sub-table td {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
+    justify-content: flex-start;
+    gap: 3px;
 }
 .photo-frame {
-    width: 30mm;
-    height: 35mm;
-    border: 1.5px solid #0f172a;
-    border-radius: 4px;
+    width: 27mm;
+    height: 32mm;
+    border: 1.2px solid #0f172a;
+    border-radius: 3px;
     overflow: hidden;
     background: #f8fafc;
     display: flex;
@@ -231,10 +244,10 @@ table.sub-table td {
     display: block;
 }
 .sign-frame {
-    width: 35mm;
-    height: 10mm;
+    width: 32mm;
+    height: 9mm;
     border: 1px solid #0f172a;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
     background: #fff;
     display: flex;
@@ -252,13 +265,13 @@ table.sub-table td {
 .decl-box {
     border: 1px solid #cbd5e1;
     background: #fffbeb;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 7.5pt;
-    line-height: 1.4;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 6.8pt;
+    line-height: 1.25;
     color: #92400e;
-    margin-top: 6px;
-    margin-bottom: 12px;
+    margin-top: 3px;
+    margin-bottom: 4px;
 }
 
 /* Signature Rows */
@@ -266,8 +279,8 @@ table.sub-table td {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-top: 14px;
-    font-size: 8pt;
+    margin-top: 4px;
+    font-size: 7pt;
     font-weight: 700;
     text-align: center;
 }
@@ -276,26 +289,37 @@ table.sub-table td {
 }
 .sig-line {
     border-top: 1px solid #0f172a;
-    padding-top: 3px;
-    margin-top: 25px;
+    padding-top: 2px;
+    margin-top: 16px;
 }
 
-/* ── Print Media Optimization ─────────────────────────────────────────────── */
+/* ── Print Media Optimization (Strict 1-Page A4 Guarantee) ─────────────────── */
 @media print {
-    body {
+    html, body {
         background: #fff !important;
         padding: 0 !important;
         margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        overflow: hidden !important;
     }
     .action-bar { display: none !important; }
     .page-wrap {
         box-shadow: none !important;
         border-radius: 0 !important;
         width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
+        padding: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        page-break-before: avoid !important;
     }
     .receipt-body {
-        padding: 8mm 10mm 6mm !important;
+        padding: 4mm 6mm 2mm 6mm !important;
+    }
+    .data-table, .sub-table, .sig-row, .decl-box, .photo-sign-block {
+        page-break-inside: avoid !important;
     }
 }
 
@@ -305,10 +329,10 @@ table.sub-table td {
     .action-bar { padding: 8px 12px; }
     .action-bar-title { font-size: 0.85rem; }
     .action-bar button { padding: 6px 12px; font-size: 0.8rem; }
-    .receipt-body { padding: 10px; }
-    .rc-board-hi { font-size: 13pt; }
-    .rc-board-en { font-size: 9pt; }
-    .rc-school-name { font-size: 10pt; }
+    .receipt-body { padding: 8px; }
+    .rc-board-hi { font-size: 12pt; }
+    .rc-board-en { font-size: 8.5pt; }
+    .rc-school-name { font-size: 9.5pt; }
     .cols-2 { grid-template-columns: 1fr; }
 }
 </style>

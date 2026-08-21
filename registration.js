@@ -229,26 +229,70 @@ if(emailF) {
     });
 }
 
-// Search Mode Radio listener
-const searchByCodeRadio = document.getElementById('searchByCode');
-const searchByRollDobRadio = document.getElementById('searchByRollDob');
-if (searchByCodeRadio && searchByRollDobRadio) {
-    const toggleSearchMode = () => {
-        const isCode = searchByCodeRadio.checked;
-        document.getElementById('searchCodeGroup').style.display = isCode ? 'block' : 'none';
-        document.getElementById('searchRollGroup').style.display = isCode ? 'none' : 'block';
-        document.getElementById('searchDobGroup').style.display = isCode ? 'none' : 'block';
-        
-        if (isCode) {
-            document.getElementById('searchRollNo').value = '';
-            document.getElementById('searchDob').value = '';
-        } else {
-            document.getElementById('regStudentCode').value = '';
-        }
-    };
-    searchByCodeRadio.addEventListener('change', toggleSearchMode);
-    searchByRollDobRadio.addEventListener('change', toggleSearchMode);
+// Search Mode Tab Buttons
+let isCodeSearchMode = true;
+const tabSearchByCode = document.getElementById('tabSearchByCode');
+const tabSearchByRoll = document.getElementById('tabSearchByRoll');
+
+function setSearchMode(mode) {
+    isCodeSearchMode = (mode === 'code');
+    if (tabSearchByCode) tabSearchByCode.classList.toggle('active', isCodeSearchMode);
+    if (tabSearchByRoll) tabSearchByRoll.classList.toggle('active', !isCodeSearchMode);
+
+    const codeGroup = document.getElementById('searchCodeGroup');
+    const rollGroup = document.getElementById('searchRollGroup');
+    const dobGroup = document.getElementById('searchDobGroup');
+
+    if (codeGroup) codeGroup.style.display = isCodeSearchMode ? 'block' : 'none';
+    if (rollGroup) rollGroup.style.display = isCodeSearchMode ? 'none' : 'block';
+    if (dobGroup) dobGroup.style.display = isCodeSearchMode ? 'none' : 'block';
+
+    if (isCodeSearchMode) {
+        const rollInput = document.getElementById('searchRollNo');
+        const dobInput = document.getElementById('searchDob');
+        if (rollInput) rollInput.value = '';
+        if (dobInput) dobInput.value = '';
+    } else {
+        const codeInput = document.getElementById('regStudentCode');
+        if (codeInput) codeInput.value = '';
+    }
 }
+
+if (tabSearchByCode) tabSearchByCode.addEventListener('click', () => setSearchMode('code'));
+if (tabSearchByRoll) tabSearchByRoll.addEventListener('click', () => setSearchMode('roll_dob'));
+
+// Check portal settings on page load
+async function checkPortalSettings() {
+    try {
+        const res = await fetch(`${ADMIN_API_URL}?action=public.settings.get`);
+        const data = await res.json();
+        if (data && data.success && data.settings) {
+            const isRegOpen = data.settings.registration_open;
+            const closedNotice = document.getElementById('portalClosedNotice');
+            const searchSec = document.getElementById('searchSection');
+            const progCont = document.getElementById('progressContainer');
+
+            if (!isRegOpen) {
+                if (closedNotice) closedNotice.style.display = 'block';
+                if (searchSec) searchSec.style.display = 'none';
+                if (progCont) progCont.style.display = 'none';
+
+                const btnShowReceipt = document.getElementById('btnShowReceiptFinderOnly');
+                if (btnShowReceipt) {
+                    btnShowReceipt.onclick = () => {
+                        if (searchSec) searchSec.style.display = 'block';
+                        const existingBox = document.getElementById('existingReceiptBox');
+                        if (existingBox) existingBox.style.display = 'block';
+                        closedNotice.style.display = 'none';
+                    };
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("Settings check failed, defaulting to active:", e);
+    }
+}
+window.addEventListener('DOMContentLoaded', checkPortalSettings);
 
 // Class change listener
 const regClass = document.getElementById('regClass');
@@ -268,7 +312,7 @@ if(regClass) {
 document.getElementById('btnFetchStudent').addEventListener('click', async () => {
     const classNum = document.getElementById('regClass').value;
     const streamVal = document.getElementById('searchStream') ? document.getElementById('searchStream').value : "";
-    const isCodeSearch = document.getElementById('searchByCode') ? document.getElementById('searchByCode').checked : true;
+    const isCodeSearch = isCodeSearchMode;
     
     const studentCode = document.getElementById('regStudentCode') ? document.getElementById('regStudentCode').value.trim() : "";
     const rollNo = document.getElementById('searchRollNo') ? document.getElementById('searchRollNo').value.trim() : "";
