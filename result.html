@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Examination Results (परीक्षा परिणाम) - UHS Kaparpura</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admission.css">
+    <style>
+        :root {
+            --nav-bg: #0f172a;
+            --nav-bg-light: #1e293b;
+            --primary-gold: #d97706;
+            --primary-gold-hover: #f59e0b;
+            --primary-blue: #2563eb;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-body: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --border-light: #e2e8f0;
+            --border-focus: #3b82f6;
+            --focus-ring: rgba(59, 130, 246, 0.25);
+            --success-green: #10b981;
+            --font-main: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            background-image: radial-gradient(at 0% 0%, #e0f2fe 0px, transparent 50%),
+                              radial-gradient(at 100% 100%, #fef3c7 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .result-container {
+            max-width: 1040px;
+            margin: 25px auto 50px auto;
+            padding: 0 16px;
+        }
+
+        /* ── Header Banner ──────────────────────────────────────────────────────── */
+        .form-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1e3a8a 100%);
+            border-radius: 20px;
+            padding: 35px 24px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.3);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-gold);
+        }
+
+        .form-header::before {
+            content: '';
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            top: -160px;
+            right: -80px;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .school-info h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin: 0 0 6px 0;
+            letter-spacing: 0.3px;
+            line-height: 1.25;
+            color: #ffffff;
+        }
+        .school-info h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #93c5fd;
+            letter-spacing: 0.8px;
+            margin: 0 0 16px 0;
+            text-transform: uppercase;
+        }
+
+        .header-badges {
+            display: inline-flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .udise-badge, .session-badge {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .session-badge { color: #fde68a; border-color: rgba(253, 230, 138, 0.4); }
+
+        .result-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #f59e0b;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .header-note {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* ── Search Form Card ────────────────────────────────────────────────────── */
+        .form-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        .section-header-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1.5px solid #f1f5f9;
+            padding-bottom: 12px;
+        }
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: #f1f5f9;
+        }
+        .section-title-wrap h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--nav-bg);
+            margin: 0;
+        }
+        .section-title-wrap p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 2px 0 0 0;
+        }
+
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+        
+        @media (max-width: 850px) {
+            .grid-3 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .result-container { margin: 15px auto 40px auto; padding: 0 12px; }
+            .form-header { padding: 25px 16px; border-radius: 16px; margin-bottom: 18px; }
+            .school-info h1 { font-size: 1.35rem; }
+            .school-info h2 { font-size: 0.8rem; }
+            .result-title { font-size: 1.15rem; }
+            .form-section { padding: 20px 16px; border-radius: 14px; margin-bottom: 16px; }
+            .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 14px; }
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        label .req { color: #ef4444; margin-left: 2px; }
+        
+        input, select {
+            width: 100%;
+            height: 48px;
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            background: #ffffff;
+            color: #0f172a;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            padding-right: 38px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+            background: #fff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--nav-bg) 0%, #1e3a8a 100%);
+            color: white;
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 13px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.25);
+            background: linear-gradient(135deg, #1e293b 0%, #172554 100%);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #ea580c 100%);
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+        }
+        .btn-accent:hover {
+            background: linear-gradient(135deg, var(--primary-gold-hover) 0%, #c2410c 100%);
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--nav-bg);
+            border: 1.5px solid #cbd5e1;
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        /* ── Closed Portal Banner ────────────────────────────────────────────────── */
+        .portal-closed-alert {
+            background: #fffbeb;
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+            display: none;
+        }
+        .portal-closed-alert h3 {
+            color: #92400e;
+            font-size: 1.35rem;
+            margin: 0 0 8px 0;
+        }
+        .portal-closed-alert p {
+            color: #78350f;
+            font-size: 0.95rem;
+            margin: 0 0 16px 0;
+            line-height: 1.5;
+        }
+
+        /* ── Report Card Outer Container ─────────────────────────────────────────── */
+        #reportCardWrapper {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .report-card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .report-card-sheet {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            border: 1px solid #cbd5e1;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        /* ── Loader ──────────────────────────────────────────────────────────────── */
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.92);
+            z-index: 20000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .spinner {
+            width: 46px;
+            height: 46px;
+            border: 4px solid #e2e8f0;
+            border-top-color: var(--primary-gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Print Media Optimization (Strict 1-Page A4 Guarantee) ─────────────────── */
+        @media print {
+            html, body {
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                overflow: hidden !important;
+            }
+            .form-header, .form-section, .report-card-actions, #loader, .portal-closed-alert, .action-bar {
+                display: none !important;
+            }
+            .result-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #reportCardWrapper {
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .report-card-sheet {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="result-container">
+
+    <!-- Header Banner -->
+    <div class="form-header">
+        <div class="header-top-row">
+            <div class="school-info">
+                <h1>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+                <h2>UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</h2>
+            </div>
+            <div class="header-badges">
+                <span class="udise-badge">🏛️ UDISE: 10140616812</span>
+                <span class="session-badge">📅 सत्र: <span id="displaySession">2026-27</span></span>
+            </div>
+        </div>
+        <div class="result-title">
+            📊 Examination Results Portal (परीक्षा परिणाम प्रपत्र)
+        </div>
+        <p class="header-note">
+            बिहार विद्यालय परीक्षा समिति (BSEB) प्रारूप अनुसार छात्र प्राप्तांक एवं प्रगति पत्रक
+        </p>
+    </div>
+
+    <!-- Closed Portal Notice (Shown when result_published is false) -->
+    <div id="portalClosedNotice" class="portal-closed-alert">
+        <h3>📢 परीक्षा परिणाम वर्तमान में प्रकाशित नहीं है (Results Not Published)</h3>
+        <p>
+            विद्यालय द्वारा वर्तमान सत्र का परीक्षा परिणाम अभी पोर्टल पर प्रकाशित नहीं किया गया है।<br>
+            परिणाम घोषित होने पर यह पृष्ठ स्वतः सक्रिय हो जाएगा। कृपया कुछ समय पश्चात पुनः देखें।
+        </p>
+        <a href="index.html" class="btn-primary" style="padding: 10px 22px; font-size: 0.9rem; text-decoration: none;">
+            🏠 मुख्य पृष्ठ पर वापस जाएँ
+        </a>
+    </div>
+
+    <!-- Search Form Section -->
+    <section class="form-section" id="searchSection">
+        <div class="section-header-row">
+            <div class="section-icon">🔍</div>
+            <div class="section-title-wrap">
+                <h3>विद्यार्थी परीक्षा परिणाम खोजें (Search Result)</h3>
+                <p>सत्र, परीक्षा, कक्षा, क्रमांक एवं जन्म तिथि दर्ज कर अपना अंक-पत्र देखें</p>
+            </div>
+        </div>
+
+        <form id="resultSearchForm">
+            <div class="grid-3">
+                <div class="input-group">
+                    <label for="resSession">शैक्षणिक सत्र (Session) <span class="req">*</span></label>
+                    <select id="resSession" required>
+                        <!-- Populated dynamically with sessions having entered marks -->
+                        <option value="2026-27" selected>2026-27</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="resClass">कक्षा (Class) <span class="req">*</span></label>
+                    <select id="resClass" required>
+                        <option value="">-- कक्षा चुनें --</option>
+                        <option value="9">Class 9 (नवमीं)</option>
+                        <option value="10">Class 10 (दसवीं)</option>
+                        <option value="11">Class 11 (ग्यारहवीं)</option>
+                        <option value="12">Class 12 (बारहवीं)</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="streamGroup" style="display: none;">
+                    <label for="resStream">संकाय (Stream) <span class="req">*</span></label>
+                    <select id="resStream">
+                        <option value="">-- संकाय चुनें --</option>
+                        <option value="Science">Science (विज्ञान)</option>
+                        <option value="Arts">Arts (कला)</option>
+                        <option value="Commerce">Commerce (वाणिज्य)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="resExam">परीक्षा का नाम (Exam) <span class="req">*</span></label>
+                    <select id="resExam" required>
+                        <option value="">-- परीक्षा चुनें --</option>
+                        <!-- Populated dynamically from ExamMarks feeded exams -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="resRollNo">क्रमांक (Roll No.) <span class="req">*</span></label>
+                    <input type="text" id="resRollNo" placeholder="e.g. 1, 2, 54" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="resDob">जन्म तिथि (Date of Birth) <span class="req">*</span></label>
+                    <input type="date" id="resDob" required>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; text-align: center;">
+                <button type="submit" id="btnSearchResult" class="btn-primary btn-accent" style="padding: 14px 36px; font-size: 1.1rem; width: 100%; max-width: 360px;">
+                    ⚡ परिणाम देखें (Search Result)
+                </button>
+            </div>
+        </form>
+
+        <div id="searchMsg" style="margin-top: 15px; font-weight: 600; text-align: center; font-size: 0.95rem;"></div>
+    </section>
+
+    <!-- Report Card Display Wrapper -->
+    <div id="reportCardWrapper">
+        <div class="report-card-actions">
+            <button type="button" id="btnSearchAnother" class="btn-primary btn-outline" style="font-size: 0.9rem; padding: 9px 18px;">
+                🔍 दूसरा परिणाम खोजें (Search Another)
+            </button>
+            <button type="button" id="btnPrintReportCard" class="btn-primary" style="background: #d97706; padding: 10px 24px; font-size: 0.95rem;">
+                🖨️ प्रिंट / PDF डाउनलोड करें (Print A4)
+            </button>
+        </div>
+
+        <div class="report-card-sheet" id="reportCardSheet">
+            <!-- Rendered dynamically by result.js -->
+        </div>
+    </div>
+
+</div>
+
+<!-- Loader -->
+<div id="loader" class="loader-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; font-weight: 700; color: #0f172a; font-size: 1.1rem; letter-spacing: 0.5px;">प्राप्तांक विवरण लोड हो रहा है...</p>
+</div>
+
+<script src="result.js"></script>
+</body>
+</html>

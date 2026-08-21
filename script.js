@@ -696,6 +696,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
+                // Check for result publication setting and show banner & link
+                if (data.settings.result_published) {
+                    const resultBanner = document.getElementById('result-banner-container');
+                    if (resultBanner) resultBanner.style.display = 'block';
+
+                    const navResultLink = document.getElementById('nav-result-link');
+                    if (navResultLink) navResultLink.style.display = 'inline-block';
+
+                    const drawerResultLink = document.getElementById('drawer-result-link');
+                    if (drawerResultLink) drawerResultLink.style.display = 'block';
+                }
+
                 // Check for registration setting and show link
                 if (data.settings.registration_open) {
                     const desktopNav = document.querySelector('.desktop-nav');
@@ -729,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            console.error('Failed to load admission settings:', error);
+            console.error('Failed to load portal settings:', error);
         }
     }
 

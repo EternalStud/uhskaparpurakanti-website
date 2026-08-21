@@ -76,6 +76,7 @@
   <nav class="container" aria-label="Desktop Navigation">
     <div class="desktop-nav">
       <a href="#home" data-section="home">मुख्य पृष्ठ</a>
+      <a href="result.html" id="nav-result-link" style="display: none; color: #f59e0b; font-weight: 700;">📊 परीक्षा परिणाम</a>
       <a href="#notices" data-section="notices">महत्वपूर्ण सूचनाएँ</a>
       <a href="#about" data-section="about">विद्यालय एक नज़र में</a>
       <a href="#highlights" data-section="highlights">मुख्य उपलब्धियाँ</a>
@@ -90,6 +91,7 @@
   <button class="drawer-close" id="drawer-close">✕</button>
   <nav>
     <a href="#home" class="drawer-link" data-section="home">🏠 मुख्य पृष्ठ</a>
+    <a href="result.html" class="drawer-link" id="drawer-result-link" style="display: none; color: #f59e0b; font-weight: 700;">📊 परीक्षा परिणाम (Results)</a>
     <a href="#notices" class="drawer-link" data-section="notices">📢 महत्वपूर्ण सूचनाएँ</a>
     <a href="#about" class="drawer-link" data-section="about">📊 विद्यालय एक नज़र में</a>
     <a href="#highlights" class="drawer-link" data-section="highlights">🏆 मुख्य उपलब्धियाँ</a>
@@ -118,10 +120,17 @@
       <span class="hero-badge-item"><span>📋</span> <strong>BSEB :</strong> Matric 51375 • Inter 31445</span>
       <span class="hero-badge-item"><span>🏫</span> <strong>कक्षाएँ :</strong> IX - XII (कला एवं विज्ञान)</span>
     </div>
-    <div id="admission-banner-container" style="display: none; margin-top: 24px; text-align: center;">
-      <a href="admission.html" class="btn-primary admission-pulse" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; text-decoration: none; padding: 12px 28px; font-size: 1.05rem; border-radius: 30px; background: #2ecc71; border: none; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); color: white; transition: all 0.3s ease;">
-        🔔 सत्र <span id="admission-session-text">2026-27</span> हेतु नामांकन प्रारंभ (Admission Open)
-      </a>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 24px;">
+      <div id="result-banner-container" style="display: none;">
+        <a href="result.html" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; text-decoration: none; padding: 12px 28px; font-size: 1.05rem; border-radius: 30px; background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); border: none; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4); color: white; transition: all 0.3s ease;">
+          🎉 परीक्षा परिणाम घोषित (Results Published) — अपना परीक्षा परिणाम देखें
+        </a>
+      </div>
+      <div id="admission-banner-container" style="display: none;">
+        <a href="admission.html" class="btn-primary admission-pulse" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; text-decoration: none; padding: 12px 28px; font-size: 1.05rem; border-radius: 30px; background: #2ecc71; border: none; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4); color: white; transition: all 0.3s ease;">
+          🔔 सत्र <span id="admission-session-text">2026-27</span> हेतु नामांकन प्रारंभ (Admission Open)
+        </a>
+      </div>
     </div>
   </div>
 </section>
