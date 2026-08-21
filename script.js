@@ -383,27 +383,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (lightboxImg) lightboxImg.style.display = 'none';
                     if (videoWrap) videoWrap.style.display = 'block';
 
-                    if (item.driveId) {
-                        if (videoPlayer) videoPlayer.style.display = 'none';
-                        if (videoFrame) {
-                            videoFrame.style.display = 'block';
-                            videoFrame.src = item.streamUrl;
-                        }
-                    } else {
+                    const directVideoUrl = item.driveId 
+                        ? `https://drive.google.com/uc?export=download&id=${item.driveId}`
+                        : (item.streamUrl || item.url);
+
+                    if (videoPlayer) {
                         if (videoFrame) {
                             videoFrame.style.display = 'none';
                             videoFrame.src = '';
                         }
-                        if (videoPlayer) {
-                            videoPlayer.style.display = 'block';
-                            videoPlayer.src = item.streamUrl;
-                            videoPlayer.play().catch(() => {});
-                        }
+                        videoPlayer.style.display = 'block';
+                        videoPlayer.src = directVideoUrl;
+                        videoPlayer.poster = item.posterUrl || item.url || '';
+                        videoPlayer.controls = true;
+                        videoPlayer.playsInline = true;
+                        videoPlayer.setAttribute('playsinline', '');
+                        videoPlayer.setAttribute('webkit-playsinline', '');
+                        videoPlayer.load();
+                        videoPlayer.play().catch(() => {});
+
+                        videoPlayer.onerror = () => {
+                            videoPlayer.style.display = 'none';
+                            if (videoFrame) {
+                                videoFrame.style.display = 'block';
+                                videoFrame.src = item.streamUrl || `https://drive.google.com/file/d/${item.driveId}/preview`;
+                            }
+                        };
+                    } else if (videoFrame) {
+                        videoFrame.style.display = 'block';
+                        videoFrame.src = item.streamUrl;
                     }
                 } else {
                     if (videoWrap) videoWrap.style.display = 'none';
                     if (videoFrame) videoFrame.src = '';
-                    if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ''; }
+                    if (videoPlayer) { 
+                        videoPlayer.pause(); 
+                        videoPlayer.removeAttribute('src'); 
+                        videoPlayer.load(); 
+                    }
 
                     if (lightboxImg) {
                         lightboxImg.style.display = 'block';
@@ -422,7 +439,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function closeLightbox() {
                 if (videoFrame) videoFrame.src = '';
-                if (videoPlayer) { videoPlayer.pause(); videoPlayer.src = ''; }
+                if (videoPlayer) { 
+                    videoPlayer.pause(); 
+                    videoPlayer.removeAttribute('src'); 
+                    videoPlayer.load(); 
+                }
                 if (lightbox) {
                     lightbox.classList.remove('active');
                     document.body.style.overflow = '';
