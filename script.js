@@ -626,19 +626,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (photoWrap) {
-                if (data.principalPhoto) {
-                    photoWrap.outerHTML = `<img id="principal-photo" src="${data.principalPhoto}" alt="${data.principal?.name || 'प्रधानाध्यापक'}">`;
-                } else {
-                    photoWrap.outerHTML = `<img id="principal-photo" src="images/staff.jpg" alt="प्रधानाध्यापक">`;
-                }
+                const pId = (data.principalPhoto && (data.principalPhoto.match(/[?&]id=([^&]+)/) || data.principalPhoto.match(/\/d\/([^/]+)/))) ? (data.principalPhoto.match(/[?&]id=([^&]+)/) || data.principalPhoto.match(/\/d\/([^/]+)/))[1] : '1RjP_eTO6pAPIFiRyrVNNEN2l2YcCshmp';
+                const pSrc = `https://drive.google.com/thumbnail?id=${pId}&sz=w1200`;
+                photoWrap.outerHTML = `<img id="principal-photo" src="${pSrc}" alt="${data.principal?.name || 'प्रधानाध्यापक'}" loading="lazy" referrerpolicy="no-referrer" data-driveid="${pId}" onerror="if(!this.dataset.fb){this.dataset.fb='1'; this.src='https://lh3.googleusercontent.com/d/' + this.dataset.driveid;} else if(this.dataset.fb==='1'){this.dataset.fb='2'; this.src='images/staff.jpg';}">`;
             }
 
             if (staffWrap) {
-                if (data.staffPhoto) {
-                    staffWrap.outerHTML = `<img id="staff-group-photo" src="${data.staffPhoto}" alt="विद्यालय शिक्षक समूह">`;
-                } else {
-                    staffWrap.outerHTML = `<img id="staff-group-photo" src="images/staff.jpg" alt="विद्यालय शिक्षक समूह">`;
-                }
+                const sId = (data.staffPhoto && (data.staffPhoto.match(/[?&]id=([^&]+)/) || data.staffPhoto.match(/\/d\/([^/]+)/))) ? (data.staffPhoto.match(/[?&]id=([^&]+)/) || data.staffPhoto.match(/\/d\/([^/]+)/))[1] : '1LDN7sKzh6ktyi9cmr95ZoFSCOSSp__jU';
+                const sSrc = `https://drive.google.com/thumbnail?id=${sId}&sz=w1200`;
+                staffWrap.outerHTML = `<img id="staff-group-photo" src="${sSrc}" alt="विद्यालय शिक्षक समूह" loading="lazy" referrerpolicy="no-referrer" data-driveid="${sId}" onerror="if(!this.dataset.fb){this.dataset.fb='1'; this.src='https://lh3.googleusercontent.com/d/' + this.dataset.driveid;} else if(this.dataset.fb==='1'){this.dataset.fb='2'; this.src='images/staff.jpg';}">`;
             }
 
         } catch (error) {
@@ -646,9 +642,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const msgContent = document.getElementById('principal-message-content');
             if (msgContent) msgContent.innerHTML = '<p style="opacity:.6">संदेश लोड नहीं हो सका।</p>';
             const pw = document.getElementById('principal-photo-wrap');
-            if (pw) pw.outerHTML = `<img id="principal-photo" src="images/staff.jpg" alt="प्रधानाध्यापक">`;
+            if (pw) pw.outerHTML = `<img id="principal-photo" src="https://drive.google.com/thumbnail?id=1RjP_eTO6pAPIFiRyrVNNEN2l2YcCshmp&sz=w1200" alt="प्रधानाध्यापक" referrerpolicy="no-referrer" onerror="this.src='https://lh3.googleusercontent.com/d/1RjP_eTO6pAPIFiRyrVNNEN2l2YcCshmp';">`;
             const sw = document.getElementById('staff-photo-wrap');
-            if (sw) sw.outerHTML = `<img id="staff-group-photo" src="images/staff.jpg" alt="विद्यालय स्टाफ">`;
+            if (sw) sw.outerHTML = `<img id="staff-group-photo" src="https://drive.google.com/thumbnail?id=1LDN7sKzh6ktyi9cmr95ZoFSCOSSp__jU&sz=w1200" alt="विद्यालय स्टाफ" referrerpolicy="no-referrer" onerror="this.src='https://lh3.googleusercontent.com/d/1LDN7sKzh6ktyi9cmr95ZoFSCOSSp__jU';">`;
         }
     }
 
