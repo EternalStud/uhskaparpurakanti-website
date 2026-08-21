@@ -598,8 +598,11 @@
 </head>
 <body>
 
-<!-- PRINT BUTTON -->
-<button class="print-btn no-print" onclick="window.print()">🖨️ PDF के रूप में सहेजें</button>
+<!-- PRINT & HOME BUTTONS -->
+<div class="no-print" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; gap: 10px;">
+  <a href="index.html" style="text-decoration: none; background: #0f172a; color: white; border: none; padding: 12px 20px; border-radius: 999px; font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); display: inline-flex; align-items: center; gap: 6px;">🏠 मुख्य पृष्ठ</a>
+  <button class="print-btn" onclick="window.print()" style="position: static;">🖨️ PDF के रूप में सहेजें</button>
+</div>
 
 <!-- ══════════════════════════════════════
      COVER PAGE
@@ -607,7 +610,9 @@
 <div class="cover">
   <div class="cover-icon">🏫</div>
   <h1>वेबसाइट प्रबंधन<br>निर्देशिका</h1>
-  <h2>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h2>
+  <a href="index.html" style="text-decoration: none; color: inherit;" title="मुख्य पृष्ठ पर जाएँ (Go to Home Page)">
+    <h2>उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h2>
+  </a>
   <div class="cover-divider"></div>
   <p style="opacity:.8;font-size:1rem;max-width:500px;line-height:1.7;">
     यह निर्देशिका विद्यालय की आधिकारिक वेबसाइट को प्रबंधित करने के लिए<br>

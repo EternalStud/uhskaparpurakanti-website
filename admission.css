@@ -64,6 +64,19 @@ body {
     left: -40px;
 }
 
+.school-info-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.school-info-link:hover {
+    opacity: 0.92;
+    transform: scale(1.008);
+}
+
 .form-header h1 {
     font-size: 2rem;
     margin-bottom: 10px;
