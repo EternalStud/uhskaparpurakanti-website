@@ -1,13 +1,8 @@
 /**
  * UHS Kaparpura - Public Student Examination Result Portal
  * 
- * Features:
- * 1. Mobile Cards View (Responsive touch UI for students on smartphones)
- * 2. Strict 1-Page A4 Printable Marksheet (Web Version)
- *    - Repeating Hindi School Name Watermark
- *    - NO BSEB Logo
- *    - NO Teacher / Headmaster signatures (Provisional Computer Generated)
- *    - Instant 1-click A4 PDF / Paper Print
+ * Accurately aligns marks, full marks, percentage, and division calculation logic
+ * with the central ResultService and ResultGeneration engine.
  */
 
 const ADMIN_API_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
@@ -257,7 +252,7 @@ function renderReportCard(data) {
         </div>
     `;
 
-    // Re-bind click on any mobile print buttons
+    // Re-bind click on mobile print & search again buttons
     const mobilePrintBtn = document.getElementById('btnMobilePrint');
     if (mobilePrintBtn) {
         mobilePrintBtn.addEventListener('click', () => window.print());
@@ -291,6 +286,62 @@ function formatDateDisplay(d) {
     return s;
 }
 
+// ── Helper: Extract Subject Data with Dynamic Full & Pass Marks ──────────────
+function getSubjectDynamicInfo(res, subId, defaultCode = "") {
+    if (!subId) return { name: "", code: defaultCode, fullMarks: 100, passMarks: 30, theoryObt: "", practicalObt: "-", totalObt: "", tMax: 100, pMax: 0 };
+    
+    const found = (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId));
+    const subObj = found ? { ...found } : {};
+
+    const sId = String(subId).toUpperCase();
+    let code = subObj.code || defaultCode;
+    if (!code) {
+        if (sId.endsWith("_SCI")) code = "112";
+        else if (sId.endsWith("_SST")) code = "111";
+        else if (sId.endsWith("_MAT")) code = "110";
+        else if (sId.endsWith("_ENG")) code = "113";
+    }
+
+    const tMax = subObj.tMax !== undefined ? subObj.tMax : 100;
+    const pMax = (subObj.pMax || 0) + (subObj.iMax || 0);
+    const fullMarks = subObj.totalMax || (tMax + pMax) || 100;
+    const passMarks = subObj.totalPassLimit || Math.ceil(fullMarks * 0.3);
+
+    const scoreObj = res.subjectScores ? res.subjectScores[subId] : null;
+
+    let theoryObt = "";
+    let practicalObt = pMax > 0 ? "" : "-";
+    let totalObt = "";
+
+    if (scoreObj) {
+        theoryObt = scoreObj.theoryObt !== undefined && scoreObj.theoryObt !== null ? scoreObj.theoryObt : "";
+        if (pMax > 0) {
+            let p = scoreObj.practicalObt;
+            if ((p === "" || p === null || p === undefined || p === 0 || p === "0") && scoreObj.internalObt) {
+                p = scoreObj.internalObt;
+            }
+            practicalObt = (p !== undefined && p !== null && p !== "") ? p : "-";
+        }
+        totalObt = scoreObj.totalObt !== undefined && scoreObj.totalObt !== null ? scoreObj.totalObt : "";
+    } else if (subObj.totalObt !== undefined) {
+        theoryObt = subObj.theoryObt;
+        practicalObt = pMax > 0 ? subObj.practicalObt : "-";
+        totalObt = subObj.totalObt;
+    }
+
+    return {
+        name: subObj.name || "",
+        code,
+        fullMarks,
+        passMarks,
+        theoryObt,
+        practicalObt,
+        totalObt,
+        tMax,
+        pMax
+    };
+}
+
 // ── JUNIOR (CLASS 9-10) DESKTOP & PRINT A4 MARKSHEET ────────────────────────
 function generateJuniorDesktopA4(data) {
     const res = data.studentResult;
@@ -303,48 +354,30 @@ function generateJuniorDesktopA4(data) {
     const issuePlace = "MUZAFFARPUR";
     const certNo = `Academic Session = ${academicYear} ,Exam Name = ${examName} ,class = ${activeClassVal} , Student Code = ${res.studentId || res.rollNo}`;
 
-    const getSubObj = (subId) => {
-        if (!subId) return {};
-        const found = (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId));
-        const subObj = found ? { ...found } : {};
-        const sId = String(subId || "").toUpperCase();
-        if (sId.endsWith("_SCI")) subObj.code = "112";
-        if (sId.endsWith("_SST")) subObj.code = "111";
-        if (sId.endsWith("_MAT")) subObj.code = "110";
-        if (sId.endsWith("_ENG")) subObj.code = "113";
-        return subObj;
-    };
+    const l1 = getSubjectDynamicInfo(res, res.language1, "101");
+    const l2 = getSubjectDynamicInfo(res, res.language2, "105");
+    const mat = getSubjectDynamicInfo(res, `${activeClassVal}_MAT`, "110");
+    const sci = getSubjectDynamicInfo(res, `${activeClassVal}_SCI`, "112");
+    const ssc = getSubjectDynamicInfo(res, `${activeClassVal}_SST`, "111");
+    const eng = getSubjectDynamicInfo(res, `${activeClassVal}_ENG`, "113");
 
-    const l1 = getSubObj(res.language1);
-    const l2 = getSubObj(res.language2);
-    const mat = getSubObj(`${activeClassVal}_MAT`);
-    const sci = getSubObj(`${activeClassVal}_SCI`);
-    const ssc = getSubObj(`${activeClassVal}_SST`);
-    const eng = getSubObj(`${activeClassVal}_ENG`);
+    // Evaluated 5 main subjects for BSEB Matric (excluding English)
+    const evaluatedFullMarks = l1.fullMarks + l2.fullMarks + mat.fullMarks + sci.fullMarks + ssc.fullMarks;
+    const evaluatedPassMarks = l1.passMarks + l2.passMarks + mat.passMarks + sci.passMarks + ssc.passMarks;
+    const totalMaxMarks = res.totalMaxMarks || evaluatedFullMarks || 500;
 
-    const getScoreVal = (subId) => {
-        const obj = res.subjectScores ? res.subjectScores[subId] : null;
-        if (!obj) return "";
-        return obj.totalObt !== undefined ? obj.totalObt : "";
-    };
-
-    const getTheoryVal = (subId) => {
-        const obj = res.subjectScores ? res.subjectScores[subId] : null;
-        if (!obj) return "";
-        return obj.theoryObt !== undefined && obj.theoryObt !== null ? obj.theoryObt : "";
-    };
-
-    const getPracVal = (subId) => {
-        const isSciOrSst = String(subId || "").includes("_SCI") || String(subId || "").includes("_SST");
-        if (!isSciOrSst) return "-";
-        const obj = res.subjectScores ? res.subjectScores[subId] : null;
-        if (!obj) return "-";
-        let p = obj.practicalObt;
-        if ((p === "" || p === null || p === undefined || p === 0 || p === "0") && obj.internalObt) {
-            p = obj.internalObt;
-        }
-        if (p === 0 || p === "0" || p === "" || p === null || p === undefined) return "-";
-        return p;
+    const renderJuniorRow = (sd, defaultName) => {
+        return `
+            <tr style="height: 34px;">
+                <td style="border: 1px solid #0f172a; padding: 6px;">${sd.code}</td>
+                <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${sd.name || defaultName}</td>
+                <td style="border: 1px solid #0f172a; padding: 6px;">${sd.fullMarks}</td>
+                <td style="border: 1px solid #0f172a; padding: 6px;">${sd.passMarks}</td>
+                <td style="border: 1px solid #0f172a; padding: 6px;">${sd.theoryObt}</td>
+                <td style="border: 1px solid #0f172a; padding: 6px;">${sd.practicalObt}</td>
+                <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${sd.totalObt}</td>
+            </tr>
+        `;
     };
 
     return `
@@ -427,67 +460,19 @@ function generateJuniorDesktopA4(data) {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="height: 34px;">
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${l1.code || '101'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${l1.name || 'HINDI'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(res.language1)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(res.language1)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(res.language1)}</td>
-                    </tr>
-                    <tr style="height: 34px;">
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${l2.code || '105'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${l2.name || 'SANSKRIT'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(res.language2)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(res.language2)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(res.language2)}</td>
-                    </tr>
-                    <tr style="height: 34px;">
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${mat.code || '110'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${mat.name || 'MATHEMATICS'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_MAT`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_MAT`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_MAT`)}</td>
-                    </tr>
-                    <tr style="height: 34px;">
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${sci.code || '112'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${sci.name || 'SCIENCE'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_SCI`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_SCI`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_SCI`)}</td>
-                    </tr>
-                    <tr style="height: 34px;">
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${ssc.code || '111'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${ssc.name || 'SOCIAL SCIENCE'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_SST`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_SST`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_SST`)}</td>
-                    </tr>
+                    ${renderJuniorRow(l1, 'HINDI')}
+                    ${renderJuniorRow(l2, 'SANSKRIT')}
+                    ${renderJuniorRow(mat, 'MATHEMATICS')}
+                    ${renderJuniorRow(sci, 'SCIENCE')}
+                    ${renderJuniorRow(ssc, 'SOCIAL SCIENCE')}
                     <tr style="height: 34px; font-weight: 700; background: #f8fafc;">
                         <td style="border: 1px solid #0f172a; padding: 6px;" colspan="2">TOTAL</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">500</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">150</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">${evaluatedFullMarks}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">${evaluatedPassMarks}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;" colspan="2">-</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 800;">${res.grandTotal !== undefined ? res.grandTotal : ''}</td>
                     </tr>
-                    <tr style="height: 34px;">
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${eng.code || '113'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${eng.name || 'ENGLISH'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_ENG`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_ENG`)}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_ENG`)}</td>
-                    </tr>
+                    ${renderJuniorRow(eng, 'ENGLISH')}
                 </tbody>
             </table>
 
@@ -499,7 +484,7 @@ function generateJuniorDesktopA4(data) {
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); padding: 8px; gap: 4px; text-align: center; align-items: center;">
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">AGGREGATE MARKS</div>
-                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'} / 500</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'} / ${totalMaxMarks}</div>
                     </div>
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">PERCENTAGE</div>
@@ -554,56 +539,17 @@ function generateSeniorDesktopA4(data) {
     const issuePlace = "MUZAFFARPUR";
     const certNo = `Academic Session = ${academicYear} ,Exam Name = ${examName} ,class = ${activeClassVal} , Student Code = ${res.studentId || res.rollNo}`;
 
-    const getSubDetails = (subId) => {
-        if (!subId) return null;
-        return (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId)) || null;
-    };
+    const sdL1 = getSubjectDynamicInfo(res, res.language1);
+    const sdL2 = getSubjectDynamicInfo(res, res.language2);
+    const sdE1 = getSubjectDynamicInfo(res, res.elective1);
+    const sdE2 = getSubjectDynamicInfo(res, res.elective2);
+    const sdE3 = getSubjectDynamicInfo(res, res.elective3);
+    const sdAdd = res.additional ? getSubjectDynamicInfo(res, res.additional) : null;
 
-    const getSubData = (subObj) => {
-        if (!subObj) return { name: "", theoryObt: "-", practicalObt: "-", totalObt: "-", score: "-", tMax: 100, pMax: 0, fullMarks: 100, passMarks: 30, code: "" };
-        const scoreObj = res.subjectScores ? res.subjectScores[subObj.subjectId] : null;
-        const tMax = subObj.tMax || 100;
-        const pMax = subObj.pMax || 0;
-        const fullMarks = tMax + pMax;
-        const passMarks = Math.ceil(fullMarks * 0.3);
-
-        if (!scoreObj) {
-            return { name: subObj.name, theoryObt: "-", practicalObt: "-", totalObt: "-", score: "-", tMax, pMax, fullMarks, passMarks, code: subObj.code || "" };
-        }
-
-        const theoryObt = scoreObj.theoryObt !== undefined && scoreObj.theoryObt !== null ? scoreObj.theoryObt : "-";
-        const practicalObt = pMax > 0 ? (scoreObj.practicalObt !== undefined && scoreObj.practicalObt !== null ? scoreObj.practicalObt : "-") : "-";
-        const totalObt = scoreObj.totalObt !== undefined && scoreObj.totalObt !== null ? scoreObj.totalObt : "-";
-
-        return {
-            name: subObj.name,
-            theoryObt,
-            practicalObt,
-            totalObt,
-            tMax,
-            pMax,
-            fullMarks,
-            passMarks,
-            code: subObj.code || ""
-        };
-    };
-
-    const l1 = getSubDetails(res.language1);
-    const l2 = getSubDetails(res.language2);
-    const e1 = getSubDetails(res.elective1);
-    const e2 = getSubDetails(res.elective2);
-    const e3 = getSubDetails(res.elective3);
-    const add = getSubDetails(res.additional);
-
-    const sdL1 = getSubData(l1);
-    const sdL2 = getSubData(l2);
-    const sdE1 = getSubData(e1);
-    const sdE2 = getSubData(e2);
-    const sdE3 = getSubData(e3);
-    const sdAdd = getSubData(add);
+    const totalMaxMarks = res.totalMaxMarks || (sdL1.fullMarks + sdL2.fullMarks + sdE1.fullMarks + sdE2.fullMarks + sdE3.fullMarks) || 500;
 
     const renderSubRow = (sd) => {
-        if (!sd.name) return "";
+        if (!sd || !sd.name) return "";
         return `
         <tr style="height: 34px;">
             <td style="border: 1px solid #0f172a; padding: 6px;">${sd.code || '-'}</td>
@@ -611,7 +557,7 @@ function generateSeniorDesktopA4(data) {
             <td style="border: 1px solid #0f172a; padding: 6px;">${sd.fullMarks}</td>
             <td style="border: 1px solid #0f172a; padding: 6px;">${sd.passMarks}</td>
             <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${sd.theoryObt}</td>
-            <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${sd.pMax > 0 ? sd.practicalObt : '-'}</td>
+            <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${sd.practicalObt}</td>
             <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 800;">${sd.totalObt}</td>
         </tr>`;
     };
@@ -717,7 +663,7 @@ function generateSeniorDesktopA4(data) {
                     ${renderSubRow(sdE2)}
                     ${renderSubRow(sdE3)}
                     
-                    ${sdAdd.name ? `<tr style="background: #f8fafc; font-weight: 700; text-align: left; height: 28px;"><td colspan="7" style="border: 1px solid #0f172a; padding: 4px 10px; color: #0f172a;">3. अतिरिक्त (Additional)</td></tr>` + renderSubRow(sdAdd) : ''}
+                    ${sdAdd && sdAdd.name ? `<tr style="background: #f8fafc; font-weight: 700; text-align: left; height: 28px;"><td colspan="7" style="border: 1px solid #0f172a; padding: 4px 10px; color: #0f172a;">3. अतिरिक्त (Additional)</td></tr>` + renderSubRow(sdAdd) : ''}
                 </tbody>
             </table>
 
@@ -729,7 +675,7 @@ function generateSeniorDesktopA4(data) {
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); padding: 8px; gap: 4px; text-align: center; align-items: center;">
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">AGGREGATE MARKS</div>
-                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'} / 500</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'} / ${totalMaxMarks}</div>
                     </div>
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">PERCENTAGE</div>
@@ -776,43 +722,32 @@ function generateJuniorMobileCards(data) {
     const res = data.studentResult;
     const isPass = (res.result === 'Pass' || !String(res.result).toLowerCase().includes('fail'));
 
-    const getSubObj = (subId) => {
-        if (!subId) return {};
-        const found = (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId));
-        return found ? { ...found } : {};
-    };
+    const l1 = getSubjectDynamicInfo(res, res.language1, "101");
+    const l2 = getSubjectDynamicInfo(res, res.language2, "105");
+    const mat = getSubjectDynamicInfo(res, `${data.classVal}_MAT`, "110");
+    const sci = getSubjectDynamicInfo(res, `${data.classVal}_SCI`, "112");
+    const ssc = getSubjectDynamicInfo(res, `${data.classVal}_SST`, "111");
+    const eng = getSubjectDynamicInfo(res, `${data.classVal}_ENG`, "113");
 
-    const getScores = (subId) => {
-        const obj = res.subjectScores ? res.subjectScores[subId] : null;
-        if (!obj) return { theory: '-', practical: '-', total: '-' };
-        return {
-            theory: obj.theoryObt !== undefined && obj.theoryObt !== null ? obj.theoryObt : '-',
-            practical: obj.practicalObt !== undefined && obj.practicalObt !== null ? obj.practicalObt : (obj.internalObt || '-'),
-            total: obj.totalObt !== undefined ? obj.totalObt : '-'
-        };
-    };
+    const totalMaxMarks = res.totalMaxMarks || (l1.fullMarks + l2.fullMarks + mat.fullMarks + sci.fullMarks + ssc.fullMarks) || 500;
 
-    const renderCard = (title, code, subId, hasPrac = false) => {
-        const sc = getScores(subId);
+    const renderCard = (sd, defaultTitle) => {
         return `
         <div class="res-sub-card">
             <div>
-                <div class="res-sub-title">${title} <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(${code})</span></div>
+                <div class="res-sub-title">${sd.name || defaultTitle} <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(${sd.code})</span></div>
                 <div class="res-sub-meta">
-                    सैद्धांतिक (Theory): <strong>${sc.theory}</strong>
-                    ${hasPrac ? ` | प्रायोगिक (Prac): <strong>${sc.practical}</strong>` : ''}
+                    सैद्धांतिक (Theory): <strong>${sd.theoryObt || '-'}</strong>
+                    ${sd.pMax > 0 ? ` | प्रायोगिक (Prac): <strong>${sd.practicalObt || '-'}</strong>` : ''}
                 </div>
             </div>
             <div class="res-sub-score">
-                ${sc.total}
-                <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">/ 100</div>
+                ${sd.totalObt || '-'}
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">/ ${sd.fullMarks}</div>
             </div>
         </div>
         `;
     };
-
-    const l1 = getSubObj(res.language1);
-    const l2 = getSubObj(res.language2);
 
     return `
     <div style="padding-bottom: 20px;">
@@ -843,7 +778,7 @@ function generateJuniorMobileCards(data) {
                 कुल प्राप्तांक (Total Marks)
             </div>
             <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 4px 0;">
-                ${res.grandTotal !== undefined ? res.grandTotal : '-'} <span style="font-size: 1.1rem; color: #64748b; font-weight: 600;">/ 500</span>
+                ${res.grandTotal !== undefined ? res.grandTotal : '-'} <span style="font-size: 1.1rem; color: #64748b; font-weight: 600;">/ ${totalMaxMarks}</span>
             </div>
             <div style="display: flex; justify-content: center; gap: 12px; align-items: center; margin-top: 6px;">
                 <span style="font-size: 1.1rem; font-weight: 800; color: #2563eb;">
@@ -861,12 +796,12 @@ function generateJuniorMobileCards(data) {
         </div>
 
         <!-- Subject Cards -->
-        ${renderCard(l1.name || 'M.I.L. (Hindi/Urdu)', l1.code || '101', res.language1)}
-        ${renderCard(l2.name || 'S.I.L. (Sanskrit/NLH)', l2.code || '105', res.language2)}
-        ${renderCard('Mathematics (गणित)', '110', `${data.classVal}_MAT`)}
-        ${renderCard('Science (विज्ञान)', '112', `${data.classVal}_SCI`, true)}
-        ${renderCard('Social Science (सामाजिक विज्ञान)', '111', `${data.classVal}_SST`, true)}
-        ${renderCard('English (अंग्रेज़ी)', '113', `${data.classVal}_ENG`)}
+        ${renderCard(l1, 'M.I.L. (Hindi/Urdu)')}
+        ${renderCard(l2, 'S.I.L. (Sanskrit/NLH)')}
+        ${renderCard(mat, 'Mathematics (गणित)')}
+        ${renderCard(sci, 'Science (विज्ञान)')}
+        ${renderCard(ssc, 'Social Science (सामाजिक विज्ञान)')}
+        ${renderCard(eng, 'English (अंग्रेज़ी)')}
 
         <!-- Mobile Floating Action Bar -->
         <div style="margin-top: 22px; display: flex; flex-direction: column; gap: 10px;">
@@ -887,33 +822,30 @@ function generateSeniorMobileCards(data) {
     const stream = data.stream || res.stream || 'Science';
     const isPass = (res.result === 'Pass' || !String(res.result).toLowerCase().includes('fail'));
 
-    const getSubDetails = (subId) => {
-        if (!subId) return null;
-        return (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId)) || null;
-    };
+    const sdL1 = getSubjectDynamicInfo(res, res.language1);
+    const sdL2 = getSubjectDynamicInfo(res, res.language2);
+    const sdE1 = getSubjectDynamicInfo(res, res.elective1);
+    const sdE2 = getSubjectDynamicInfo(res, res.elective2);
+    const sdE3 = getSubjectDynamicInfo(res, res.elective3);
+    const sdAdd = res.additional ? getSubjectDynamicInfo(res, res.additional) : null;
 
-    const renderSeniorCard = (subId, label) => {
-        if (!subId) return '';
-        const sub = getSubDetails(subId);
-        if (!sub) return '';
-        const scoreObj = res.subjectScores ? res.subjectScores[subId] : null;
-        const th = scoreObj && scoreObj.theoryObt !== undefined ? scoreObj.theoryObt : '-';
-        const pr = (sub.pMax > 0 && scoreObj && scoreObj.practicalObt !== undefined) ? scoreObj.practicalObt : '-';
-        const tot = scoreObj && scoreObj.totalObt !== undefined ? scoreObj.totalObt : '-';
+    const totalMaxMarks = res.totalMaxMarks || (sdL1.fullMarks + sdL2.fullMarks + sdE1.fullMarks + sdE2.fullMarks + sdE3.fullMarks) || 500;
 
+    const renderSeniorCard = (sd, label) => {
+        if (!sd || !sd.name) return '';
         return `
         <div class="res-sub-card">
             <div>
                 <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">${label}</div>
-                <div class="res-sub-title">${sub.name} <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(${sub.code || '-'})</span></div>
+                <div class="res-sub-title">${sd.name} <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(${sd.code || '-'})</span></div>
                 <div class="res-sub-meta">
-                    सैद्धांतिक (Theory): <strong>${th}</strong>
-                    ${sub.pMax > 0 ? ` | प्रायोगिक (Prac): <strong>${pr}</strong>` : ''}
+                    सैद्धांतिक (Theory): <strong>${sd.theoryObt || '-'}</strong>
+                    ${sd.pMax > 0 ? ` | प्रायोगिक (Prac): <strong>${sd.practicalObt || '-'}</strong>` : ''}
                 </div>
             </div>
             <div class="res-sub-score">
-                ${tot}
-                <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">/ ${sub.tMax + sub.pMax}</div>
+                ${sd.totalObt || '-'}
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">/ ${sd.fullMarks}</div>
             </div>
         </div>
         `;
@@ -948,7 +880,7 @@ function generateSeniorMobileCards(data) {
                 कुल प्राप्तांक (Total Marks)
             </div>
             <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 4px 0;">
-                ${res.grandTotal !== undefined ? res.grandTotal : '-'} <span style="font-size: 1.1rem; color: #64748b; font-weight: 600;">/ 500</span>
+                ${res.grandTotal !== undefined ? res.grandTotal : '-'} <span style="font-size: 1.1rem; color: #64748b; font-weight: 600;">/ ${totalMaxMarks}</span>
             </div>
             <div style="display: flex; justify-content: center; gap: 12px; align-items: center; margin-top: 6px;">
                 <span style="font-size: 1.1rem; font-weight: 800; color: #2563eb;">
@@ -966,12 +898,12 @@ function generateSeniorMobileCards(data) {
         </div>
 
         <!-- Subject Cards -->
-        ${renderSeniorCard(res.language1, 'Compulsory 1 (अनिवार्य)')}
-        ${renderSeniorCard(res.language2, 'Compulsory 2 (अनिवार्य)')}
-        ${renderSeniorCard(res.elective1, 'Elective 1 (ऐच्छिक)')}
-        ${renderSeniorCard(res.elective2, 'Elective 2 (ऐच्छिक)')}
-        ${renderSeniorCard(res.elective3, 'Elective 3 (ऐच्छिक)')}
-        ${res.additional ? renderSeniorCard(res.additional, 'Additional (अतिरिक्त)') : ''}
+        ${renderSeniorCard(sdL1, 'Compulsory 1 (अनिवार्य)')}
+        ${renderSeniorCard(sdL2, 'Compulsory 2 (अनिवार्य)')}
+        ${renderSeniorCard(sdE1, 'Elective 1 (ऐच्छिक)')}
+        ${renderSeniorCard(sdE2, 'Elective 2 (ऐच्छिक)')}
+        ${renderSeniorCard(sdE3, 'Elective 3 (ऐच्छिक)')}
+        ${sdAdd ? renderSeniorCard(sdAdd, 'Additional (अतिरिक्त)') : ''}
 
         <!-- Mobile Floating Action Bar -->
         <div style="margin-top: 22px; display: flex; flex-direction: column; gap: 10px;">
