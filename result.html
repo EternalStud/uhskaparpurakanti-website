@@ -342,6 +342,82 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ── Mobile vs Desktop Result Card Display ──────────────────────────────── */
+        .mobile-only-result { display: none; }
+        .desktop-only-result { display: block; }
+
+        @media (max-width: 768px) {
+            .mobile-only-result { display: block !important; }
+            .desktop-only-result { display: none !important; }
+            .report-card-sheet {
+                padding: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+
+        /* ── Mobile Result Card Styles ───────────────────────────────────────────── */
+        .res-mobile-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+
+        .res-mobile-header-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.2);
+            text-align: center;
+        }
+
+        .res-mobile-score-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border: 2px solid #86efac;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        .res-mobile-score-card.fail {
+            background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+            border-color: #fca5a5;
+        }
+
+        .res-sub-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .res-sub-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #0f172a;
+        }
+        .res-sub-meta {
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 3px;
+        }
+        .res-sub-score {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            text-align: right;
+        }
+
         /* ── Print Media Optimization (Strict 1-Page A4 Guarantee) ─────────────────── */
         @media print {
             html, body {
@@ -352,8 +428,11 @@
                 height: 297mm !important;
                 overflow: hidden !important;
             }
-            .form-header, .form-section, .report-card-actions, #loader, .portal-closed-alert, .action-bar {
+            .form-header, .form-section, .report-card-actions, #loader, .portal-closed-alert, .mobile-only-result {
                 display: none !important;
+            }
+            .desktop-only-result {
+                display: block !important;
             }
             .result-container {
                 max-width: 100% !important;
@@ -371,8 +450,24 @@
                 border-radius: 0 !important;
                 padding: 0 !important;
                 width: 100% !important;
+                background: transparent !important;
                 page-break-inside: avoid !important;
                 page-break-after: avoid !important;
+            }
+            .bseb-web-print-card {
+                width: 210mm !important;
+                max-width: 210mm !important;
+                height: 295mm !important;
+                max-height: 295mm !important;
+                padding: 8mm 10mm !important;
+                margin: 0 auto !important;
+                border: 2px solid #0f172a !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                background-color: #fff !important;
+                background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='130' viewBox='0 0 280 130'><text x='50%' y='50%' fill='rgba(0,0,0,0.035)' font-size='12' font-family='sans-serif' font-weight='bold' text-anchor='middle' transform='rotate(-22 140 65)'>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</text></svg>") !important;
+                background-repeat: repeat !important;
             }
         }
     </style>

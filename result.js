@@ -1,10 +1,16 @@
 /**
  * UHS Kaparpura - Public Student Examination Result Portal
- * Matches the official BSEB Report Card format from Admin Portal's resultGeneration.js
+ * 
+ * Features:
+ * 1. Mobile Cards View (Responsive touch UI for students on smartphones)
+ * 2. Strict 1-Page A4 Printable Marksheet (Web Version)
+ *    - Repeating Hindi School Name Watermark
+ *    - NO BSEB Logo
+ *    - NO Teacher / Headmaster signatures (Provisional Computer Generated)
+ *    - Instant 1-click A4 PDF / Paper Print
  */
 
 const ADMIN_API_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
-const BSEB_LOGO_B64 = "https://raw.githubusercontent.com/EternalStud/uhskaparpura-admin-web/main/assets/images/bseb-logo.png";
 
 let currentResultData = null;
 
@@ -38,12 +44,12 @@ function generateQrSvg(text) {
                     }
                 }
             }
-            return `<svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="-2 -2 ${size + 4} ${size + 4}" style="display: block; margin: 0 auto; background: white; border-radius: 4px; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;"><path fill="#0f172a" d="${path}"/></svg>`;
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="65" height="65" viewBox="-2 -2 ${size + 4} ${size + 4}" style="display: block; margin: 0 auto; background: white; border-radius: 4px; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;"><path fill="#0f172a" d="${path}"/></svg>`;
         }
     } catch (e) {
         console.warn("QR generation error:", e);
     }
-    return `<div style="width: 70px; height: 70px; background: #f1f5f9; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; margin: 0 auto; border-radius: 4px;">QR</div>`;
+    return `<div style="width: 65px; height: 65px; background: #f1f5f9; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; margin: 0 auto; border-radius: 4px;">QR</div>`;
 }
 
 // ── Initial Setup & Settings Check ──────────────────────────────────────────
@@ -100,7 +106,6 @@ async function loadExamList() {
         const data = await response.json();
 
         if (data && data.success) {
-            // Update sessions if available
             if (data.sessions && data.sessions.length && sessionSelect) {
                 const curVal = sessionSelect.value;
                 sessionSelect.innerHTML = '';
@@ -113,7 +118,6 @@ async function loadExamList() {
                 });
             }
 
-            // Update exams
             if (examSelect) {
                 examSelect.innerHTML = '<option value="">-- परीक्षा चुनें --</option>';
                 const exams = data.exams || [];
@@ -234,18 +238,33 @@ if (resultSearchForm) {
     });
 }
 
-// ── Report Card Rendering ───────────────────────────────────────────────────
+// ── Report Card Rendering (Dual View: Mobile Cards + Desktop/Print Marksheet) ─
 function renderReportCard(data) {
     const sheet = document.getElementById('reportCardSheet');
     if (!sheet) return;
 
-    const res = data.studentResult;
     const isJunior = Number(data.classVal) <= 10;
 
-    if (isJunior) {
-        sheet.innerHTML = generateJuniorReportCardHtml(data);
-    } else {
-        sheet.innerHTML = generateSeniorReportCardHtml(data);
+    const desktopHtml = isJunior ? generateJuniorDesktopA4(data) : generateSeniorDesktopA4(data);
+    const mobileHtml = isJunior ? generateJuniorMobileCards(data) : generateSeniorMobileCards(data);
+
+    sheet.innerHTML = `
+        <div class="desktop-only-result">
+            ${desktopHtml}
+        </div>
+        <div class="mobile-only-result">
+            ${mobileHtml}
+        </div>
+    `;
+
+    // Re-bind click on any mobile print buttons
+    const mobilePrintBtn = document.getElementById('btnMobilePrint');
+    if (mobilePrintBtn) {
+        mobilePrintBtn.addEventListener('click', () => window.print());
+    }
+    const mobileSearchAgain = document.getElementById('btnMobileSearchAgain');
+    if (mobileSearchAgain) {
+        mobileSearchAgain.addEventListener('click', resetSearch);
     }
 }
 
@@ -272,35 +291,17 @@ function formatDateDisplay(d) {
     return s;
 }
 
-// ── Class 9 & 10 (Junior) Report Card Generator (Matches resultGeneration.js) ──
-function generateJuniorReportCardHtml(data) {
+// ── JUNIOR (CLASS 9-10) DESKTOP & PRINT A4 MARKSHEET ────────────────────────
+function generateJuniorDesktopA4(data) {
     const res = data.studentResult;
     const examName = data.examName;
     const academicYear = data.academicYear;
     const activeClassVal = data.classVal;
-    const assets = data.assets || {};
     const classNumeral = Number(activeClassVal) === 10 ? 'X' : 'IX';
 
-    const issueDate = formatDateDisplay(assets.report_card_issue_date);
-    const issuePlace = (assets.report_card_issue_place || "MUZAFFARPUR").toUpperCase();
-
+    const issueDate = formatDateDisplay(new Date());
+    const issuePlace = "MUZAFFARPUR";
     const certNo = `Academic Session = ${academicYear} ,Exam Name = ${examName} ,class = ${activeClassVal} , Student Code = ${res.studentId || res.rollNo}`;
-
-    const teacherSig = assets.report_card_teacher_sig || "";
-    const hmSig = assets.report_card_hm_sig || "";
-    const schoolStamp = assets.report_card_school_stamp || "";
-
-    const teacherSigHtml = teacherSig 
-        ? `<img src="${teacherSig}" style="height: 44px; width: 150px; object-fit: contain; display: block; margin: 0 auto 2px auto;">` 
-        : `<div style="height: 38px;"></div>`;
-
-    const hmSigHtml = hmSig 
-        ? `<img src="${hmSig}" style="position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%); height: 50px; width: 160px; z-index: 2; object-fit: contain;">` 
-        : `<div style="height: 38px;"></div>`;
-
-    const stampHtml = schoolStamp
-        ? `<img src="${schoolStamp}" style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 85mm; height: 42mm; z-index: 1; opacity: 0.90; object-fit: contain;">`
-        : ``;
 
     const getSubObj = (subId) => {
         if (!subId) return {};
@@ -321,18 +322,6 @@ function generateJuniorReportCardHtml(data) {
     const ssc = getSubObj(`${activeClassVal}_SST`);
     const eng = getSubObj(`${activeClassVal}_ENG`);
 
-    const getFullMarks = (subObj) => {
-        if (!subObj || Object.keys(subObj).length === 0) return 100;
-        const total = (subObj.tMax || 0) + (subObj.pMax || 0);
-        return total > 0 ? total : 100;
-    };
-
-    const getPassMarks = (subObj) => {
-        if (!subObj || Object.keys(subObj).length === 0) return 30;
-        if (subObj.passMarks) return subObj.passMarks;
-        return Math.round(getFullMarks(subObj) * 0.3);
-    };
-
     const getScoreVal = (subId) => {
         const obj = res.subjectScores ? res.subjectScores[subId] : null;
         if (!obj) return "";
@@ -348,61 +337,34 @@ function generateJuniorReportCardHtml(data) {
     const getPracVal = (subId) => {
         const isSciOrSst = String(subId || "").includes("_SCI") || String(subId || "").includes("_SST");
         if (!isSciOrSst) return "-";
-
         const obj = res.subjectScores ? res.subjectScores[subId] : null;
         if (!obj) return "-";
-        
         let p = obj.practicalObt;
-        if ((p === "" || p === null || p === undefined || p === 0 || p === "0") && obj.internalObt !== undefined && obj.internalObt !== "" && obj.internalObt !== 0 && obj.internalObt !== "0") {
+        if ((p === "" || p === null || p === undefined || p === 0 || p === "0") && obj.internalObt) {
             p = obj.internalObt;
         }
-
-        if (p === 0 || p === "0" || p === "" || p === null || p === undefined) {
-            return "-";
-        }
+        if (p === 0 || p === "0" || p === "" || p === null || p === undefined) return "-";
         return p;
     };
 
-    const l1Full = getFullMarks(l1), l1Pass = getPassMarks(l1);
-    const l2Full = getFullMarks(l2), l2Pass = getPassMarks(l2);
-    const matFull = getFullMarks(mat), matPass = getPassMarks(mat);
-    const sciFull = getFullMarks(sci), sciPass = getPassMarks(sci);
-    const sscFull = getFullMarks(ssc), sscPass = getPassMarks(ssc);
-    const engFull = getFullMarks(eng), engPass = getPassMarks(eng);
-
-    const totalFullMarks = l1Full + l2Full + matFull + sciFull + sscFull;
-    const totalPassMarks = l1Pass + l2Pass + matPass + sciPass + sscPass;
-
     return `
-    <div class="bseb-report-card-page" style="width: 210mm; min-height: 290mm; max-height: 295mm; padding: 12mm 14mm; margin: 0 auto; background-color: #ffffff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1e293b; position: relative; overflow: hidden; border: 2.5px solid #0f172a;">
+    <div class="bseb-web-print-card" style="width: 210mm; min-height: 290mm; max-height: 295mm; padding: 12mm 14mm; margin: 0 auto; background-color: #ffffff; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'280\\' height=\\'130\\' viewBox=\\'0 0 280 130\\'><text x=\\'50%\\' y=\\'50%\\' fill=\\'rgba(0,0,0,0.035)\\' font-size=\\'12\\' font-family=\\'sans-serif\\' font-weight=\\'bold\\' text-anchor=\\'middle\\' transform=\\'rotate(-22 140 65)\\'>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</text></svg>'); background-repeat: repeat; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1e293b; position: relative; overflow: hidden; border: 2px solid #0f172a;">
 
         <!-- Double Inner Border Frame -->
         <div style="position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid #0f172a; pointer-events: none; z-index: 10;"></div>
 
-        <!-- Centered Emblem Watermark Layer -->
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; height: 440px; opacity: 0.05; pointer-events: none; z-index: 5;">
-            <img src="${BSEB_LOGO_B64}" style="width: 100%; height: 100%; object-fit: contain;">
-        </div>
-
         <!-- Main Content Area -->
         <div style="position: relative; z-index: 1;">
             <!-- Header Container -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <div style="width: 120px; text-align: left; display: flex; align-items: center;">
-                    <img src="${BSEB_LOGO_B64}" style="width: 110px; height: 110px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <h1 style="font-size: 22px; font-weight: 800; margin: 0; color: #1e3a8a; letter-spacing: 0.5px;">उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+                <h2 style="font-size: 14px; font-weight: 600; margin: 3px 0; color: #475569;">UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</h2>
+                <div style="font-size: 12px; font-weight: 700; color: #0f172a; margin-top: 4px;">UDISE : 10140616812 • BSEB MATRIC CODE : 51375</div>
+                
+                <!-- Pill Container for Exam Name -->
+                <div style="display: inline-block; background: linear-gradient(135deg, #f8fafc, #e2e8f0); box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #cbd5e1; border-radius: 20px; padding: 5px 20px; margin-top: 8px;">
+                    <span style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${examName} — STATEMENT OF MARKS (CLASS ${classNumeral})</span>
                 </div>
-                <div style="flex: 1; text-align: center; padding: 0 10px;">
-                    <h1 style="font-size: 24px; font-weight: 700; margin: 0; color: #1e3a8a; letter-spacing: 0.5px; text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);">बिहार विद्यालय परीक्षा समिति, पटना</h1>
-                    <h2 style="font-size: 16px; font-weight: 600; margin: 3px 0; color: #dc2626;">Bihar School Examination Board, Patna</h2>
-                    <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 4px;">विद्यालय: U.H.S. KAPARPURA, KANTI, MUZAFFARPUR</div>
-                    
-                    <!-- Pill Container for Exam Name -->
-                    <div style="display: inline-block; background: linear-gradient(135deg, #f8fafc, #e2e8f0); box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #cbd5e1; border-radius: 20px; padding: 5px 20px; margin-top: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${examName} STATEMENT OF MARKS</span>
-                    </div>
-                    <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 4px;">CLASS ${classNumeral}</div>
-                </div>
-                <div style="width: 120px;"></div>
             </div>
 
             <hr style="border: none; border-top: 1.5px solid #0f172a; margin: 0 0 12px 0;">
@@ -444,9 +406,9 @@ function generateJuniorReportCardHtml(data) {
                         <td style="padding: 2px 0; font-weight: 700;">${academicYear}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 2px 8px 2px 0; white-space: nowrap;">BSEB CODE</td>
+                        <td style="padding: 2px 8px 2px 0; white-space: nowrap;">कक्षा Class</td>
                         <td style="padding: 2px 8px; font-weight: 700;">:</td>
-                        <td style="padding: 2px 0; font-weight: 700;">51375</td>
+                        <td style="padding: 2px 0; font-weight: 700;">Class ${activeClassVal} (${classNumeral})</td>
                     </tr>
                 </table>
             </div>
@@ -468,8 +430,8 @@ function generateJuniorReportCardHtml(data) {
                     <tr style="height: 34px;">
                         <td style="border: 1px solid #0f172a; padding: 6px;">${l1.code || '101'}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${l1.name || 'HINDI'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${l1Full}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${l1Pass}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(res.language1)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(res.language1)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(res.language1)}</td>
@@ -477,8 +439,8 @@ function generateJuniorReportCardHtml(data) {
                     <tr style="height: 34px;">
                         <td style="border: 1px solid #0f172a; padding: 6px;">${l2.code || '105'}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${l2.name || 'SANSKRIT'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${l2Full}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${l2Pass}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(res.language2)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(res.language2)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(res.language2)}</td>
@@ -486,8 +448,8 @@ function generateJuniorReportCardHtml(data) {
                     <tr style="height: 34px;">
                         <td style="border: 1px solid #0f172a; padding: 6px;">${mat.code || '110'}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${mat.name || 'MATHEMATICS'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${matFull}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${matPass}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_MAT`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_MAT`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_MAT`)}</td>
@@ -495,8 +457,8 @@ function generateJuniorReportCardHtml(data) {
                     <tr style="height: 34px;">
                         <td style="border: 1px solid #0f172a; padding: 6px;">${sci.code || '112'}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${sci.name || 'SCIENCE'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${sciFull}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${sciPass}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_SCI`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_SCI`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_SCI`)}</td>
@@ -504,24 +466,24 @@ function generateJuniorReportCardHtml(data) {
                     <tr style="height: 34px;">
                         <td style="border: 1px solid #0f172a; padding: 6px;">${ssc.code || '111'}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${ssc.name || 'SOCIAL SCIENCE'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${sscFull}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${sscPass}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_SST`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_SST`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_SST`)}</td>
                     </tr>
                     <tr style="height: 34px; font-weight: 700; background: #f8fafc;">
                         <td style="border: 1px solid #0f172a; padding: 6px;" colspan="2">TOTAL</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${totalFullMarks}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${totalPassMarks}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">500</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">150</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;" colspan="2">-</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 800;">${res.grandTotal !== undefined ? res.grandTotal : ''}</td>
                     </tr>
                     <tr style="height: 34px;">
                         <td style="border: 1px solid #0f172a; padding: 6px;">${eng.code || '113'}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px 12px; text-align: left; text-transform: uppercase;">${eng.name || 'ENGLISH'}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${engFull}</td>
-                        <td style="border: 1px solid #0f172a; padding: 6px;">${engPass}</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">100</td>
+                        <td style="border: 1px solid #0f172a; padding: 6px;">30</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getTheoryVal(`${activeClassVal}_ENG`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px;">${getPracVal(`${activeClassVal}_ENG`)}</td>
                         <td style="border: 1px solid #0f172a; padding: 6px; font-weight: 700;">${getScoreVal(`${activeClassVal}_ENG`)}</td>
@@ -530,31 +492,31 @@ function generateJuniorReportCardHtml(data) {
             </table>
 
             <!-- FINAL RESULT Dashboard Container -->
-            <div style="border: 1.5px solid #0f172a; border-radius: 6px; overflow: hidden; margin-bottom: 12px; background-color: #ffffff;">
+            <div style="border: 1.5px solid #0f172a; border-radius: 6px; overflow: hidden; margin-bottom: 16px; background-color: #ffffff;">
                 <div style="background: #f1f5f9; padding: 5px; text-align: center; font-weight: 800; font-size: 11.5px; color: #0f172a; border-bottom: 1px solid #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
-                    FINAL RESULT
+                    FINAL RESULT SUMMARY
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); padding: 8px; gap: 4px; text-align: center; align-items: center;">
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">AGGREGATE MARKS</div>
-                        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'}</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'} / 500</div>
                     </div>
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">PERCENTAGE</div>
-                        <div style="font-size: 13.5px; font-weight: 800; color: #2563eb; margin-top: 2px;">${res.percentage !== '0.0%' ? res.percentage : '-'}</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #2563eb; margin-top: 2px;">${res.percentage !== '0.0%' ? res.percentage : '-'}</div>
                     </div>
                     <div>
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">RESULT / DIVISION</div>
-                        <div style="font-size: 12.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.result} ${res.division ? '/ ' + res.division : ''}</div>
+                        <div style="font-size: 13px; font-weight: 800; color: #047857; margin-top: 2px;">${res.result} ${res.division ? '/ ' + res.division : ''}</div>
                     </div>
                 </div>
             </div>
 
             <!-- Footer Details & Centered QR Code -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; font-size: 11.5px; color: #0f172a;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 25px; font-size: 11px; color: #0f172a; padding: 0 10px;">
                 <div>
-                    <div style="font-weight: 700;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" style="vertical-align: -1px; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>PLACE : ${issuePlace}</div>
-                    <div style="margin-top: 4px; font-weight: 700;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" style="vertical-align: -1px; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>ISSUE DATE : ${issueDate}</div>
+                    <div style="font-weight: 700;">स्थान PLACE : ${issuePlace}</div>
+                    <div style="margin-top: 4px; font-weight: 700;">दिनांक DATE : ${issueDate}</div>
                 </div>
 
                 <!-- Centered QR Code Stamp -->
@@ -562,66 +524,35 @@ function generateJuniorReportCardHtml(data) {
                     <div style="border: 1px solid #0f172a; padding: 4px; background: #fff; display: inline-block; border-radius: 4px;">
                         ${generateQrSvg(certNo)}
                     </div>
+                    <div style="font-size: 8.5px; color: #64748b; margin-top: 2px; font-weight: 600;">Scan to Verify</div>
                 </div>
 
-                <div style="width: 120px;"></div>
-            </div>
-
-            <!-- Signatures & Stamp Row -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; font-size: 12px; font-weight: 700; color: #0f172a;">
-                <div style="text-align: center; width: 200px;">
-                    ${teacherSigHtml}
-                    <div style="border-top: 1px solid #0f172a; padding-top: 4px;">Class Teacher's Signature</div>
-                </div>
-
-                <div style="text-align: center; width: 200px; position: relative; height: 160px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
-                    ${stampHtml}
-                </div>
-
-                <div style="text-align: center; width: 200px; position: relative; height: 160px; display: flex; flex-direction: column; justify-content: flex-end;">
-                    ${hmSigHtml}
-                    <div style="border-top: 1px solid #0f172a; padding-top: 4px; position: relative; z-index: 3;">Principal's Signature</div>
+                <div style="text-align: right; font-size: 9.5px; color: #475569; max-width: 220px; line-height: 1.4;">
+                    <strong>💻 ऑनलाइन प्राप्तांक विवरण</strong><br>
+                    (Computer Generated Provisional Marksheet)
                 </div>
             </div>
 
             <!-- Disclaimer Note at Very Bottom -->
-            <div style="text-align: center; font-size: 10px; color: #475569; margin-top: 12px; font-weight: 600;">
-                नोट: यह अंक विवरण विद्यालय द्वारा जारी किया गया है। / Note: This statement of marks is issued by the school.
+            <div style="text-align: center; font-size: 9.5px; color: #64748b; margin-top: 24px; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
+                नोट: यह इंटरनेट पर उपलब्ध कराया गया कंप्यूटर जनित प्राप्तांक विवरण है। किसी भी विसंगति की स्थिति में विद्यालय का मूल अभिलेख अंतिम एवं मान्य होगा।
             </div>
         </div>
     </div>`;
 }
 
-// ── Class 11 & 12 (Senior) Report Card Generator (Matches resultGeneration.js) ──
-function generateSeniorReportCardHtml(data) {
+// ── SENIOR (CLASS 11-12) DESKTOP & PRINT A4 MARKSHEET ───────────────────────
+function generateSeniorDesktopA4(data) {
     const res = data.studentResult;
     const examName = data.examName;
     const academicYear = data.academicYear;
     const activeClassVal = data.classVal;
     const stream = data.stream || res.stream || 'Science';
-    const assets = data.assets || {};
     const classNumeral = Number(activeClassVal) === 12 ? 'XII' : 'XI';
 
-    const issueDate = formatDateDisplay(assets.report_card_issue_date);
-    const issuePlace = (assets.report_card_issue_place || "MUZAFFARPUR").toUpperCase();
-
+    const issueDate = formatDateDisplay(new Date());
+    const issuePlace = "MUZAFFARPUR";
     const certNo = `Academic Session = ${academicYear} ,Exam Name = ${examName} ,class = ${activeClassVal} , Student Code = ${res.studentId || res.rollNo}`;
-
-    const teacherSig = assets.report_card_teacher_sig || "";
-    const hmSig = assets.report_card_hm_sig || "";
-    const schoolStamp = assets.report_card_school_stamp || "";
-
-    const teacherSigHtml = teacherSig 
-        ? `<img src="${teacherSig}" style="height: 44px; width: 150px; object-fit: contain; display: block; margin: 0 auto 2px auto;">` 
-        : `<div style="height: 38px;"></div>`;
-
-    const hmSigHtml = hmSig 
-        ? `<img src="${hmSig}" style="position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%); height: 50px; width: 160px; z-index: 2; object-fit: contain;">` 
-        : `<div style="height: 38px;"></div>`;
-
-    const stampHtml = schoolStamp
-        ? `<img src="${schoolStamp}" style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 85mm; height: 42mm; z-index: 1; opacity: 0.90; object-fit: contain;">`
-        : ``;
 
     const getSubDetails = (subId) => {
         if (!subId) return null;
@@ -643,14 +574,12 @@ function generateSeniorReportCardHtml(data) {
         const theoryObt = scoreObj.theoryObt !== undefined && scoreObj.theoryObt !== null ? scoreObj.theoryObt : "-";
         const practicalObt = pMax > 0 ? (scoreObj.practicalObt !== undefined && scoreObj.practicalObt !== null ? scoreObj.practicalObt : "-") : "-";
         const totalObt = scoreObj.totalObt !== undefined && scoreObj.totalObt !== null ? scoreObj.totalObt : "-";
-        const score = scoreObj.score !== undefined && scoreObj.score !== null ? scoreObj.score : "-";
 
         return {
             name: subObj.name,
             theoryObt,
             practicalObt,
             totalObt,
-            score,
             tMax,
             pMax,
             fullMarks,
@@ -688,35 +617,23 @@ function generateSeniorReportCardHtml(data) {
     };
 
     return `
-    <div class="bseb-report-card-page" style="width: 210mm; min-height: 290mm; max-height: 295mm; padding: 12mm 14mm; margin: 0 auto; background-color: #ffffff; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1e293b; position: relative; overflow: hidden; border: 2.5px solid #0f172a;">
+    <div class="bseb-web-print-card" style="width: 210mm; min-height: 290mm; max-height: 295mm; padding: 12mm 14mm; margin: 0 auto; background-color: #ffffff; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'280\\' height=\\'130\\' viewBox=\\'0 0 280 130\\'><text x=\\'50%\\' y=\\'50%\\' fill=\\'rgba(0,0,0,0.035)\\' font-size=\\'12\\' font-family=\\'sans-serif\\' font-weight=\\'bold\\' text-anchor=\\'middle\\' transform=\\'rotate(-22 140 65)\\'>उ.मा.वि. कपरपुरा, काँटी, मुजफ्फरपुर</text></svg>'); background-repeat: repeat; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #1e293b; position: relative; overflow: hidden; border: 2px solid #0f172a;">
 
         <!-- Double Inner Border Frame -->
         <div style="position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid #0f172a; pointer-events: none; z-index: 10;"></div>
 
-        <!-- Single Centered Faint BSEB Seal Watermark -->
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; height: 420px; opacity: 0.05; pointer-events: none; z-index: 5;">
-            <img src="${BSEB_LOGO_B64}" style="width: 100%; height: 100%; object-fit: contain;">
-        </div>
-
         <!-- Main Content Area -->
         <div style="position: relative; z-index: 1;">
             <!-- Header Container -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <div style="width: 120px; text-align: left; display: flex; align-items: center;">
-                    <img src="${BSEB_LOGO_B64}" style="width: 110px; height: 110px; object-fit: contain;">
+            <div style="text-align: center; margin-bottom: 12px;">
+                <h1 style="font-size: 22px; font-weight: 800; margin: 0; color: #1e3a8a; letter-spacing: 0.5px;">उच्चतर माध्यमिक विद्यालय कपरपुरा, काँटी, मुजफ्फरपुर</h1>
+                <h2 style="font-size: 14px; font-weight: 600; margin: 3px 0; color: #475569;">UCHCH MADHYAMIK VIDYALAYA KAPARPURA, KANTI, MUZAFFARPUR</h2>
+                <div style="font-size: 12px; font-weight: 700; color: #0f172a; margin-top: 4px;">UDISE : 10140616812 • BSEB INTER CODE : 31445</div>
+                
+                <!-- Pill Container for Exam Name -->
+                <div style="display: inline-block; background: linear-gradient(135deg, #f8fafc, #e2e8f0); box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #cbd5e1; border-radius: 20px; padding: 5px 20px; margin-top: 8px;">
+                    <span style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${examName} — STATEMENT OF MARKS (CLASS ${classNumeral} • ${stream.toUpperCase()} STREAM)</span>
                 </div>
-                <div style="flex: 1; text-align: center; padding: 0 10px;">
-                    <h1 style="font-size: 24px; font-weight: 700; margin: 0; color: #1e3a8a; letter-spacing: 0.5px; text-shadow: 0.5px 0.5px 0px rgba(0,0,0,0.1);">बिहार विद्यालय परीक्षा समिति, पटना</h1>
-                    <h2 style="font-size: 16px; font-weight: 600; margin: 3px 0; color: #dc2626;">Bihar School Examination Board, Patna</h2>
-                    <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 4px;">विद्यालय: U.H.S. KAPARPURA, KANTI, MUZAFFARPUR</div>
-                    
-                    <!-- Pill Container for Exam Name -->
-                    <div style="display: inline-block; background: linear-gradient(135deg, #f8fafc, #e2e8f0); box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #cbd5e1; border-radius: 20px; padding: 5px 20px; margin-top: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">${examName} STATEMENT OF MARKS</span>
-                    </div>
-                    <div style="font-size: 13px; font-weight: 800; color: #0f172a; margin-top: 4px;">CLASS ${classNumeral}</div>
-                </div>
-                <div style="width: 120px;"></div>
             </div>
 
             <hr style="border: none; border-top: 1.5px solid #0f172a; margin: 0 0 12px 0;">
@@ -763,7 +680,7 @@ function generateSeniorReportCardHtml(data) {
                         <td style="padding: 2px 0; font-weight: 700;">31445</td>
                     </tr>
                     <tr>
-                        <td style="padding: 2px 8px 2px 0; white-space: nowrap;">FACULTY</td>
+                        <td style="padding: 2px 8px 2px 0; white-space: nowrap;">संकाय FACULTY</td>
                         <td style="padding: 2px 8px; font-weight: 700;">:</td>
                         <td style="padding: 2px 0; font-weight: 700; text-transform: uppercase;">${stream.toUpperCase()}</td>
                     </tr>
@@ -805,31 +722,31 @@ function generateSeniorReportCardHtml(data) {
             </table>
 
             <!-- FINAL RESULT Dashboard Container -->
-            <div style="border: 1.5px solid #0f172a; border-radius: 6px; overflow: hidden; margin-bottom: 12px; background-color: #ffffff;">
+            <div style="border: 1.5px solid #0f172a; border-radius: 6px; overflow: hidden; margin-bottom: 16px; background-color: #ffffff;">
                 <div style="background: #f1f5f9; padding: 5px; text-align: center; font-weight: 800; font-size: 11.5px; color: #0f172a; border-bottom: 1px solid #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">
-                    FINAL RESULT
+                    FINAL RESULT SUMMARY
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); padding: 8px; gap: 4px; text-align: center; align-items: center;">
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">AGGREGATE MARKS</div>
-                        <div style="font-size: 13.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'}</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.grandTotal !== undefined ? res.grandTotal : '-'} / 500</div>
                     </div>
                     <div style="border-right: 1px solid #e2e8f0; padding-right: 4px;">
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">PERCENTAGE</div>
-                        <div style="font-size: 13.5px; font-weight: 800; color: #2563eb; margin-top: 2px;">${res.percentage !== '0.0%' ? res.percentage : '-'}</div>
+                        <div style="font-size: 14px; font-weight: 800; color: #2563eb; margin-top: 2px;">${res.percentage !== '0.0%' ? res.percentage : '-'}</div>
                     </div>
                     <div>
                         <div style="font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase;">RESULT / DIVISION</div>
-                        <div style="font-size: 12.5px; font-weight: 800; color: #0f172a; margin-top: 2px;">${res.result} ${res.division ? '/ ' + res.division : ''}</div>
+                        <div style="font-size: 13px; font-weight: 800; color: #047857; margin-top: 2px;">${res.result} ${res.division ? '/ ' + res.division : ''}</div>
                     </div>
                 </div>
             </div>
 
             <!-- Footer Details & Centered QR Code -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; font-size: 11.5px; color: #0f172a;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 25px; font-size: 11px; color: #0f172a; padding: 0 10px;">
                 <div>
-                    <div style="font-weight: 700;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" style="vertical-align: -1px; margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>PLACE : ${issuePlace}</div>
-                    <div style="margin-top: 4px; font-weight: 700;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="2.5" style="vertical-align: -1px; margin-right: 4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>ISSUE DATE : ${issueDate}</div>
+                    <div style="font-weight: 700;">स्थान PLACE : ${issuePlace}</div>
+                    <div style="margin-top: 4px; font-weight: 700;">दिनांक DATE : ${issueDate}</div>
                 </div>
 
                 <!-- Centered QR Code Stamp -->
@@ -837,34 +754,245 @@ function generateSeniorReportCardHtml(data) {
                     <div style="border: 1px solid #0f172a; padding: 4px; background: #fff; display: inline-block; border-radius: 4px;">
                         ${generateQrSvg(certNo)}
                     </div>
+                    <div style="font-size: 8.5px; color: #64748b; margin-top: 2px; font-weight: 600;">Scan to Verify</div>
                 </div>
 
-                <div style="width: 120px;"></div>
-            </div>
-
-            <!-- Signatures & Stamp Row -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; font-size: 12px; font-weight: 700; color: #0f172a;">
-                <div style="text-align: center; width: 200px;">
-                    ${teacherSigHtml}
-                    <div style="border-top: 1px solid #0f172a; padding-top: 4px;">Class Teacher's Signature</div>
-                </div>
-
-                <div style="text-align: center; width: 200px; position: relative; height: 160px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
-                    ${stampHtml}
-                </div>
-
-                <div style="text-align: center; width: 200px; position: relative; height: 160px; display: flex; flex-direction: column; justify-content: flex-end;">
-                    ${hmSigHtml}
-                    <div style="border-top: 1px solid #0f172a; padding-top: 4px; position: relative; z-index: 3;">Principal's Signature</div>
+                <div style="text-align: right; font-size: 9.5px; color: #475569; max-width: 220px; line-height: 1.4;">
+                    <strong>💻 ऑनलाइन प्राप्तांक विवरण</strong><br>
+                    (Computer Generated Provisional Marksheet)
                 </div>
             </div>
 
             <!-- Disclaimer Note at Very Bottom -->
-            <div style="text-align: center; font-size: 10px; color: #475569; margin-top: 12px; font-weight: 600;">
-                नोट: यह अंक विवरण विद्यालय द्वारा जारी किया गया है। / Note: This statement of marks is issued by the school.
+            <div style="text-align: center; font-size: 9.5px; color: #64748b; margin-top: 24px; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
+                नोट: यह इंटरनेट पर उपलब्ध कराया गया कंप्यूटर जनित प्राप्तांक विवरण है। किसी भी विसंगति की स्थिति में विद्यालय का मूल अभिलेख अंतिम एवं मान्य होगा।
             </div>
         </div>
     </div>`;
+}
+
+// ── JUNIOR (CLASS 9-10) MOBILE CARD VIEW ────────────────────────────────────
+function generateJuniorMobileCards(data) {
+    const res = data.studentResult;
+    const isPass = (res.result === 'Pass' || !String(res.result).toLowerCase().includes('fail'));
+
+    const getSubObj = (subId) => {
+        if (!subId) return {};
+        const found = (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId));
+        return found ? { ...found } : {};
+    };
+
+    const getScores = (subId) => {
+        const obj = res.subjectScores ? res.subjectScores[subId] : null;
+        if (!obj) return { theory: '-', practical: '-', total: '-' };
+        return {
+            theory: obj.theoryObt !== undefined && obj.theoryObt !== null ? obj.theoryObt : '-',
+            practical: obj.practicalObt !== undefined && obj.practicalObt !== null ? obj.practicalObt : (obj.internalObt || '-'),
+            total: obj.totalObt !== undefined ? obj.totalObt : '-'
+        };
+    };
+
+    const renderCard = (title, code, subId, hasPrac = false) => {
+        const sc = getScores(subId);
+        return `
+        <div class="res-sub-card">
+            <div>
+                <div class="res-sub-title">${title} <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(${code})</span></div>
+                <div class="res-sub-meta">
+                    सैद्धांतिक (Theory): <strong>${sc.theory}</strong>
+                    ${hasPrac ? ` | प्रायोगिक (Prac): <strong>${sc.practical}</strong>` : ''}
+                </div>
+            </div>
+            <div class="res-sub-score">
+                ${sc.total}
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">/ 100</div>
+            </div>
+        </div>
+        `;
+    };
+
+    const l1 = getSubObj(res.language1);
+    const l2 = getSubObj(res.language2);
+
+    return `
+    <div style="padding-bottom: 20px;">
+        <!-- Student Header Card -->
+        <div class="res-mobile-header-card">
+            <div style="font-size: 0.85rem; color: #93c5fd; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">
+                🎓 ${data.academicYear} • Class ${data.classVal}
+            </div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #ffffff; letter-spacing: 0.3px;">
+                ${res.studentName}
+            </div>
+            <div style="font-size: 0.9rem; color: #cbd5e1; margin-top: 4px;">
+                पिता: ${res.fatherName || '-'}
+            </div>
+            <div style="display: inline-flex; gap: 8px; margin-top: 12px;">
+                <span style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">
+                    क्रमांक (Roll): ${res.rollNo}
+                </span>
+                <span style="background: #d97706; padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #fff;">
+                    ${data.examName}
+                </span>
+            </div>
+        </div>
+
+        <!-- Grand Total Score Banner -->
+        <div class="res-mobile-score-card ${isPass ? '' : 'fail'}">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #047857; text-transform: uppercase;">
+                कुल प्राप्तांक (Total Marks)
+            </div>
+            <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 4px 0;">
+                ${res.grandTotal !== undefined ? res.grandTotal : '-'} <span style="font-size: 1.1rem; color: #64748b; font-weight: 600;">/ 500</span>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 12px; align-items: center; margin-top: 6px;">
+                <span style="font-size: 1.1rem; font-weight: 800; color: #2563eb;">
+                    ${res.percentage !== '0.0%' ? res.percentage : '-'}
+                </span>
+                <span style="background: ${isPass ? '#10b981' : '#ef4444'}; color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">
+                    ${res.result} ${res.division ? '• ' + res.division : ''}
+                </span>
+            </div>
+        </div>
+
+        <!-- Subject List Header -->
+        <div style="font-weight: 800; color: #0f172a; font-size: 1rem; margin: 18px 0 10px 4px; display: flex; align-items: center; gap: 6px;">
+            📚 विषयवार प्राप्तांक विवरण (Subject Scores)
+        </div>
+
+        <!-- Subject Cards -->
+        ${renderCard(l1.name || 'M.I.L. (Hindi/Urdu)', l1.code || '101', res.language1)}
+        ${renderCard(l2.name || 'S.I.L. (Sanskrit/NLH)', l2.code || '105', res.language2)}
+        ${renderCard('Mathematics (गणित)', '110', `${data.classVal}_MAT`)}
+        ${renderCard('Science (विज्ञान)', '112', `${data.classVal}_SCI`, true)}
+        ${renderCard('Social Science (सामाजिक विज्ञान)', '111', `${data.classVal}_SST`, true)}
+        ${renderCard('English (अंग्रेज़ी)', '113', `${data.classVal}_ENG`)}
+
+        <!-- Mobile Floating Action Bar -->
+        <div style="margin-top: 22px; display: flex; flex-direction: column; gap: 10px;">
+            <button type="button" id="btnMobilePrint" class="btn-primary btn-accent" style="width: 100%; padding: 14px; font-size: 1rem; border-radius: 14px;">
+                🖨️ अंक-पत्रक प्रिंट / डाउनलोड करें (Print A4)
+            </button>
+            <button type="button" id="btnMobileSearchAgain" class="btn-primary btn-outline" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 14px;">
+                🔍 अन्य छात्र का परिणाम खोजें
+            </button>
+        </div>
+    </div>
+    `;
+}
+
+// ── SENIOR (CLASS 11-12) MOBILE CARD VIEW ───────────────────────────────────
+function generateSeniorMobileCards(data) {
+    const res = data.studentResult;
+    const stream = data.stream || res.stream || 'Science';
+    const isPass = (res.result === 'Pass' || !String(res.result).toLowerCase().includes('fail'));
+
+    const getSubDetails = (subId) => {
+        if (!subId) return null;
+        return (res.subjectDetails || []).find(s => String(s.subjectId) === String(subId)) || null;
+    };
+
+    const renderSeniorCard = (subId, label) => {
+        if (!subId) return '';
+        const sub = getSubDetails(subId);
+        if (!sub) return '';
+        const scoreObj = res.subjectScores ? res.subjectScores[subId] : null;
+        const th = scoreObj && scoreObj.theoryObt !== undefined ? scoreObj.theoryObt : '-';
+        const pr = (sub.pMax > 0 && scoreObj && scoreObj.practicalObt !== undefined) ? scoreObj.practicalObt : '-';
+        const tot = scoreObj && scoreObj.totalObt !== undefined ? scoreObj.totalObt : '-';
+
+        return `
+        <div class="res-sub-card">
+            <div>
+                <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">${label}</div>
+                <div class="res-sub-title">${sub.name} <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">(${sub.code || '-'})</span></div>
+                <div class="res-sub-meta">
+                    सैद्धांतिक (Theory): <strong>${th}</strong>
+                    ${sub.pMax > 0 ? ` | प्रायोगिक (Prac): <strong>${pr}</strong>` : ''}
+                </div>
+            </div>
+            <div class="res-sub-score">
+                ${tot}
+                <div style="font-size: 0.7rem; color: #64748b; font-weight: 500;">/ ${sub.tMax + sub.pMax}</div>
+            </div>
+        </div>
+        `;
+    };
+
+    return `
+    <div style="padding-bottom: 20px;">
+        <!-- Student Header Card -->
+        <div class="res-mobile-header-card">
+            <div style="font-size: 0.85rem; color: #93c5fd; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">
+                🎓 ${data.academicYear} • Class ${data.classVal} [${stream.toUpperCase()}]
+            </div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: #ffffff; letter-spacing: 0.3px;">
+                ${res.studentName}
+            </div>
+            <div style="font-size: 0.9rem; color: #cbd5e1; margin-top: 4px;">
+                पिता: ${res.fatherName || '-'}
+            </div>
+            <div style="display: inline-flex; gap: 8px; margin-top: 12px;">
+                <span style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">
+                    क्रमांक (Roll): ${res.rollNo}
+                </span>
+                <span style="background: #d97706; padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; color: #fff;">
+                    ${data.examName}
+                </span>
+            </div>
+        </div>
+
+        <!-- Grand Total Score Banner -->
+        <div class="res-mobile-score-card ${isPass ? '' : 'fail'}">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #047857; text-transform: uppercase;">
+                कुल प्राप्तांक (Total Marks)
+            </div>
+            <div style="font-size: 2.2rem; font-weight: 800; color: #0f172a; margin: 4px 0;">
+                ${res.grandTotal !== undefined ? res.grandTotal : '-'} <span style="font-size: 1.1rem; color: #64748b; font-weight: 600;">/ 500</span>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 12px; align-items: center; margin-top: 6px;">
+                <span style="font-size: 1.1rem; font-weight: 800; color: #2563eb;">
+                    ${res.percentage !== '0.0%' ? res.percentage : '-'}
+                </span>
+                <span style="background: ${isPass ? '#10b981' : '#ef4444'}; color: white; padding: 4px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">
+                    ${res.result} ${res.division ? '• ' + res.division : ''}
+                </span>
+            </div>
+        </div>
+
+        <!-- Subject List Header -->
+        <div style="font-weight: 800; color: #0f172a; font-size: 1rem; margin: 18px 0 10px 4px; display: flex; align-items: center; gap: 6px;">
+            📚 विषयवार प्राप्तांक विवरण (Subject Scores)
+        </div>
+
+        <!-- Subject Cards -->
+        ${renderSeniorCard(res.language1, 'Compulsory 1 (अनिवार्य)')}
+        ${renderSeniorCard(res.language2, 'Compulsory 2 (अनिवार्य)')}
+        ${renderSeniorCard(res.elective1, 'Elective 1 (ऐच्छिक)')}
+        ${renderSeniorCard(res.elective2, 'Elective 2 (ऐच्छिक)')}
+        ${renderSeniorCard(res.elective3, 'Elective 3 (ऐच्छिक)')}
+        ${res.additional ? renderSeniorCard(res.additional, 'Additional (अतिरिक्त)') : ''}
+
+        <!-- Mobile Floating Action Bar -->
+        <div style="margin-top: 22px; display: flex; flex-direction: column; gap: 10px;">
+            <button type="button" id="btnMobilePrint" class="btn-primary btn-accent" style="width: 100%; padding: 14px; font-size: 1rem; border-radius: 14px;">
+                🖨️ अंक-पत्रक प्रिंट / डाउनलोड करें (Print A4)
+            </button>
+            <button type="button" id="btnMobileSearchAgain" class="btn-primary btn-outline" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 14px;">
+                🔍 अन्य छात्र का परिणाम खोजें
+            </button>
+        </div>
+    </div>
+    `;
+}
+
+// ── Reset Search ────────────────────────────────────────────────────────────
+function resetSearch() {
+    document.getElementById('reportCardWrapper').style.display = 'none';
+    document.getElementById('searchSection').style.display = 'block';
+    document.getElementById('resRollNo').value = '';
+    document.getElementById('resDob').value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── Action Buttons ──────────────────────────────────────────────────────────
@@ -877,13 +1005,7 @@ if (btnPrint) {
 
 const btnAnother = document.getElementById('btnSearchAnother');
 if (btnAnother) {
-    btnAnother.addEventListener('click', function () {
-        document.getElementById('reportCardWrapper').style.display = 'none';
-        document.getElementById('searchSection').style.display = 'block';
-        document.getElementById('resRollNo').value = '';
-        document.getElementById('resDob').value = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    btnAnother.addEventListener('click', resetSearch);
 }
 
 // ── Bootstrap on Load ───────────────────────────────────────────────────────
