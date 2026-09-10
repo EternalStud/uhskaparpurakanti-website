@@ -443,6 +443,9 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
 
     try {
         let url = `${ADMIN_API_URL}?action=public.registration.getStudent&className=${classNum}`;
+        if (classNum === '11' && streamVal) {
+            url += `&stream=${encodeURIComponent(streamVal)}`;
+        }
         if (isCodeSearch) {
             url += `&studentCode=${encodeURIComponent(studentCode)}`;
         } else {
@@ -467,10 +470,11 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
                 const stName = stObj.studentName || data.student?.studentName || '-';
                 const roll = stObj.rollNo || data.student?.rollNo || '-';
                 const stStatus = data.status || data.student?.status || 'Pending';
+                const stStream = stObj.stream || data.student?.stream || (classNum === '11' ? streamVal : '');
 
                 document.getElementById('arStudentName').textContent = stName;
                 document.getElementById('arRegId').textContent = regId;
-                document.getElementById('arClassRoll').textContent = `Class ${classNum}, Roll: ${roll}`;
+                document.getElementById('arClassRoll').textContent = `Class ${classNum}${stStream ? ' (' + stStream + ')' : ''}, Roll: ${roll}`;
                 document.getElementById('arStatus').textContent = (stStatus.toLowerCase() === 'verified') ? '✓ Verified (सत्यापित)' : '⏳ Pending (सत्यापन लंबित)';
                 
                 const btnAr = document.getElementById('btnArDownloadReceipt');
