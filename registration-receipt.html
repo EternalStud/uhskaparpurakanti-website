@@ -279,18 +279,26 @@ table.sub-table td {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-top: 4px;
+    margin-top: 12px;
+    margin-bottom: 2px;
     font-size: 7pt;
     font-weight: 700;
     text-align: center;
 }
 .sig-item {
     width: 23%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.sig-space {
+    height: 52px; /* Handsome vertical space for physical stamping & signature */
 }
 .sig-line {
-    border-top: 1px solid #0f172a;
-    padding-top: 2px;
-    margin-top: 16px;
+    border-top: 1.2px solid #0f172a;
+    padding-top: 3px;
+    font-size: 6.8pt;
+    line-height: 1.25;
 }
 
 /* ── Print Media Optimization (Strict 1-Page A4 Guarantee) ─────────────────── */
@@ -515,15 +523,19 @@ table.sub-table td {
         <!-- Signature Row -->
         <div class="sig-row">
             <div class="sig-item">
+                <div class="sig-space"></div>
                 <div class="sig-line">छात्र / छात्रा का हस्ताक्षर<br>(Student Signature)</div>
             </div>
             <div class="sig-item">
+                <div class="sig-space"></div>
                 <div class="sig-line">माता / पिता का हस्ताक्षर<br>(Parent Signature)</div>
             </div>
             <div class="sig-item">
+                <div class="sig-space"></div>
                 <div class="sig-line">पंजीयन प्रभारी के हस्ताक्षर<br>(Registration In-Charge)</div>
             </div>
             <div class="sig-item">
+                <div class="sig-space"></div>
                 <div class="sig-line">प्रधानाध्यापक के हस्ताक्षर एवं मुहर<br>(Principal Seal & Signature)</div>
             </div>
         </div>
@@ -619,7 +631,11 @@ async function populateReceipt(data) {
     setText('fatherName', data.fatherName);
     setText('motherName', data.motherName);
     setText('dob', formatDate(data.dob));
-    setText('gender', data.gender || 'Not Specified');
+    let genderDisplay = data.gender || 'Not Specified';
+    if (genderDisplay === 'Male') genderDisplay = 'Male (पुरुष)';
+    else if (genderDisplay === 'Female') genderDisplay = 'Female (महिला)';
+    else if (genderDisplay === 'Transgender') genderDisplay = 'Transgender (तृतीय लिंग)';
+    setText('gender', genderDisplay);
     setText('aadhaar', data.aadhaar);
     setText('mobile', data.mobile);
 

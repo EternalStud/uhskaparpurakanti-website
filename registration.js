@@ -229,6 +229,103 @@ if(emailF) {
     });
 }
 
+// ── Uniform DD/MM/YYYY Date Formatter & Input Mask ──────────────────────────
+function formatToDDMMYYYY(dobStr) {
+    if (!dobStr) return '';
+    let raw = String(dobStr).trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) return raw;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const parts = raw.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    // If ISO string with T, parse in Indian Standard Time (UTC+05:30)
+    if (raw.includes('T')) {
+        const dt = new Date(raw);
+        if (!isNaN(dt.getTime())) {
+            const ist = new Date(dt.getTime() + (5.5 * 3600 * 1000));
+            const day = String(ist.getUTCDate()).padStart(2, '0');
+            const month = String(ist.getUTCMonth() + 1).padStart(2, '0');
+            const year = ist.getUTCFullYear();
+            return `${day}/${month}/${year}`;
+        }
+    }
+    const dateRegex = /([a-zA-Z]{3}) (\d{1,2}) (\d{4})/;
+    const match = raw.match(dateRegex);
+    if (match) {
+        const months = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
+        return `${match[2].padStart(2, '0')}/${months[match[1]] || '01'}/${match[3]}`;
+    }
+    try {
+        const d = new Date(raw);
+        if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+    } catch(e) {}
+    return raw;
+}
+
+function attachDateMask(inputEl, hiddenPickerEl, btnCalendarEl) {
+    if (!inputEl) return;
+
+    inputEl.addEventListener('input', function(e) {
+        if (e.inputType && e.inputType.startsWith('delete')) return;
+        let v = this.value.replace(/\D/g, '');
+        if (v.length > 8) v = v.substring(0, 8);
+        if (v.length > 4) {
+            this.value = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4);
+        } else if (v.length > 2) {
+            this.value = v.substring(0, 2) + '/' + v.substring(2);
+        } else {
+            this.value = v;
+        }
+    });
+
+    if (hiddenPickerEl && btnCalendarEl) {
+        btnCalendarEl.addEventListener('click', function() {
+            const current = inputEl.value.trim();
+            if (/^\d{2}\/\d{2}\/\d{4}$/.test(current)) {
+                const parts = current.split('/');
+                hiddenPickerEl.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            if (typeof hiddenPickerEl.showPicker === 'function') {
+                try {
+                    hiddenPickerEl.showPicker();
+                } catch(err) {
+                    hiddenPickerEl.click();
+                }
+            } else {
+                hiddenPickerEl.focus();
+                hiddenPickerEl.click();
+            }
+        });
+
+        hiddenPickerEl.addEventListener('change', function() {
+            if (this.value) {
+                const parts = this.value.split('-');
+                if (parts.length === 3) {
+                    inputEl.value = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+        });
+    }
+}
+
+// Initialize date masks for search DOB and form DOB
+attachDateMask(
+    document.getElementById('searchDob'),
+    document.getElementById('hiddenSearchDobPicker'),
+    document.getElementById('btnSearchDobCalendar')
+);
+attachDateMask(
+    document.getElementById('dob'),
+    document.getElementById('hiddenDobPicker'),
+    document.getElementById('btnDobCalendar')
+);
+
 // Search Mode Tab Buttons
 let isCodeSearchMode = true;
 const tabSearchByCode = document.getElementById('tabSearchByCode');
@@ -250,8 +347,10 @@ function setSearchMode(mode) {
     if (isCodeSearchMode) {
         const rollInput = document.getElementById('searchRollNo');
         const dobInput = document.getElementById('searchDob');
+        const hiddenDob = document.getElementById('hiddenSearchDobPicker');
         if (rollInput) rollInput.value = '';
         if (dobInput) dobInput.value = '';
+        if (hiddenDob) hiddenDob.value = '';
     } else {
         const codeInput = document.getElementById('regStudentCode');
         if (codeInput) codeInput.value = '';
@@ -416,28 +515,19 @@ function populateForm(student) {
     document.getElementById('fatherName').value = student.fatherName || '';
     document.getElementById('motherName').value = student.motherName || '';
     
-    let dobVal = student.dob || '';
-    if (dobVal) {
-        try {
-            const d = new Date(dobVal);
-            if (!isNaN(d.getTime())) {
-                const year = d.getFullYear();
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                dobVal = `${year}-${month}-${day}`;
-            } else {
-                const dateRegex = /([a-zA-Z]{3}) (\d{1,2}) (\d{4})/;
-                const match = String(student.dob).match(dateRegex);
-                if(match) {
-                    const months = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
-                    dobVal = `${match[3]}-${months[match[1]]}-${match[2].padStart(2, '0')}`;
-                }
-            }
-        } catch(e) {
-            console.log("Date parsing error", e);
-        }
+    // Format DOB to DD/MM/YYYY for uniform display across all devices
+    document.getElementById('dob').value = formatToDDMMYYYY(student.dob);
+
+    // Populate Gender from student record if available
+    let g = String(student.gender || '').trim().toLowerCase();
+    let gVal = '';
+    if (g === 'm' || g === 'male' || g === 'पुरुष' || g === 'पु.') gVal = 'Male';
+    else if (g === 'f' || g === 'female' || g === 'महिला' || g === 'म.') gVal = 'Female';
+    else if (g === 'transgender' || g === 'other' || g === 'तृतीय लिंग') gVal = 'Transgender';
+    else gVal = student.gender || '';
+    if (document.getElementById('gender')) {
+        document.getElementById('gender').value = gVal;
     }
-    document.getElementById('dob').value = dobVal;
 
     document.getElementById('aadhaar').value = student.aadhaar || '';
     document.getElementById('mobile').value = student.mobile || '';
@@ -692,6 +782,7 @@ function buildPreviewModal(subs) {
         'Father Name': document.getElementById('fatherName').value,
         'Mother Name': document.getElementById('motherName').value,
         'DOB': document.getElementById('dob').value,
+        'Gender': document.getElementById('gender')?.value || '-',
         'Mobile': document.getElementById('mobile').value,
         'Aadhaar': document.getElementById('aadhaar').value,
         'Email': document.getElementById('email').value,
@@ -755,6 +846,12 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
 
     const subs = getSelectedSubjects();
 
+    let dobSubmitVal = document.getElementById('dob').value.trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dobSubmitVal)) {
+        const parts = dobSubmitVal.split('/');
+        dobSubmitVal = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
     const payload = {
         studentCode: fetchedStudentData.studentCode || "",
         rollNo: fetchedStudentData.rollNo || "",
@@ -764,7 +861,8 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
         studentName: document.getElementById('studentName').value,
         fatherName: document.getElementById('fatherName').value,
         motherName: document.getElementById('motherName').value,
-        dob: document.getElementById('dob').value,
+        dob: dobSubmitVal,
+        gender: document.getElementById('gender') ? document.getElementById('gender').value : "",
         aadhaar: document.getElementById('aadhaar').value,
         mobile: document.getElementById('mobile').value,
         bankName: document.getElementById('bankName').value,
