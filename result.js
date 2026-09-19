@@ -8,6 +8,7 @@
 const ADMIN_API_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
 
 let currentResultData = null;
+let isResultPublished = false;
 
 function showLoader(text = "प्राप्तांक विवरण लोड हो रहा है...") {
     const loader = document.getElementById('loader');
@@ -61,11 +62,12 @@ async function initResultPortal() {
         const res = await fetch(`${ADMIN_API_URL}?action=public.settings.get`);
         const data = await res.json();
 
-        const isResultPublished = data?.settings?.result_published;
+        const isPub = data?.settings?.result_published === true || data?.settings?.result_published === "ON" || data?.settings?.result_published === "true";
+        isResultPublished = isPub;
         const searchSec = document.getElementById('searchSection');
         const closedNotice = document.getElementById('portalClosedNotice');
 
-        if (!isResultPublished) {
+        if (!isPub) {
             if (searchSec) searchSec.style.display = 'none';
             if (closedNotice) closedNotice.style.display = 'block';
             return;
@@ -79,7 +81,10 @@ async function initResultPortal() {
 
     } catch (err) {
         console.error("Portal status check failed:", err);
-        await loadExamList();
+        const searchSec = document.getElementById('searchSection');
+        const closedNotice = document.getElementById('portalClosedNotice');
+        if (searchSec) searchSec.style.display = 'none';
+        if (closedNotice) closedNotice.style.display = 'block';
     }
 }
 
@@ -180,6 +185,11 @@ const resultSearchForm = document.getElementById('resultSearchForm');
 if (resultSearchForm) {
     resultSearchForm.addEventListener('submit', async function (e) {
         e.preventDefault();
+
+        if (!isResultPublished) {
+            alert('परीक्षा परिणाम वर्तमान में प्रकाशित नहीं है। (Results are not published yet.)');
+            return;
+        }
 
         const session = document.getElementById('resSession').value;
         const classNum = document.getElementById('resClass').value;
@@ -921,7 +931,15 @@ function generateSeniorMobileCards(data) {
 // ── Reset Search ────────────────────────────────────────────────────────────
 function resetSearch() {
     document.getElementById('reportCardWrapper').style.display = 'none';
-    document.getElementById('searchSection').style.display = 'block';
+    const searchSec = document.getElementById('searchSection');
+    const closedNotice = document.getElementById('portalClosedNotice');
+    if (!isResultPublished) {
+        if (searchSec) searchSec.style.display = 'none';
+        if (closedNotice) closedNotice.style.display = 'block';
+    } else {
+        if (searchSec) searchSec.style.display = 'block';
+        if (closedNotice) closedNotice.style.display = 'none';
+    }
     document.getElementById('resRollNo').value = '';
     document.getElementById('resDob').value = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });

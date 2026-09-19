@@ -4,6 +4,7 @@ let photoBase64 = '';
 let signatureBase64 = '';
 let fetchedStudentData = null;
 let currentSubjectsConfig = [];
+let isRegistrationOpen = true;
 
 /**
  * Verhoeff Checksum Algorithm for Indian Aadhaar Number Validation
@@ -366,7 +367,8 @@ async function checkPortalSettings() {
         const res = await fetch(`${ADMIN_API_URL}?action=public.settings.get`);
         const data = await res.json();
         if (data && data.success && data.settings) {
-            const isRegOpen = data.settings.registration_open;
+            const isRegOpen = data.settings.registration_open === true || data.settings.registration_open === "ON" || data.settings.registration_open === "true";
+            isRegistrationOpen = isRegOpen;
             const closedNotice = document.getElementById('portalClosedNotice');
             const searchSec = document.getElementById('searchSection');
             const progCont = document.getElementById('progressContainer');
@@ -385,6 +387,10 @@ async function checkPortalSettings() {
                         closedNotice.style.display = 'none';
                     };
                 }
+            } else {
+                if (closedNotice) closedNotice.style.display = 'none';
+                if (searchSec) searchSec.style.display = 'block';
+                if (progCont) progCont.style.display = 'flex';
             }
         }
     } catch (e) {
@@ -502,7 +508,7 @@ document.getElementById('btnFetchStudent').addEventListener('click', async () =>
             updateProgressStep(2);
         } else {
             document.getElementById('registrationDetails').style.display = 'none';
-            fetchMsg.textContent = data.message || "आप फॉर्म भरने के योग्य नहीं हैं या विवरण सुलभ नहीं है। (You are not eligible or details not found.)";
+            fetchMsg.textContent = data.error || data.message || "आप फॉर्म भरने के योग्य नहीं हैं या विवरण सुलभ नहीं है। (You are not eligible or details not found.)";
             fetchMsg.style.color = "#ef4444";
         }
     } catch (err) {
@@ -744,6 +750,10 @@ function getSelectedSubjects() {
 // Form submit -> Show Preview Modal
 document.getElementById('registrationForm').addEventListener('submit', (e) => {
     e.preventDefault();
+    if (!isRegistrationOpen) {
+        alert("सत्र 2026-28 के लिए नया ऑनलाइन पंजीयन वर्तमान में बंद कर दिया गया है। (New online registration is closed.)");
+        return;
+    }
     if (!fetchedStudentData) return;
 
     const aadhaarVal = document.getElementById('aadhaar')?.value?.trim();
@@ -890,6 +900,11 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
         signatureUrl: signatureBase64
     };
 
+    if (!isRegistrationOpen) {
+        alert("सत्र 2026-28 के लिए नया ऑनलाइन पंजीयन वर्तमान में बंद कर दिया गया है। (New online registration is closed.)");
+        return;
+    }
+
     try {
         const response = await fetch(`${ADMIN_API_URL}?action=public.registration.submit`, {
             method: 'POST',
@@ -912,7 +927,7 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
             };
             sessionStorage.setItem('lastRegistrationData', JSON.stringify(receiptData));
         } else {
-            alert("त्रुटि: " + (data.error || "Failed to submit."));
+            alert("त्रुटि: " + (data.error || data.message || "Failed to submit."));
         }
     } catch(err) {
         alert("Server error. कृपया पुनः प्रयास करें।");

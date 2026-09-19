@@ -31,9 +31,22 @@
 </p>
     </div>
 
+    <!-- Closed Portal Notice (Shown when admission_open is false) -->
+    <div id="portalClosedNotice" class="portal-closed-alert" style="display:none; background: #fffbeb; border: 2px solid #f59e0b; border-radius: 16px; padding: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(245,158,11,0.15);">
+        <h3 style="color: #92400e; font-size: 1.35rem; margin: 0 0 8px 0; font-weight: 700;">📢 ऑनलाइन नामांकन वर्तमान में बंद है (Admission Closed)</h3>
+        <p style="color: #78350f; font-size: 0.95rem; margin: 0 0 16px 0; line-height: 1.6;">
+            नए विद्यार्थियों का ऑनलाइन नामांकन प्रपत्र वर्तमान में बंद कर दिया गया है।<br>
+            यदि आपने पूर्व में आवेदन किया है, तो नीचे से अपनी रसीद खोजें एवं डाउनलोड करें।
+        </p>
+        <button type="button" id="btnScrollToReceipt" style="background: linear-gradient(135deg, #d97706 0%, #ea580c 100%); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);">
+            📄 पूर्व आवेदन रसीद खोजें एवं डाउनलोड करें
+        </button>
+    </div>
+
+    <div id="newAdmissionContainer">
     <form id="admissionForm">
 
-        <section class="form-section">
+        <section class="form-section" id="classSection">
             <h3>नामांकन कक्षा का चयन</h3>
 
             <div class="grid-2">
@@ -334,65 +347,66 @@
             <button type="submit" id="submitBtn">✅ आवेदन जमा करें</button>
             <button type="reset">🗑 सभी जानकारी हटाएँ</button>
         </div>
-
-        <section class="form-section">
-            <h3>यदि आपने पहले से नामांकन प्रपत्र भर रखा है, तो आवेदन डाउनलोड कर विद्यालय में जमा करें</h3>
-            <div class="grid-2">
-                <div>
-                    <label>कक्षा <span style="color:red">*</span></label>
-                    <select id="searchClass">
-                        <option value="">-- कक्षा चुनें --</option>
-                        <option value="1">Class I</option>
-                        <option value="2">Class II</option>
-                        <option value="3">Class III</option>
-                        <option value="4">Class IV</option>
-                        <option value="5">Class V</option>
-                        <option value="6">Class VI</option>
-                        <option value="7">Class VII</option>
-                        <option value="8">Class VIII</option>
-                        <option value="9">Class IX</option>
-                        <option value="10">Class X</option>
-                        <option value="11">Class XI</option>
-                        <option value="12">Class XII</option>
-                    </select>
-                </div>
-
-                <div id="searchTypeBlock" style="display:none;">
-                    <label>खोजने का प्रकार (Search By)</label>
-                    <select id="searchType">
-                        <option value="aadhaar">आधार संख्या (Aadhaar Number)</option>
-                        <option value="appId">Application ID</option>
-                        <option value="pen">PEN Number</option>
-                    </select>
-                </div>
-
-                <div id="searchAadhaarBlock" style="display:none;">
-                    <label>आधार संख्या (Student Aadhaar)</label>
-                    <input type="text" id="searchAadhaar" maxlength="12" placeholder="Enter 12-digit Student Aadhaar">
-                    <small style="color:#2563eb;">विद्यार्थी के 12 अंकों के आधार नंबर से खोजें।</small>
-                </div>
-
-                <div id="searchApplicationBlock" style="display:none;">
-                    <label>Application ID</label>
-                    <input type="text" id="searchApplicationId" placeholder="Enter Application ID">
-                    <small style="color:#2563eb;">Application ID से खोजें।</small>
-                </div>
-
-                <div id="searchPenBlock" style="display:none;">
-                    <label>PEN संख्या</label>
-                    <input type="text" id="searchPen" maxlength="11" placeholder="Enter 11-digit PEN Number">
-                    <small style="color:#2563eb;">PEN Number से खोजें।</small>
-                </div>
-            </div>
-
-            <div style="margin-top:15px;">
-                <button type="button" id="downloadExistingBtn">
-                    📄 आवेदन डाउनलोड करें (Search & Download PDF)
-                </button>
-            </div>
-        </section>
-
     </form>
+    </div>
+
+    <!-- Search / Download Existing Application Section (Remains accessible even when admission is closed) -->
+    <section class="form-section" id="searchReceiptSection">
+        <h3>यदि आपने पहले से नामांकन प्रपत्र भर रखा है, तो आवेदन डाउनलोड कर विद्यालय में जमा करें</h3>
+        <div class="grid-2">
+            <div>
+                <label>कक्षा <span style="color:red">*</span></label>
+                <select id="searchClass">
+                    <option value="">-- कक्षा चुनें --</option>
+                    <option value="1">Class I</option>
+                    <option value="2">Class II</option>
+                    <option value="3">Class III</option>
+                    <option value="4">Class IV</option>
+                    <option value="5">Class V</option>
+                    <option value="6">Class VI</option>
+                    <option value="7">Class VII</option>
+                    <option value="8">Class VIII</option>
+                    <option value="9">Class IX</option>
+                    <option value="10">Class X</option>
+                    <option value="11">Class XI</option>
+                    <option value="12">Class XII</option>
+                </select>
+            </div>
+
+            <div id="searchTypeBlock" style="display:none;">
+                <label>खोजने का प्रकार (Search By)</label>
+                <select id="searchType">
+                    <option value="aadhaar">आधार संख्या (Aadhaar Number)</option>
+                    <option value="appId">Application ID</option>
+                    <option value="pen">PEN Number</option>
+                </select>
+            </div>
+
+            <div id="searchAadhaarBlock" style="display:none;">
+                <label>आधार संख्या (Student Aadhaar)</label>
+                <input type="text" id="searchAadhaar" maxlength="12" placeholder="Enter 12-digit Student Aadhaar">
+                <small style="color:#2563eb;">विद्यार्थी के 12 अंकों के आधार नंबर से खोजें।</small>
+            </div>
+
+            <div id="searchApplicationBlock" style="display:none;">
+                <label>Application ID</label>
+                <input type="text" id="searchApplicationId" placeholder="Enter Application ID">
+                <small style="color:#2563eb;">Application ID से खोजें।</small>
+            </div>
+
+            <div id="searchPenBlock" style="display:none;">
+                <label>PEN संख्या</label>
+                <input type="text" id="searchPen" maxlength="11" placeholder="Enter 11-digit PEN Number">
+                <small style="color:#2563eb;">PEN Number से खोजें।</small>
+            </div>
+        </div>
+
+        <div style="margin-top:15px;">
+            <button type="button" id="downloadExistingBtn">
+                📄 आवेदन डाउनलोड करें (Search & Download PDF)
+            </button>
+        </div>
+    </section>
 </div>
 
 <script>
@@ -445,6 +459,11 @@
     const formActions = document.getElementById('formActions');
 
     function updateBankFields(){
+        if (window.isAdmissionOpen === false) {
+            if (formActions) formActions.style.display = 'none';
+            if (studentSection) studentSection.style.display = 'none';
+            return;
+        }
         const cls = parseInt(classSelect.value || '0',10);
         const showSections = cls >= 1;
         if (formActions) {

@@ -2,6 +2,8 @@
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQtEdZ-Y-NIgFFoWCmqQap-hCdfHk6lTFjSqswH-bOS75MkPr4PFz31S-TuFea9KE/exec';
 let photoBase64 = '';
 let signatureBase64 = '';
+let isAdmissionOpen = true;
+window.isAdmissionOpen = true;
 
 /**
  * Verhoeff Checksum Algorithm for Indian Aadhaar Number Validation
@@ -210,6 +212,10 @@ const form = document.getElementById('admissionForm');
 if (form) {
     form.addEventListener('submit', function (e) {
         e.preventDefault();
+        if (!isAdmissionOpen) {
+            alert('ऑनलाइन नामांकन वर्तमान में बंद है (Online Admission is currently closed)।');
+            return;
+        }
         const clsSelected = parseInt(document.getElementById('admissionClass')?.value || '0', 10);
         const pen = document.getElementById('penNumber').value.trim();
         const aadhaar = document.getElementById('studentAadhaar').value.trim();
@@ -644,25 +650,32 @@ async function checkAdmissionSettings() {
         const res = await fetch(`${WEB_APP_URL}?action=public.settings.get`);
         const data = await res.json();
         if (data && data.success && data.settings) {
-            if (!data.settings.admission_open) {
-                const classSec = document.getElementById('classSection');
-                const studentSec = document.getElementById('studentSection');
-                const header = document.querySelector('.form-header');
-                
-                if (classSec) classSec.style.display = 'none';
-                if (studentSec) studentSec.style.display = 'none';
+            const isOpen = data.settings.admission_open === true || data.settings.admission_open === "ON" || data.settings.admission_open === "true";
+            isAdmissionOpen = isOpen;
+            window.isAdmissionOpen = isOpen;
 
-                const closedAlert = document.createElement('div');
-                closedAlert.style.cssText = 'background: #fffbeb; border: 2px solid #f59e0b; border-radius: 16px; padding: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(245,158,11,0.15);';
-                closedAlert.innerHTML = `
-                    <h3 style="color: #92400e; font-size: 1.3rem; margin: 0 0 8px 0;">📢 ऑनलाइन नामांकन वर्तमान में बंद है (Admission Closed)</h3>
-                    <p style="color: #78350f; font-size: 0.95rem; margin: 0 0 15px 0;">नए विद्यार्थियों का ऑनलाइन नामांकन प्रपत्र वर्तमान में बंद कर दिया गया है।<br>यदि आपने पूर्व में आवेदन किया है, तो नीचे से अपनी रसीद खोजें एवं डाउनलोड करें।</p>
-                `;
-                if (header) header.insertAdjacentElement('afterend', closedAlert);
+            const newAdmissionContainer = document.getElementById('newAdmissionContainer');
+            const closedNotice = document.getElementById('portalClosedNotice');
+
+            if (!isOpen) {
+                if (newAdmissionContainer) newAdmissionContainer.style.display = 'none';
+                if (closedNotice) closedNotice.style.display = 'block';
+
+                const btnScroll = document.getElementById('btnScrollToReceipt');
+                if (btnScroll) {
+                    btnScroll.onclick = () => {
+                        const receiptSec = document.getElementById('searchReceiptSection');
+                        if (receiptSec) receiptSec.scrollIntoView({ behavior: 'smooth' });
+                    };
+                }
+            } else {
+                if (newAdmissionContainer) newAdmissionContainer.style.display = 'block';
+                if (closedNotice) closedNotice.style.display = 'none';
             }
         }
     } catch (e) {
         console.warn("Admission settings check failed:", e);
     }
 }
+checkAdmissionSettings();
 window.addEventListener('DOMContentLoaded', checkAdmissionSettings);
