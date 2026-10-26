@@ -479,8 +479,8 @@ table.sub-table td {
                         <td class="val"><span id="caste">-</span> / <span id="religion">-</span></td>
                     </tr>
                     <tr>
-                        <td class="lbl">वैवाहिक स्थिति / दिव्यांग</td>
-                        <td class="val"><span id="maritalStatus">-</span> / <span id="differentlyAbled">-</span></td>
+                        <td class="lbl">माध्यम / वैवाहिक स्थिति</td>
+                        <td class="val"><span id="medium">Hindi</span> / <span id="maritalStatus">-</span></td>
                     </tr>
                     <tr>
                         <td class="lbl">पहचान चिह्न 1 (Mark 1)</td>
@@ -647,6 +647,7 @@ async function populateReceipt(data) {
 
     setText('caste', data.caste);
     setText('religion', data.religion);
+    setText('medium', data.medium || 'Hindi');
     setText('maritalStatus', data.maritalStatus);
     setText('differentlyAbled', data.differentlyAbled === 'Yes' ? 'दिव्यांग (Yes)' : 'सामान्य (No)');
     setText('mark1', data.mark1);

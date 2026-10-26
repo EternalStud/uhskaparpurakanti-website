@@ -546,6 +546,9 @@ function populateForm(student) {
     if (document.getElementById('religion')) {
         document.getElementById('religion').value = student.religion || '';
     }
+    if (document.getElementById('medium')) {
+        document.getElementById('medium').value = student.medium || 'Hindi';
+    }
     
     // Always false as we collect via dropdowns even if they have old tags
     document.getElementById('hasExistingSubjects').value = "false";
@@ -806,6 +809,7 @@ function buildPreviewModal(subs) {
         'IFSC': document.getElementById('bankIFSC').value,
         'Caste': document.getElementById('caste').value,
         'Religion': document.getElementById('religion')?.value || '-',
+        'Medium': document.getElementById('medium')?.value || 'Hindi',
         'Marital Status': document.getElementById('maritalStatus').value,
         'Differently Abled': document.getElementById('differentlyAbled').value,
         'Visually Impaired': document.getElementById('visuallyImpaired').value,
@@ -886,6 +890,7 @@ document.getElementById('confirmSubmitBtn').addEventListener('click', async () =
         email: document.getElementById('email').value,
         caste: document.getElementById('caste').value,
         religion: document.getElementById('religion') ? document.getElementById('religion').value : "",
+        medium: document.getElementById('medium') ? document.getElementById('medium').value : 'Hindi',
         maritalStatus: document.getElementById('maritalStatus').value,
         differentlyAbled: document.getElementById('differentlyAbled').value,
         visuallyImpaired: document.getElementById('visuallyImpaired').value,
